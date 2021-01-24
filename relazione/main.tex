@@ -1,0 +1,144 @@
+\documentclass[corpo=12pt,numerazioneromana,table]{toptesi}
+
+% INCLUSIONE PACCHETTI
+\usepackage[classica]{topfront}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{blindtext}
+\usepackage{graphicx,wrapfig}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{lmodern}
+\usepackage{floatrow}
+\usepackage{varioref}
+\usepackage{url}
+\usepackage{array}
+\usepackage{paralist}{\obeyspaces\global\let =\space}
+\usepackage{verbatim}
+\usepackage{subfig}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{float}
+\usepackage{pgfplots}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{hhline}
+\usepackage{listings}
+\usepackage[pass]{geometry}
+\usepackage[figuresright]{rotating}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amsmath}
+\usepackage[babel]{csquotes}
+\usepackage{hyperref}
+\usepackage[backend=biber,bibencoding=ascii]{biblatex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% CONFIGURAZIONE LINK E RIFERIMENTI
+\hypersetup{%
+  pdfpagemode={UseOutlines},
+  bookmarksopen,
+  pdfstartview={FitH},
+  colorlinks,
+  linkcolor={black},  %COLORE DEI RIFERIMENTI AL TESTO
+  citecolor={blue},   %COLORE DEI RIFERIMENTI ALLE CITAZIONI
+  urlcolor={blue}     %COLORI DEGLI URL
+}
+
+% INFORMAZIONI PDF
+\hypersetup{%
+  pdfauthor={},
+  pdfsubject={},
+  pdftitle={},
+  pdfkeywords={}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\captionsetup[algorithm]{font=footnotesize}
+
+\frenchspacing
+\linespread{1.25}
+\pgfplotsset{compat=1.9}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%DEFINIZIONE SEZIONI IN NUMERAZIONE ROMANA
+%ELENCO DEI LISTATI/CODICI
+\makeatletter
+\newcommand\listofcodes{%
+ \iffrontmatter\else\frontmattertrue\fi
+ \if@openright\cleardoublepage\else\clearpage\fi
+ % change the meaning of \chapter in a group
+ \begingroup\def\chapter##1{\@schapter}
+ \phantomsection % for the hyperlink
+ \addcontentsline{toc}{chapter}{Elenco dei listati}
+ \lstlistoflistings
+ \endgroup
+}
+\makeatother
+
+\addto\captionsitalian{%
+  \renewcommand{\lstlistlistingname}{Elenco dei listati}%
+  \renewcommand{\lstlistingname}{Listato}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% LISTA DEI CAPITOLI DA INCLUDERE
+\includeonly{
+chapters/introduzione,
+%chapters/app_a,
+frontespizio
+}
+
+% FILE DI BIBLIOGRAFIA
+\addbibresource{bibliography.bib}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+% FRONTESPIZIO
+\include{frontespizio}
+
+\frontmatter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% INDICE GENERALE
+\tableofcontents
+
+% INDICE DELLE FIGURE
+%\listoffigures
+
+% INDICE DELLE TABELLE
+%\listoftables
+
+% INDICE DEI CODICI
+%\listofcodes
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\mainmatter
+
+% INCLUSIONE CAPITOLI
+\include{chapters/introduzione}
+%\include{chapters/conclusione}
+
+% INCLUSIONE APPENDICE
+%\appendix
+%\include{chapters/app_a}
+
+% BIBLIOGRAFIA
+\phantomsection
+\addcontentsline{toc}{chapter}{\refname}
+\nocite{*}
+\printbibliography
+
+\end{document}
