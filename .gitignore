@@ -40,3 +40,6 @@ vignettes/*.pdf
 
 # IDE
 .idea/
+
+# Latex build files
+relazione/build/
