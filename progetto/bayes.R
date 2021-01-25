@@ -1,4 +1,7 @@
-## Naive Bayes Classification
+#' Naive Bayes Classification
+#'
+#' add description.
+#'
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
@@ -14,26 +17,29 @@ redwine$quality <- NULL
 
 # Partition the dataset
 index <- createDataPartition(redwine$good, p = 0.7, list = FALSE)
-redwineTrain <- redwine[index,]
-redwineTest <- redwine[-index,]
+redwine_train <- redwine[index,]
+redwine_test <- redwine[-index,]
+
+# Preprocess method
+pre_process <- "range" # c("center", "scale")
 
 # 10-Fold cross validation
-control <- trainControl(
+tr_control <- trainControl(
   method = "repeatedcv",
   number = 10
 )
 
 # Train the model
-nb.model <- train(
+nb_model <- train(
   good ~ .,
-  data = redwineTrain,
+  data = redwine_train,
   method = "nb",
-  preProcess = c("center", "scale"),
-  trControl = control
+  preProcess = pre_process,
+  trControl = tr_control
 )
 
 # Predict
-nb.pred <- predict(nb.model, redwineTest, preProcess = c("center", "scale"))
+nb_pred <- predict(nb_model, redwine_test, preProcess = pre_process)
 
 # Print confusion matrix
-confusionMatrix(data = nb.pred, reference = redwineTest$good)
+confusionMatrix(data = nb_pred, reference = redwine_test$good)

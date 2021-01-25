@@ -1,8 +1,11 @@
-## Exploratory Data Analysis
+#' Exploratory Data Analysis
+#'
+#' add description.
+#'
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(corrplot, ggplot2)
+pacman::p_load(corrplot, ggplot2, dplyr)
 
 # Read the dataset
 redwine <- read.csv("progetto/dataset/winequality-red.csv")
@@ -18,17 +21,20 @@ redwine$good <- factor(redwine$good)
 summary(redwine)
 
 plot_variable_by_class <- function(data, input, class) {
-  ggplot(data, aes_string(x = input, fill = class, color = class)) +
+  data %>%
+    ggplot(aes_string(x = input, fill = class, color = class)) +
     geom_histogram(position = "identity", alpha = 0.5)
 }
 
 plot_variable_boxplot <- function(data, input, class) {
-  ggplot(data, aes_string(y = input, x = class, fill = class, color = class)) +
+  data %>%
+    ggplot(aes_string(y = input, x = class, fill = class, color = class)) +
     geom_boxplot(outlier.shape = "cross")
 }
 
 plot_class_barplot <- function(data, class) {
-  ggplot(data, aes_string(x = class, fill = class, color = class)) +
+  data %>%
+    ggplot(aes_string(x = class, fill = class, color = class)) +
     geom_bar()
 }
 
