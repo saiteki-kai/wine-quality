@@ -14,7 +14,7 @@
 \usepackage{varioref}
 \usepackage{url}
 \usepackage{array}
-\usepackage{paralist}{\obeyspaces\global\let =\space}
+\usepackage{paralist}
 \usepackage{verbatim}
 \usepackage{subfig}
 \usepackage{tabularx}
@@ -32,8 +32,6 @@
 \usepackage[figuresright]{rotating}
 \usepackage{algorithm}
 \usepackage{algorithmic}
-\usepackage{amsmath}
-\usepackage[babel]{csquotes}
 \usepackage{hyperref}
 \usepackage[backend=biber,bibencoding=ascii]{biblatex}
 
@@ -41,21 +39,21 @@
 
 % CONFIGURAZIONE LINK E RIFERIMENTI
 \hypersetup{%
-  pdfpagemode={UseOutlines},
-  bookmarksopen,
-  pdfstartview={FitH},
-  colorlinks,
-  linkcolor={black},  %COLORE DEI RIFERIMENTI AL TESTO
-  citecolor={blue},   %COLORE DEI RIFERIMENTI ALLE CITAZIONI
-  urlcolor={blue}     %COLORI DEGLI URL
+    pdfpagemode={UseOutlines},
+    bookmarksopen,
+    pdfstartview={FitH},
+    colorlinks,
+    linkcolor={black},  %COLORE DEI RIFERIMENTI AL TESTO
+    citecolor={blue},   %COLORE DEI RIFERIMENTI ALLE CITAZIONI
+    urlcolor={blue}     %COLORI DEGLI URL
 }
 
 % INFORMAZIONI PDF
 \hypersetup{%
-  pdfauthor={},
-  pdfsubject={},
-  pdftitle={},
-  pdfkeywords={}
+    pdfauthor={},
+    pdfsubject={},
+    pdftitle={},
+    pdfkeywords={}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -72,73 +70,79 @@
 %ELENCO DEI LISTATI/CODICI
 \makeatletter
 \newcommand\listofcodes{%
- \iffrontmatter\else\frontmattertrue\fi
- \if@openright\cleardoublepage\else\clearpage\fi
- % change the meaning of \chapter in a group
- \begingroup\def\chapter##1{\@schapter}
- \phantomsection % for the hyperlink
- \addcontentsline{toc}{chapter}{Elenco dei listati}
- \lstlistoflistings
- \endgroup
+    \iffrontmatter\else\frontmattertrue\fi
+    \if@openright\cleardoublepage\else\clearpage\fi
+    % change the meaning of \chapter in a group
+    \begingroup\def\chapter##1{\@schapter}
+    \phantomsection % for the hyperlink
+    \addcontentsline{toc}{chapter}{Elenco dei listati}
+    \lstlistoflistings
+    \endgroup
 }
 \makeatother
 
 \addto\captionsitalian{%
-  \renewcommand{\lstlistlistingname}{Elenco dei listati}%
-  \renewcommand{\lstlistingname}{Listato}%
+    \renewcommand{\lstlistlistingname}{Elenco dei listati}%
+    \renewcommand{\lstlistingname}{Listato}%
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % LISTA DEI CAPITOLI DA INCLUDERE
 \includeonly{
-chapters/introduzione,
-%chapters/app_a,
-frontespizio
+    chapters/introduzione,
+    chapters/dominio,
+    chapters/assunzioni,
+    chapters/analisi,
+    chapters/modelli,
+    chapters/esperimenti,
+    chapters/risultati,
+    chapters/conclusioni,
+    %chapters/app_a
+    frontespizio
 }
 
 % FILE DI BIBLIOGRAFIA
 \addbibresource{bibliography.bib}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{document}
 
-% FRONTESPIZIO
-\include{frontespizio}
+    % FRONTESPIZIO
+    \include{frontespizio}
 
-\frontmatter
+    \frontmatter
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % INDICE GENERALE
+    \tableofcontents
 
-% INDICE GENERALE
-\tableofcontents
+    % INDICE DELLE FIGURE
+    %\listoffigures
 
-% INDICE DELLE FIGURE
-%\listoffigures
+    % INDICE DELLE TABELLE
+    %\listoftables
 
-% INDICE DELLE TABELLE
-%\listoftables
+    % INDICE DEI CODICI
+    %\listofcodes
 
-% INDICE DEI CODICI
-%\listofcodes
+    \mainmatter
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % INCLUSIONE CAPITOLI
+    \include{chapters/introduzione}
+    \include{chapters/dominio}
+    \include{chapters/assunzioni}
+    \include{chapters/analisi}
+    \include{chapters/modelli}
+    \include{chapters/esperimenti}
+    \include{chapters/risultati}
+    \include{chapters/conclusioni}
 
-\mainmatter
+    % INCLUSIONE APPENDICE
+    % \appendix
+    % \include{chapters/app_a}
 
-% INCLUSIONE CAPITOLI
-\include{chapters/introduzione}
-%\include{chapters/conclusione}
-
-% INCLUSIONE APPENDICE
-%\appendix
-%\include{chapters/app_a}
-
-% BIBLIOGRAFIA
-\phantomsection
-\addcontentsline{toc}{chapter}{\refname}
-\nocite{*}
-\printbibliography
+    % BIBLIOGRAFIA
+    \phantomsection
+    \addcontentsline{toc}{chapter}{\refname}\nocite{*}
+    \printbibliography
 
 \end{document}
