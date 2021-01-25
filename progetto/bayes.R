@@ -43,3 +43,6 @@ nb_pred <- predict(nb_model, redwine_test, preProcess = pre_process)
 
 # Print confusion matrix
 confusionMatrix(data = nb_pred, reference = redwine_test$good)
+
+# Save the model
+save(nb_model, file = "progetto/models/nb_model.RData")
