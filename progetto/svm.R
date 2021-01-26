@@ -49,10 +49,10 @@ svm_model <- train(
 )
 
 # Predict
-nb_pred <- predict(svm_model, redwine_test, preProcess = pre_process)
+svm_pred <- predict(svm_model, redwine_test, preProcess = pre_process)
 
 # Print confusion matrix
-confusionMatrix(data = nb_pred, reference = redwine_test$good)
+confusionMatrix(data = svm_pred, reference = redwine_test$good)
 
 # Save the model
 save(svm_model, file = "progetto/models/svm_model.RData")
