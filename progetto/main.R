@@ -8,16 +8,16 @@ source("./bayes.R")
 
 # Prepare the dataset
 redwine <- read.csv("./dataset/winequality-red.csv") %>%
-  preProcessDataset() %>%
-  partitionDataset()
+  preprocess_dataset() %>%
+  partition_dataset()
 
 # Normalize the data
-redwine$train <- normalizeDataset(redwine$train)
-redwine$test <- normalizeDataset(redwine$test)
+redwine$train <- normalize_dataset(redwine$train)
+redwine$test <- normalize_dataset(redwine$test)
 
 # Train the model
-nb_model <- bayesClassification(redwine)
+nb_model <- bayes_classification(redwine)
 
 # Evaluate the model
-evaluateModel(nb_model, redwine$train)
-evaluateModel(nb_model, redwine$test)
+evaluate_model(nb_model, redwine$train)
+evaluate_model(nb_model, redwine$test)
