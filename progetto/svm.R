@@ -29,23 +29,30 @@ tr_control <- trainControl(
   number = 10
 )
 
+
+#tuneLength=10 svmRadial
+#tuneLength=4 svmPoly
+grid_radial <- expand.grid(
+  sigma = c(0,0.01,0.1,0.5,0.75,0.9,1),
+  C = c(0,0.01,0.1,0.5,0.75,0.9,1,1.5,2,5)
+)
+
 # Train the model
-nb_model <- train(
+svm_model <- train(
   good ~ .,
   data = redwine_train,
-  method = "svmLinear", #svmPoly, svmRadial
+  method = "svmRadial", #svmLinear, svmPoly, svmRadial, svmRadialWeights
   preProcess = pre_process,
-  tuneGrid = expand.grid(C = seq(0, 2, length = 20)),
-  #tuneLength=4,\1
-  #tuneGrid = expand.grid(C = seq(1e-3, 1e-4, length = 20)),
+  tuneGrid=grid_radial,
+  #tuneLength=10,
   trControl = tr_control
 )
 
 # Predict
-nb_pred <- predict(nb_model, redwine_test, preProcess = pre_process)
+nb_pred <- predict(svm_model, redwine_test, preProcess = pre_process)
 
 # Print confusion matrix
 confusionMatrix(data = nb_pred, reference = redwine_test$good)
 
 # Save the model
-save(nb_model, file = "progetto/models/nb_model.RData")
+save(svm_model, file = "progetto/models/svm_model.RData")
