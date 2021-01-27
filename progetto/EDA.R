@@ -8,7 +8,7 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(corrplot, ggplot2, dplyr)
 
 # Read the dataset
-redwine <- read.csv("progetto/dataset/winequality-red.csv")
+redwine <- read.csv("./dataset/winequality-red.csv")
 
 # Plot correlation matrix
 corrplot.mixed(cor(redwine), tl.pos = "lt", tl.cex = .8, number.cex = .8)
