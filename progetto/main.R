@@ -16,7 +16,7 @@ redwine$train <- normalize_dataset(redwine$train)
 redwine$test <- normalize_dataset(redwine$test)
 
 # Train the model
-nb_model <- bayes_classification(redwine)
+nb_model <- bayes_classification(redwine$train)
 
 # Evaluate the model
 evaluate_model(nb_model, redwine$train)
