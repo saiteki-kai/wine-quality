@@ -1,0 +1,40 @@
+#' Exploratory Data Analysis
+#'
+#' add description.
+#'
+
+.plot_variable_by_class <- function(data, input, class) {
+  data %>%
+    ggplot(aes_string(x = input, fill = class, color = class)) +
+    geom_histogram(position = "identity", alpha = 0.5)
+}
+
+.plot_variable_boxplot <- function(data, input, class) {
+  data %>%
+    ggplot(aes_string(y = input, x = class, fill = class, color = class)) +
+    geom_boxplot(outlier.shape = "cross")
+}
+
+.plot_class_barplot <- function(data, class) {
+  data %>%
+    ggplot(aes_string(x = class, fill = class, color = class)) +
+    geom_bar()
+}
+
+eda <- function() {
+
+  # Install packages
+  if (!require("pacman")) install.packages("pacman")
+  pacman::p_load(corrplot, ggplot2, dplyr)
+
+  # Summary report
+  summary(redwine)
+
+  # Plot correlation matrix
+  corrplot.mixed(cor(redwine), tl.pos = "lt", tl.cex = .8, number.cex = .8)
+
+  .plot_class_barplot(redwine, "quality")
+
+  .plot_variable_by_class(redwine, "pH", "quality")
+  .plot_variable_boxplot(redwine, "pH", "quality")
+}
