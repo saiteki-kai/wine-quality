@@ -14,7 +14,7 @@ preprocess_dataset <- function(dataset) {
 #' @param dataset a dataset
 #' @return the partition composed of train and test
 partition_dataset <- function(dataset) {
-  index <- createDataPartition(dataset$quality, p = 0.9, list = FALSE)
+  index <- createDataPartition(dataset$quality, p = 0.75, list = FALSE)
   train <- dataset[index,]
   test <- dataset[-index,]
 
@@ -47,7 +47,10 @@ evaluate_model <- function(model, dataset) {
   cm$byClass["F1"]
 }
 
-#' Combine the red and the white datasets and add type attribute
+#' Combine the red and the white datasets and add type attribute.
+#' Save the result as a csv file
+#'
+#' @return the combined dataset
 combine_redwhite <- function() {
   redwine <- read.csv("./dataset/winequality-red.csv")
   whitewine <- read.csv("./dataset/winequality-white.csv")
@@ -56,4 +59,9 @@ combine_redwhite <- function() {
   whitewine$type <- "white"
 
   wines <- rbind(redwine, whitewine)
+
+  # Save the combined dataset
+  write.csv(wines, "./dataset/winequality-combined.csv", row.names = FALSE)
+
+  wines
 }
