@@ -42,5 +42,18 @@ evaluate_model <- function(model, dataset) {
   pred <- predict(model, dataset)
 
   # Print confusion matrix
-  confusionMatrix(data = pred, reference = dataset$quality)
+  cm <- confusionMatrix(data = pred, reference = dataset$quality)
+
+  cm$byClass["F1"]
+}
+
+#' Combine the red and the white datasets and add type attribute
+combine_redwhite <- function() {
+  redwine <- read.csv("./dataset/winequality-red.csv")
+  whitewine <- read.csv("./dataset/winequality-white.csv")
+
+  redwine$type <- "red"
+  whitewine$type <- "white"
+
+  wines <- rbind(redwine, whitewine)
 }
