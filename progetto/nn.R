@@ -6,7 +6,11 @@
 neural_network_classification <- function(trainset) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
-  pacman::p_load(caret)
+  pacman::p_load(caret, doParallel)
+
+  cores <- detectCores()
+  registerDoParallel(cores = cores)
+  cluster <- makeCluster(cores)
 
   # 10-Fold cross validation
   tr_control <- trainControl(
@@ -15,21 +19,23 @@ neural_network_classification <- function(trainset) {
     repeats = 5
   )
 
-  #x <- expand.grid(size = c(1, 2, 3, 4, 5, 6, 7), decay = c(0, 10^(-2), 10^(-3), 10^(-4)))
-  params <- expand.grid(
-    layer1 = 9,
-    layer2 = 7,
-    layer3 = 5
-  )
+  # Set seed for repeatability
+  set.seed(314)
 
   # Train the model
+  start_train_time <- Sys.time()
   nn_model <- train(
     quality ~ .,
     data = trainset,
-    method = "mlpML", #neuralnet
+    method = "mlpML",
     trControl = tr_control,
-    tuneGrid = params
+    tuneGrid = expand.grid(layer1 = 9, layer2 = 7, layer3 = 5)
   )
+  end_train_time <- Sys.time()
+  time_train <- end_train_time - start_train_time
+
+  # Stop using parallel computing
+  stopCluster(cluster)
 
   # Save the model
   save(nn_model, file = "./models/nn_model.RData")

@@ -5,55 +5,43 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, klaR, rattle)
-
-# Read the dataset
-redwine <- read.csv("./dataset/winequality-red.csv")
-
-# Add class attribute
-redwine$good <- ifelse(redwine$quality > 6, "Yes", "No")
-redwine$good <- factor(redwine$good)
-redwine$quality <- NULL
-
-# Partition the dataset
-index <- createDataPartition(redwine$good, p = 0.7, list = FALSE)
-redwine_train <- redwine[index,]
-redwine_test <- redwine[-index,]
-
-# Preprocess method
-pre_process <- "range" # c("center", "scale")
-
-# 10-Fold cross validation
-tr_control <- trainControl(
-  method = "repeatedcv",
-  number = 10
-)
+pacman::p_load(caret, klaR, rattle, pROC, dplyr)
 
 
-# Train the model
-dt_model <- train(
-  good ~ .,
-  data = redwine_train,
-  method = "rpart",
-  tuneLength=30,
-  preProcess = pre_process,
-  trControl = tr_control
-)
+decision_tree_classification <- function(trainset) {
 
-# Predict
-dt_pred <- predict(dt_model, redwine_test, preProcess = pre_process)
+  # 10-Fold cross validation
+  tr_control <- trainControl(
+    method = "repeatedcv",
+    number = 10,
+    repeats = 5
+  )
 
-# Print confusion matrix
-confusionMatrix(data = dt_pred, reference = redwine_test$good)
+  # Set seed for repeatability
+  set.seed(314)
 
-# Print tuningProcess
-plot(dt_model)
+  # Train the model
+  dt_model <- train(
+    quality ~ .,
+    data = trainset,
+    method = "rpart2",
+    tuneGrid = expand.grid(maxdepth = 2:10),
+    #tuneLength=20,
+    #metric = "ROC",
+    trControl = tr_control,
+  )
 
-# Print bestTune
-dt_model$bestTune
+  # Print Tuning Process
+  plot(dt_model)
 
-# Print Tree
-fancyRpartPlot(dt_model$finalModel)
+  # Print Tree
+  fancyRpartPlot(dt_model$finalModel)
 
-# Save the model
-save(dt_model, file = "./models/dt_model.RData")
+  # Save the model
+  save(dt_model, file = "./models/dt_model.RData")
+
+  # Return
+  dt_model
+}
+
+
