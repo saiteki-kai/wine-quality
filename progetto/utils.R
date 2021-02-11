@@ -1,11 +1,20 @@
-#' Convert the quality attribute to a binary attribute
-#' The new quality has the value "good" if quality was greater than 6, "bad" otherwise
-#'
+#' Convert the quality attribute based on the configuration
 #' @param dataset a dataset
+#' @param config the followings:
+#' (config = 1) -> (0 -> bad-quality, 1 -> good-quality)
+#' (config = 2) -> (0 -> low-quality, 1 -> medium-quality, 2 -> high-quality)
+#' (config = 3) -> (0 -> low-quality, ..., 10 -> high-quality levels of quality)
 #' @return the processed dataset
-preprocess_dataset <- function(dataset) {
-  dataset$quality <- ifelse(dataset$quality > 6, "good", "bad")
-  dataset$quality <- factor(dataset$quality, levels = c("good", "bad"))
+preprocess_dataset <- function(dataset, config) {
+  dataset$type <- NULL
+  if (config == 3) {
+    dataset$quality <- ifelse(dataset$quality > 6, 0, 1)
+    dataset$quality <- factor(dataset$quality, levels = c(0, 1))
+  } else if (config == 2) {
+    dataset$quality <- ifelse(dataset$quality < 5, 0,
+                                     ifelse(dataset$quality > 7, 2, 1))
+    dataset$quality <- factor(dataset$quality, levels = c(0, 1, 2))
+  }
   dataset
 }
 
@@ -38,13 +47,15 @@ normalize_dataset <- function(dataset) {
 #' @param model classification model
 #' @param dataset a dataset to predict
 evaluate_model <- function(model, dataset) {
+
   # Predict
-  pred <- predict(model, dataset)
+  pred <- predict(model, dataset[names(dataset) != "quality"])
 
   # Print confusion matrix
   cm <- confusionMatrix(data = pred, reference = dataset$quality)
 
-  cm$byClass["F1"]
+  cm
+  #cm$byClass["F1"]
 }
 
 #' Combine the red and the white datasets and add type attribute.
