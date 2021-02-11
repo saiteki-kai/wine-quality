@@ -7,13 +7,13 @@
 #' @return the processed dataset
 preprocess_dataset <- function(dataset, config) {
   dataset$type <- NULL
-  if (config == 3) {
+
+  if (config == 1) {
     dataset$quality <- ifelse(dataset$quality > 6, 0, 1)
-    dataset$quality <- factor(dataset$quality, levels = c(0, 1))
+    dataset$quality <- factor(dataset$quality, levels = c(0, 1)) # labels = c("bad", "good")
   } else if (config == 2) {
-    dataset$quality <- ifelse(dataset$quality < 5, 0,
-                                     ifelse(dataset$quality > 7, 2, 1))
-    dataset$quality <- factor(dataset$quality, levels = c(0, 1, 2))
+    dataset$quality <- ifelse(dataset$quality <= 5, 0, ifelse(dataset$quality <= 7, 1, 2))
+    dataset$quality <- factor(dataset$quality, levels = c(0, 1, 2)) # labels = c("low", "medium", "high")
   }
   dataset
 }
@@ -52,7 +52,7 @@ evaluate_model <- function(model, dataset) {
   pred <- predict(model, dataset[names(dataset) != "quality"])
 
   # Print confusion matrix
-  cm <- confusionMatrix(data = pred, reference = dataset$quality)
+  cm <- confusionMatrix(data = pred, reference = dataset$quality, mode = prec_recall)
 
   cm
   #cm$byClass["F1"]
