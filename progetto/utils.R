@@ -49,10 +49,13 @@ normalize_dataset <- function(dataset) {
 evaluate_model <- function(model, dataset) {
 
   # Predict
+  start_pred_time <- Sys.time()
   pred <- predict(model, dataset[names(dataset) != "quality"])
+  end_pred_time <- Sys.time()
+  time_pred <- end_pred_time - start_pred_time
 
   # Print confusion matrix
-  cm <- confusionMatrix(data = pred, reference = dataset$quality, mode = prec_recall)
+  cm <- confusionMatrix(data = pred, reference = dataset$quality)
 
   cm
   #cm$byClass["F1"]
