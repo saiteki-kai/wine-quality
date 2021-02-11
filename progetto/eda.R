@@ -21,20 +21,48 @@
     geom_bar()
 }
 
-eda <- function() {
+# Install packages
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(corrplot, ggplot2, dplyr)
 
-  # Install packages
-  if (!require("pacman")) install.packages("pacman")
-  pacman::p_load(corrplot, ggplot2, dplyr)
+# Local functions
+source("./utils.R")
 
-  # Summary report
-  summary(redwine)
+# Import datasets
+combined <- read.csv("./dataset/winequality-combined.csv")
+redwine <- read.csv("./dataset/winequality-red.csv")
+whitewine <- read.csv("./dataset/winequality-white.csv")
 
-  # Plot correlation matrix
-  corrplot.mixed(cor(redwine), tl.pos = "lt", tl.cex = .8, number.cex = .8)
+# Summary report
+summary(combined)
 
-  .plot_class_barplot(redwine, "quality")
+# Distribuzione Dati Red & White
+.plot_class_barplot(combined, "quality")
 
-  .plot_variable_by_class(redwine, "pH", "quality")
-  .plot_variable_boxplot(redwine, "pH", "quality")
-}
+# Distribuzione Dati Red Only
+.plot_class_barplot(redwine, "quality")
+
+# Distribuzione Dati White Only
+.plot_class_barplot(whitewine, "quality")
+
+# Distribuzione Dati Red & White Configurazione 1: Multiclasse
+# ...
+
+# Distribuzione Dati Red & White Configurazione 2: 3 Classi
+# ...
+
+# Distribuzione Dati Red & White Configurazione 3: 2 Classi
+# ...
+
+# Boxplot delle singole covariate
+.plot_variable_boxplot(combined, "pH", "quality")
+
+# Distribuzione delle singole covariate
+.plot_variable_by_class(combined, "pH", "quality")
+
+# Plot correlation matrix
+corrplot.mixed(cor(combined), tl.pos = "lt", tl.cex = .8, number.cex = .8)
+
+# PCA Analysis
+# Ripetere i plot dopo aver fatto pca
+# ...
