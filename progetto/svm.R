@@ -3,19 +3,25 @@
 #' add description.
 #'
 
-# Install packages
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, klaR)
-
 svm_classification <- function(trainset) {
-  
+  # Install packages
+  if (!require("pacman")) install.packages("pacman")
+  pacman::p_load(caret, klaR)
+
+  cores <- detectCores()
+  registerDoParallel(cores = cores)
+  cluster <- makeCluster(cores)
+
   # 10-Fold cross validation
   tr_control <- trainControl(
     method = "repeatedcv",
     number = 10,
     repeats = 5
   )
-  
+
+  # Set seed for repeatability
+  set.seed(314)
+
   #tuneLength=10 svmRadial
   #tuneLength=4 svmPoly
   grid_radial <- expand.grid(
@@ -23,7 +29,8 @@ svm_classification <- function(trainset) {
     C = c(0.01,1,2) #0,0.01,0.1,0.5,0.75,0.9,1,1.5,2,5)
   )
   
-  # Train the model
+   # Train the model
+  start_train_time <- Sys.time()
   svm_model <- train(
     quality ~ .,
     data = trainset,
@@ -32,7 +39,15 @@ svm_classification <- function(trainset) {
     #tuneLength=10,
     trControl = tr_control
   )
-  
+  end_train_time <- Sys.time()
+  time_train <- end_train_time - start_train_time
+
+  file <- paste(svm_model$method, "log.txt", sep='_')
+  write.table(paste(time_train, "ms", sep="."), file, row.names = FALSE)
+
+  # Stop using parallel computing
+  stopCluster(cluster)
+
   # Save the model
   save(svm_model, file = "./models/svm_model.RData")
   

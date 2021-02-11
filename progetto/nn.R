@@ -34,6 +34,10 @@ neural_network_classification <- function(trainset) {
   end_train_time <- Sys.time()
   time_train <- end_train_time - start_train_time
 
+  file <- paste(nn_model$method, "log.txt", sep='_')
+  write.table(paste(time_train, "ms", sep="."), file, row.names = FALSE)
+
+
   # Stop using parallel computing
   stopCluster(cluster)
 

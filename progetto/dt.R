@@ -3,12 +3,10 @@
 #' add description.
 #'
 
-# Install packages
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, klaR, rattle, pROC, dplyr)
-
-
 decision_tree_classification <- function(trainset) {
+  # Install packages
+  if (!require("pacman")) install.packages("pacman")
+  pacman::p_load(caret, klaR, rattle, pROC, dplyr)
 
   # 10-Fold cross validation
   tr_control <- trainControl(
@@ -21,6 +19,7 @@ decision_tree_classification <- function(trainset) {
   set.seed(314)
 
   # Train the model
+  start_train_time <- Sys.time()
   dt_model <- train(
     quality ~ .,
     data = trainset,
@@ -30,6 +29,11 @@ decision_tree_classification <- function(trainset) {
     #metric = "ROC",
     trControl = tr_control,
   )
+  end_train_time <- Sys.time()
+  time_train <- end_train_time - start_train_time
+
+  file <- paste(dt_model$method, "log.txt", sep='_')
+  write.table(paste(time_train, "ms", sep="."), file, row.names = FALSE)
 
   # Print Tuning Process
   plot(dt_model)

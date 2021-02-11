@@ -55,10 +55,16 @@ evaluate_model <- function(model, dataset) {
   time_pred <- end_pred_time - start_pred_time
 
   # Print confusion matrix
-  cm <- confusionMatrix(data = pred, reference = dataset$quality)
+  cm <- confusionMatrix(data = pred, reference = dataset$quality, mode = 'prec_recall')
+
+  file <- paste(model$method, "log.txt", sep='_')
+  write.table(cm$overall["Accuracy"], file, append = TRUE, row.names = FALSE)
+  write.table(cm$byClass["F1"], file, append = TRUE, row.names = FALSE)
+  write.table(cm$byClass["Precision"], file, append = TRUE, row.names = FALSE)
+  write.table(cm$byClass["Recall"], file, append = TRUE, row.names = FALSE)
+  write.table(paste(time_pred, "ms", sep="."), file, append = TRUE, row.names = FALSE)
 
   cm
-  #cm$byClass["F1"]
 }
 
 #' Combine the red and the white datasets and add type attribute.

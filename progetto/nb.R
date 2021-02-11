@@ -15,13 +15,22 @@ bayes_classification <- function(trainset) {
     repeats = 5
   )
 
+  # Set seed for repeatability
+  set.seed(314)
+
   # Train the model
+  start_train_time <- Sys.time()
   nb_model <- train(
     quality ~ .,
     data = trainset,
     method = "nb",
     trControl = tr_control
   )
+  end_train_time <- Sys.time()
+  time_train <- end_train_time - start_train_time
+
+  file <- paste(nb_model$method, "log.txt", sep='_')
+  write.table(paste(time_train, "ms", sep="."), file, row.names = FALSE)
 
   # Save the model
   save(nb_model, file = "./models/nb_model.RData")
