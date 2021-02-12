@@ -14,7 +14,7 @@ repository [https://archive.ics.uci.edu/ml/datasets/wine+quality](https://archiv
 ### EDA
 
 - [x] Variable Summary
-- [ ] Check Null, Missing Data 
+- [x] Check Null, Missing Data 
 - [ ] Distribution Analysis (Red, White, Both) & Class Options (10 classes, 2 classes, 3 classes)
 - [ ] Attribute Distribution By Class
 - [ ] Box Plot
@@ -36,6 +36,6 @@ repository [https://archive.ics.uci.edu/ml/datasets/wine+quality](https://archiv
 ### Model Evaluation
 
 - [x] Confusion Matrix
-- [ ] F1, Accuracy, Recall, ...
+- [x] F1, Accuracy, Recall, ...
 - [ ] Model Comparison
 - [ ] Computational Time
