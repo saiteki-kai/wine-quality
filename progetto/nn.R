@@ -3,7 +3,7 @@
 #' add description.
 #'
 
-neural_network_classification <- function(trainset) {
+nn_classification <- function(trainset) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(caret, doParallel)

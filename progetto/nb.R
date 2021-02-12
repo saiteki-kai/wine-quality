@@ -3,7 +3,7 @@
 #' add description.
 #'
 
-bayes_classification <- function(trainset) {
+nb_classification <- function(trainset) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(caret)

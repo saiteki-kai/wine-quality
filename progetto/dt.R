@@ -3,7 +3,7 @@
 #' add description.
 #'
 
-decision_tree_classification <- function(trainset) {
+dt_classification <- function(trainset) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(caret, klaR, rattle, pROC, dplyr)
