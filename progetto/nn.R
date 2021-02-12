@@ -8,10 +8,6 @@ neural_network_classification <- function(trainset) {
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(caret, doParallel)
 
-  cores <- detectCores()
-  registerDoParallel(cores = cores)
-  cluster <- makeCluster(cores)
-
   # 10-Fold cross validation
   tr_control <- trainControl(
     method = "repeatedcv",
@@ -34,12 +30,8 @@ neural_network_classification <- function(trainset) {
   end_train_time <- Sys.time()
   time_train <- end_train_time - start_train_time
 
-  file <- paste(nn_model$method, "log.txt", sep='_')
-  write.table(paste(time_train, "ms", sep="."), file, row.names = FALSE)
-
-
-  # Stop using parallel computing
-  stopCluster(cluster)
+  file <- file.path("./results", paste0(nn_model$method, "_train.log"))
+  write.table(paste(time_train, "ms"), file, row.names = FALSE, col.names = FALSE)
 
   # Save the model
   save(nn_model, file = "./models/nn_model.RData")

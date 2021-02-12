@@ -32,8 +32,8 @@ decision_tree_classification <- function(trainset) {
   end_train_time <- Sys.time()
   time_train <- end_train_time - start_train_time
 
-  file <- paste(dt_model$method, "log.txt", sep='_')
-  write.table(paste(time_train, "ms", sep="."), file, row.names = FALSE)
+  file <- file.path("./results", paste0(dt_model$method, "_train.log"))
+  write.table(paste(time_train, "ms"), file, row.names = FALSE, col.names = FALSE)
 
   # Print Tuning Process
   plot(dt_model)

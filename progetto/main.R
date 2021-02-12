@@ -1,6 +1,6 @@
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, dplyr)
+pacman::p_load(caret, dplyr, doParallel)
 
 # Local functions
 source("./utils.R")
@@ -18,11 +18,19 @@ combined <- read.csv("./dataset/winequality-combined.csv") %>%
 combined$train <- normalize_dataset(combined$train)
 combined$test <- normalize_dataset(combined$test)
 
+# Register parallel processing
+cores <- detectCores()
+registerDoParallel(cores = cores)
+cluster <- makeCluster(cores)
+
 # Train the model
 nb_model <- bayes_classification(combined$train)
 dt_model <- decision_tree_classification(combined$train)
 svm_model <- svm_classification(combined$train)
 nn_model <- neural_network_classification(combined$train)
+
+# Stop using parallel computing
+stopCluster(cluster)
 
 # Evaluate the model
 evaluate_model(nb_model, combined$test)

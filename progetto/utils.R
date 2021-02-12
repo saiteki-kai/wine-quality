@@ -47,22 +47,25 @@ normalize_dataset <- function(dataset) {
 #' @param model classification model
 #' @param dataset a dataset to predict
 evaluate_model <- function(model, dataset) {
+  if (!require("pacman")) install.packages("pacman")
+  pacman::p_load(rjson)
 
   # Predict
-  start_pred_time <- Sys.time()
+  start_time <- Sys.time()
   pred <- predict(model, dataset[names(dataset) != "quality"])
-  end_pred_time <- Sys.time()
-  time_pred <- end_pred_time - start_pred_time
+  end_time <- Sys.time()
 
   # Print confusion matrix
   cm <- confusionMatrix(data = pred, reference = dataset$quality, mode = 'prec_recall')
 
-  file <- paste(model$method, "log.txt", sep='_')
-  write.table(cm$overall["Accuracy"], file, append = TRUE, row.names = FALSE)
-  write.table(cm$byClass["F1"], file, append = TRUE, row.names = FALSE)
-  write.table(cm$byClass["Precision"], file, append = TRUE, row.names = FALSE)
-  write.table(cm$byClass["Recall"], file, append = TRUE, row.names = FALSE)
-  write.table(paste(time_pred, "ms", sep="."), file, append = TRUE, row.names = FALSE)
+  measures <- data.frame(
+    accuracy = cm$overall["Accuracy"],
+    f1 = cm$byClass["F1"],
+    precision = cm$byClass["Precision"],
+    recall = cm$byClass["Recall"],
+    time = end_time - start_time
+  )
+  saveRDS(measures, file.path("./results/", paste0(model$method, "_test.rds")))
 
   cm
 }
