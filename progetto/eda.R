@@ -82,7 +82,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(corrplot, ggplot2, dplyr, naniar, patchwork)
+pacman::p_load(corrplot, ggplot2, dplyr, naniar, patchwork, factoextra)
 
 # Local functions
 source("./utils.R")
@@ -108,32 +108,33 @@ miss_var_summary(combined)
 .plot_class_barplot(whitewine, "quality")
 
 # Distribuzione Dati Red & White Configurazione 1: Multiclasse
+config3 <- preprocess_dataset(combined, 3)
+.plot_class_barplot(config3, "quality")
 
 # Distribuzione Dati Red & White Configurazione 2: 3 Classi
-# ...
+config2 <- preprocess_dataset(combined, 2)
+.plot_class_barplot(config2, "quality")
 
 # Distribuzione Dati Red & White Configurazione 3: 2 Classi
-# ...
+config1 <- preprocess_dataset(combined, 1)
+.plot_class_barplot(config1, "quality")
 
 
-.plot_outliers(combined, "pH")
+# Plot ouliers
+.plot_outliers(config1, "pH")
 
-.plot_variable_boxplot(combined, "pH", "quality")
-
-combined <- combined %>% preprocess_dataset(2)
+# Plot boxplot
+.plot_variable_boxplot(config1, "pH", "quality")
 
 # Boxplot delle singole covariate
 #lapply(combined, function(variable) { # variable is not the column name??
 #  .plot_variable_boxplot(combined, variable, "quality")
 #})
-.plot_variable_boxplot(combined, "pH", "quality")
 
 # Distribuzione delle singole covariate
-.plot_variable_by_class(combined, "pH", "quality")
+.plot_variable_by_class(config1, "pH", "quality")
 
 # Plot correlation matrix
-corrplot.mixed(cor(combined[names(combined) != "quality"]), tl.pos = "lt", tl.cex = .8, number.cex = .8)
+corrplot.mixed(cor(config1[names(config1) != "quality"]), tl.pos = "lt", tl.cex = .8, number.cex = .8)
 
 # PCA Analysis
-# Ripetere i plot dopo aver fatto pca
-# ...

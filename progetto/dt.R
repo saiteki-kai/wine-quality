@@ -23,8 +23,9 @@ dt_classification <- function(trainset) {
   dt_model <- train(
     quality ~ .,
     data = trainset,
-    method = "rpart2",
+    method = "rpart2", # rpart
     tuneGrid = expand.grid(maxdepth = 2:10),
+    #tuneLength = 10,
     trControl = tr_control
   )
   end_time <- Sys.time()

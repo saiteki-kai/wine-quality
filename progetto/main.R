@@ -24,10 +24,10 @@ registerDoParallel(cores = cores)
 cluster <- makeCluster(cores)
 
 # Train the model
-#m1 <- nb_classification(combined$train)
-#m2 <- dt_classification(combined$train)
-#m3 <- svm_classification(combined$train)
-#m4 <- nn_classification(combined$train)
+m1 <- nb_classification(combined$train)
+m2 <- dt_classification(combined$train)
+m3 <- svm_classification(combined$train)
+m4 <- nn_classification(combined$train)
 
 # Stop using parallel computing
 stopCluster(cluster)

@@ -136,5 +136,4 @@ write_log <- function (model_name, measures, train_time, pred_time) {
   write.table(paste("f1: ", measures$f1), file, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(paste("precision: ", measures$precision), file, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(paste("recall: ", measures$recall), file, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table(paste("accuracy: ", measures$accuracy), file, row.names = FALSE, col.names = FALSE, append = TRUE)
 }
