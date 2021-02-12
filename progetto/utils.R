@@ -54,10 +54,13 @@ evaluate_model <- function(model, dataset) {
   start_time <- Sys.time()
   pred <- predict(model, dataset[names(dataset) != "quality"])
   end_time <- Sys.time()
+  time <- end_time - start_time
 
-  # ROC and AUC
+  # ROC and PRC
   #sscurves <- evalmod(scores = as.numeric(pred), labels = combined$test$quality)
   #autoplot(sscurves)
+  #auc_ci <- auc_ci(sscurves)
+  #knitr::kable(auc_ci)
 
   # Print confusion matrix
   cm <- confusionMatrix(data = pred, reference = dataset$quality, mode = 'prec_recall')
@@ -66,12 +69,10 @@ evaluate_model <- function(model, dataset) {
     accuracy = cm$overall["Accuracy"],
     f1 = cm$byClass["F1"],
     precision = cm$byClass["Precision"],
-    recall = cm$byClass["Recall"],
-    time = end_time - start_time
+    recall = cm$byClass["Recall"]
   )
-  saveRDS(measures, file.path("./results/", paste0(model$method, "_test.rds")))
 
-  cm
+ out <- list(cm = cm, measures = measures, pred_time = time)
 }
 
 #' Combine the red and the white datasets and add type attribute.
@@ -117,4 +118,23 @@ plot_roc_and_prc_all <- function(dataset, models) {
 
   # Use knitr::kable to display the result in a table format
   knitr::kable(auc_ci)
+}
+
+#' Write a log file
+#' @param model_name model's name
+#' @param measures model's measures after training
+#' @param train_time training time
+#' @param pred_time prediction time
+#'
+write_log <- function (model_name, measures, train_time, pred_time) {
+  file <- file.path("./results", paste0(model_name, "_.log"))
+  write.table(paste("model_name: ", model_name), file, row.names = FALSE, col.names = FALSE)
+  write.table(paste("pred_time: ", pred_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table(paste("train_time: ", train_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table("metrics: ", file, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table(paste("accuracy: ", measures$accuracy), file, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table(paste("f1: ", measures$f1), file, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table(paste("precision: ", measures$precision), file, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table(paste("recall: ", measures$recall), file, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table(paste("accuracy: ", measures$accuracy), file, row.names = FALSE, col.names = FALSE, append = TRUE)
 }

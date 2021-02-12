@@ -19,21 +19,16 @@ dt_classification <- function(trainset) {
   set.seed(314)
 
   # Train the model
-  start_train_time <- Sys.time()
+  start_time <- Sys.time()
   dt_model <- train(
     quality ~ .,
     data = trainset,
     method = "rpart2",
     tuneGrid = expand.grid(maxdepth = 2:10),
-    #tuneLength=20,
-    #metric = "ROC",
-    trControl = tr_control,
+    trControl = tr_control
   )
-  end_train_time <- Sys.time()
-  time_train <- end_train_time - start_train_time
-
-  file <- file.path("./results", paste0(dt_model$method, "_train.log"))
-  write.table(paste(time_train, "ms"), file, row.names = FALSE, col.names = FALSE)
+  end_time <- Sys.time()
+  time <- end_time - start_time
 
   # Print Tuning Process
   plot(dt_model)
@@ -45,7 +40,7 @@ dt_classification <- function(trainset) {
   save(dt_model, file = "./models/dt_model.RData")
 
   # Return
-  dt_model
+  list(model = dt_model, train_time = time)
 }
 
 

@@ -19,22 +19,19 @@ nb_classification <- function(trainset) {
   set.seed(314)
 
   # Train the model
-  start_train_time <- Sys.time()
+  start_time <- Sys.time()
   nb_model <- train(
     quality ~ .,
     data = trainset,
     method = "nb",
     trControl = tr_control
   )
-  end_train_time <- Sys.time()
-  time_train <- end_train_time - start_train_time
-
-  file <- file.path("./results", paste0(nb_model$method, "_train.log"))
-  write.table(paste(time_train, "ms"), file, row.names = FALSE, col.names = FALSE)
+  end_time <- Sys.time()
+  time <- end_time - start_time
 
   # Save the model
   save(nb_model, file = "./models/nb_model.RData")
 
   # Return
-  nb_model
+  list(model = nb_model, train_time = time)
 }

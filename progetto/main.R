@@ -24,21 +24,28 @@ registerDoParallel(cores = cores)
 cluster <- makeCluster(cores)
 
 # Train the model
-#nb_model <- nb_classification(combined$train)
-#dt_model <- dt_classification(combined$train)
-#svm_model <- svm_classification(combined$train)
-#nn_model <- nn_classification(combined$train)
+#m1 <- nb_classification(combined$train)
+#m2 <- dt_classification(combined$train)
+#m3 <- svm_classification(combined$train)
+#m4 <- nn_classification(combined$train)
 
 # Stop using parallel computing
 stopCluster(cluster)
 
 # Evaluate the model
-evaluate_model(nb_model, combined$test)
-evaluate_model(dt_model, combined$test)
-evaluate_model(svm_model, combined$test)
-evaluate_model(nn_model, combined$test)
+res1 <- evaluate_model(m1$model, combined$test)
+res2 <- evaluate_model(m2$model, combined$test)
+res3 <- evaluate_model(m3$model, combined$test)
+res4 <- evaluate_model(m4$model, combined$test)
 
-plot_roc_and_prc_all(combined$test, list(nb_model=nb_model,
-                                         dt_model=dt_model,
-                                         svm_model=svm_model,
-                                         nn_model=nn_model))
+# Plot AUCs ROC & PRC
+plot_roc_and_prc_all(combined$test, list(nb_model=m1$model,
+                                         dt_model=m2$model,
+                                         svm_model=m3$model,
+                                         nn_model=m4$model))
+
+# Write Logs
+write_log(m1$model$method, res1$measures, m1$train_time, res1$pred_time)
+write_log(m2$model$method, res2$measures, m2$train_time, res2$pred_time)
+write_log(m3$model$method, res3$measures, m3$train_time, res3$pred_time)
+write_log(m4$model$method, res4$measures, m4$train_time, res4$pred_time)

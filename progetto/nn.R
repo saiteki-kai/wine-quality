@@ -19,7 +19,7 @@ nn_classification <- function(trainset) {
   set.seed(314)
 
   # Train the model
-  start_train_time <- Sys.time()
+  start_time <- Sys.time()
   nn_model <- train(
     quality ~ .,
     data = trainset,
@@ -27,15 +27,12 @@ nn_classification <- function(trainset) {
     trControl = tr_control,
     tuneGrid = expand.grid(layer1 = 9, layer2 = 7, layer3 = 5)
   )
-  end_train_time <- Sys.time()
-  time_train <- end_train_time - start_train_time
-
-  file <- file.path("./results", paste0(nn_model$method, "_train.log"))
-  write.table(paste(time_train, "ms"), file, row.names = FALSE, col.names = FALSE)
+  end_time <- Sys.time()
+  time <- end_time - start_time
 
   # Save the model
   save(nn_model, file = "./models/nn_model.RData")
 
   # Return
-  nn_model
+  list(model = nn_model, train_time = time)
 }

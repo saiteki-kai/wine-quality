@@ -26,7 +26,7 @@ svm_classification <- function(trainset) {
   )
 
   # Train the model
-  start_train_time <- Sys.time()
+  start_time <- Sys.time()
   svm_model <- train(
     quality ~ .,
     data = trainset,
@@ -35,15 +35,12 @@ svm_classification <- function(trainset) {
     #tuneLength=10,
     trControl = tr_control
   )
-  end_train_time <- Sys.time()
-  time_train <- end_train_time - start_train_time
-
-  file <- file.path("./results", paste0(svm_model$method, "_train.log"))
-  write.table(paste(time_train, "ms"), file, row.names = FALSE, col.names = FALSE)
+  end_time <- Sys.time()
+  time <- end_time - start_time
 
   # Save the model
   save(svm_model, file = "./models/svm_model.RData")
 
   # Return
-  svm_model
+  list(model = svm_model, train_time = time)
 }
