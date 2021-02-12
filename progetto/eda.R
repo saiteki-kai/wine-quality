@@ -3,6 +3,50 @@
 #' add description.
 #'
 
+.plot_outliers <- function(data, input) {
+  values <- data[[input]]
+  outlier_bounds <- .detect_outliers(values)
+
+  min_input <- min(values)
+  max_input <- max(values)
+
+  boxplot <- data %>%
+    ggplot(aes_string(x = input)) +
+    geom_boxplot(outlier.shape = "cross") +
+    geom_vline(xintercept = outlier_bounds$lower, linetype = 'dotted') +
+    geom_vline(xintercept = outlier_bounds$upper, linetype = 'dotted') +
+    theme(axis.text.y = element_blank()) +
+    scale_x_continuous(limits = c(min_input, max_input), breaks = pretty(values, n = 5))
+
+  # MyBreaks <- c(-Inf, outlier_bounds$lower, outlier_bounds$upper, Inf)
+  # MyColours <- c("black", "blue", "yellow")
+  # data$breaks <- cut(values, MyBreaks)
+  # TODO: aggiustare la scala dei breaks
+
+  without_outliers <- data.frame(x = values[values >= outlier_bounds$lower & values <= outlier_bounds$upper])
+
+  histogram <- data %>%
+    ggplot(aes_string(x = input), show.legend = TRUE) + # fill = "breaks"
+    geom_histogram(aes(y = ..density..), binwidth = 0.025, position = "identity", alpha = 0.5) +
+    geom_vline(xintercept = outlier_bounds$lower, linetype = 'dotted') +
+    geom_vline(xintercept = outlier_bounds$upper, linetype = 'dotted') +
+    geom_density(colour = "blue") +
+    geom_density(data = without_outliers, mapping = aes(x = x), colour = "red") +
+    # scale_fill_manual(breaks = levels(data$breaks), values = MyColours) +
+    labs(y = "count", x = NULL) +
+    scale_x_continuous(limits = c(min_input, max_input), breaks = pretty(values, n = 5)) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      legend.position = c(.95, .95),
+      legend.justification = c("right", "top"),
+      legend.box.just = "right",
+      legend.margin = margin(6, 6, 6, 6)
+    )
+
+  (histogram / boxplot) + plot_layout(heights = c(5, 1), guides = "collect")
+}
+
 .plot_variable_by_class <- function(data, input, class) {
   data %>%
     ggplot(aes_string(x = input, fill = class, color = class)) +
@@ -11,15 +55,29 @@
 }
 
 .plot_variable_boxplot <- function(data, input, class) {
+  outlier_bounds <- .detect_outliers(data[[input]])
+
   data %>%
-    ggplot(aes_string(y = input, x = class, fill = class, color = class)) +
-    geom_boxplot(outlier.shape = "cross")
+    ggplot(aes_string(y = input, x = class, fill = class)) +
+    geom_boxplot(outlier.shape = "cross") +
+    # geom_jitter(aes_string(color = class), size = 0.4, alpha = 0.5) +
+    geom_hline(yintercept = outlier_bounds$lower, linetype = 'dotted') +
+    geom_hline(yintercept = outlier_bounds$upper, linetype = 'dotted') +
+    labs(y = input)
 }
 
 .plot_class_barplot <- function(data, class) {
   data %>%
     ggplot(aes_string(x = class, fill = class, color = class)) +
     geom_bar()
+}
+
+.detect_outliers <- function(data) {
+  quantiles <- quantile(data, c(0.25, 0.75), names = FALSE)
+  lower <- quantiles[1] - 1.5 * IQR(data)
+  upper <- quantiles[2] + 1.5 * IQR(data)
+
+  list(lower = lower, upper = upper)
 }
 
 # Install packages
@@ -58,18 +116,17 @@ miss_var_summary(combined)
 # ...
 
 
+.plot_outliers(combined, "pH")
+
+.plot_variable_boxplot(combined, "pH", "quality")
+
+combined <- combined %>% preprocess_dataset(2)
+
 # Boxplot delle singole covariate
-.plot_variable_boxplot(redwine, "fixed.acidity", "quality")
-.plot_variable_boxplot(redwine, "volatile.acidity", "quality")
-.plot_variable_boxplot(redwine, "citric.acid", "quality")
-.plot_variable_boxplot(redwine, "residual.sugar", "quality")
-.plot_variable_boxplot(redwine, "chlorides", "quality")
-.plot_variable_boxplot(redwine, "free.sulfur.dioxide", "quality")
-.plot_variable_boxplot(redwine, "total.sulfur.dioxide", "quality")
-.plot_variable_boxplot(redwine, "density", "quality")
-.plot_variable_boxplot(redwine, "pH", "quality")
-.plot_variable_boxplot(redwine, "sulphates", "quality")
-.plot_variable_boxplot(redwine, "alcohol", "quality")
+#lapply(combined, function(variable) { # variable is not the column name??
+#  .plot_variable_boxplot(combined, variable, "quality")
+#})
+.plot_variable_boxplot(combined, "pH", "quality")
 
 # Distribuzione delle singole covariate
 .plot_variable_by_class(combined, "pH", "quality")
