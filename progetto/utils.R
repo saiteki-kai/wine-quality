@@ -55,6 +55,10 @@ evaluate_model <- function(model, dataset) {
   pred <- predict(model, dataset[names(dataset) != "quality"])
   end_time <- Sys.time()
 
+  # ROC and AUC
+  #sscurves <- evalmod(scores = as.numeric(pred), labels = combined$test$quality)
+  #autoplot(sscurves)
+
   # Print confusion matrix
   cm <- confusionMatrix(data = pred, reference = dataset$quality, mode = 'prec_recall')
 
@@ -87,4 +91,30 @@ combine_redwhite <- function() {
   write.csv(wines, "./dataset/winequality-combined.csv", row.names = FALSE)
 
   wines
+}
+
+#' Plot ROC and precision_recall_curve for all the models specified
+#' @param dataset a dataset
+#' @param models a list of models
+#'
+#' @return AUCs for ROC and PRC for all the models
+plot_roc_and_prc_all <- function(dataset, models) {
+  nb_pred <- as.numeric(predict(models$nb_model, dataset[names(dataset) != "quality"]))
+  dt_pred <- as.numeric(predict(models$dt_model, dataset[names(dataset) != "quality"]))
+  svm_pred <- as.numeric(predict(models$svm_model, dataset[names(dataset) != "quality"]))
+  nn_pred <- as.numeric(predict(models$nn_model, dataset[names(dataset) != "quality"]))
+
+  scores <- join_scores(nb_pred, dt_pred, svm_pred, nn_pred)
+  labels <- join_labels(dataset$quality, dataset$quality, dataset$quality, dataset$quality)
+  mmmdat <- mmdata(scores, labels, modnames = c("nb", "dt", "svm", "nn"), dsids = c(1, 2, 3, 4))
+  sscurves <- evalmod(mmmdat) # mode = 'aucroc'
+
+  # Plot ROC and PRC
+  autoplot(sscurves)
+
+  # Calculate CI of AUCs with normal distibution
+  auc_ci <- auc_ci(sscurves)
+
+  # Use knitr::kable to display the result in a table format
+  knitr::kable(auc_ci)
 }

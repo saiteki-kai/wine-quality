@@ -1,6 +1,6 @@
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, dplyr, doParallel)
+pacman::p_load(caret, dplyr, doParallel, ggplot2, grid, precrec)
 
 # Local functions
 source("./utils.R")
@@ -24,10 +24,10 @@ registerDoParallel(cores = cores)
 cluster <- makeCluster(cores)
 
 # Train the model
-nb_model <- nb_classification(combined$train)
-dt_model <- dt_classification(combined$train)
-svm_model <- svm_classification(combined$train)
-nn_model <- nn_classification(combined$train)
+#nb_model <- nb_classification(combined$train)
+#dt_model <- dt_classification(combined$train)
+#svm_model <- svm_classification(combined$train)
+#nn_model <- nn_classification(combined$train)
 
 # Stop using parallel computing
 stopCluster(cluster)
@@ -37,3 +37,8 @@ evaluate_model(nb_model, combined$test)
 evaluate_model(dt_model, combined$test)
 evaluate_model(svm_model, combined$test)
 evaluate_model(nn_model, combined$test)
+
+plot_roc_and_prc_all(combined$test, list(nb_model=nb_model,
+                                         dt_model=dt_model,
+                                         svm_model=svm_model,
+                                         nn_model=nn_model))
