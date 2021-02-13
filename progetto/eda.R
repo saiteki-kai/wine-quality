@@ -119,6 +119,30 @@ config2 <- preprocess_dataset(combined, 2)
 config1 <- preprocess_dataset(combined, 1)
 .plot_class_barplot(config1, "quality")
 
+# Distribuzione Dati Red only Configurazione 1: Multiclasse
+config3 <- preprocess_dataset(redwine, 3)
+.plot_class_barplot(config3, "quality")
+
+# Distribuzione Dati Red only Configurazione 2: 3 Classi
+config2 <- preprocess_dataset(redwine, 2)
+.plot_class_barplot(config2, "quality")
+
+# Distribuzione Dati Red only Configurazione 3: 2 Classi
+config1 <- preprocess_dataset(redwine, 1)
+.plot_class_barplot(config1, "quality")
+
+# Distribuzione Dati white only Configurazione 1: Multiclasse
+config3 <- preprocess_dataset(whitewine, 3)
+.plot_class_barplot(config3, "quality")
+
+# Distribuzione Dati white only Configurazione 2: 3 Classi
+config2 <- preprocess_dataset(whitewine, 2)
+.plot_class_barplot(config2, "quality")
+
+# Distribuzione Dati white only Configurazione 3: 2 Classi
+config1 <- preprocess_dataset(whitewine, 1)
+.plot_class_barplot(config1, "quality")
+
 
 # Plot ouliers
 .plot_outliers(config1, "pH")
