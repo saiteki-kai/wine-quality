@@ -13,11 +13,11 @@ repository [https://archive.ics.uci.edu/ml/datasets/wine+quality](https://archiv
 
 ### EDA
 
-- [x] Variable Summary
-- [x] Check Null, Missing Data 
+- [x] Variable Summary @saiteki-kai
+- [x] Check Null, Missing Data @saiteki-kai
 - [ ] Distribution Analysis (Red, White, Both) & Class Options (10 classes, 2 classes, 3 classes)
 - [ ] Attribute Distribution By Class
-- [ ] Box Plot
+- [ ] Box Plot @saiteki-kai
 - [ ] Correlation Map
 - [ ] PCA
 
@@ -29,7 +29,7 @@ repository [https://archive.ics.uci.edu/ml/datasets/wine+quality](https://archiv
 
 ### Classification
 
-- [x] Naive Bayes
+- [x] Naive Bayes @saiteki-kai
 - [ ] Other Model (to be decided) 
 - [x] Train, Test
 
