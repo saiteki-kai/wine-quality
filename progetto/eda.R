@@ -80,6 +80,17 @@
   list(lower = lower, upper = upper)
 }
 
+.plot_pca <- function (dataset) {
+  normalized <- normalize_dataset(dataset)
+  pca <- prcomp(cov(normalized[1:11]))
+
+  # Calculate eigenvalue to check how many PCs we can pick up
+  eig <- get_eigenvalue(pca)
+  print(eig)
+  pca_plot <- fviz_eig(pca, addlabels = TRUE, ncp = 11)
+  plot(pca_plot)
+}
+
 # Install packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(corrplot, ggplot2, dplyr, naniar, patchwork, factoextra)
@@ -95,8 +106,6 @@ whitewine <- read.csv("./dataset/winequality-white.csv")
 # Summary report
 summary(combined)
 
-# Check Missing Values
-miss_var_summary(combined)
 
 # Distribuzione Dati Red & White
 .plot_class_barplot(combined, "quality")
@@ -107,29 +116,6 @@ miss_var_summary(combined)
 # Distribuzione Dati White Only
 .plot_class_barplot(whitewine, "quality")
 
-# Distribuzione Dati Red & White Configurazione 1: Multiclasse
-config3 <- preprocess_dataset(combined, 3)
-.plot_class_barplot(config3, "quality")
-
-# Distribuzione Dati Red & White Configurazione 2: 3 Classi
-config2 <- preprocess_dataset(combined, 2)
-.plot_class_barplot(config2, "quality")
-
-# Distribuzione Dati Red & White Configurazione 3: 2 Classi
-config1 <- preprocess_dataset(combined, 1)
-.plot_class_barplot(config1, "quality")
-
-# Distribuzione Dati Red only Configurazione 1: Multiclasse
-config3 <- preprocess_dataset(redwine, 3)
-.plot_class_barplot(config3, "quality")
-
-# Distribuzione Dati Red only Configurazione 2: 3 Classi
-config2 <- preprocess_dataset(redwine, 2)
-.plot_class_barplot(config2, "quality")
-
-# Distribuzione Dati Red only Configurazione 3: 2 Classi
-config1 <- preprocess_dataset(redwine, 1)
-.plot_class_barplot(config1, "quality")
 
 # Distribuzione Dati white only Configurazione 1: Multiclasse
 config3 <- preprocess_dataset(whitewine, 3)
@@ -143,6 +129,9 @@ config2 <- preprocess_dataset(whitewine, 2)
 config1 <- preprocess_dataset(whitewine, 1)
 .plot_class_barplot(config1, "quality")
 
+
+# Check Missing Values
+miss_var_summary(combined)
 
 # Plot ouliers
 .plot_outliers(config1, "pH")
@@ -158,7 +147,10 @@ config1 <- preprocess_dataset(whitewine, 1)
 # Distribuzione delle singole covariate
 .plot_variable_by_class(config1, "pH", "quality")
 
+
 # Plot correlation matrix
 corrplot.mixed(cor(config1[names(config1) != "quality"]), tl.pos = "lt", tl.cex = .8, number.cex = .8)
 
+
 # PCA Analysis
+.plot_pca(config1)

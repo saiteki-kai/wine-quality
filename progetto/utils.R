@@ -137,3 +137,14 @@ write_log <- function (model_name, measures, train_time, pred_time) {
   write.table(paste("precision: ", measures$precision), file, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(paste("recall: ", measures$recall), file, row.names = FALSE, col.names = FALSE, append = TRUE)
 }
+
+#' Feature Reduction with PCA
+#' @param dataset a dataset
+#'
+#' @return a data.frame with the reduced features + target
+calculate_pca <- function(dataset) {
+  pca <- prcomp(cov(dataset[1:11]))
+  components <- as.matrix(dataset[1:11]) %*% pca$x[, 1:4]
+  dataset <- data.frame(quality = dataset$quality, components)
+  dataset
+}

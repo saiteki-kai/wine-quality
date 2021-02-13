@@ -1,6 +1,6 @@
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, dplyr, doParallel, ggplot2, grid, precrec)
+pacman::p_load(caret, dplyr, doParallel, ggplot2, grid, precrec, factoextra)
 
 # Local functions
 source("./utils.R")
@@ -17,6 +17,10 @@ combined <- read.csv("./dataset/winequality-combined.csv") %>%
 # Normalize the data
 combined$train <- normalize_dataset(combined$train)
 combined$test <- normalize_dataset(combined$test)
+
+# Calculate PCA
+#combined$train <- calculate_pca(combined$train)
+#combined$test <- calculate_pca(combined$test)
 
 # Register parallel processing
 cores <- detectCores()
