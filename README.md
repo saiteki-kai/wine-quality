@@ -15,27 +15,28 @@ repository [https://archive.ics.uci.edu/ml/datasets/wine+quality](https://archiv
 
 - [x] Variable Summary #Giuseppe
 - [x] Check Null, Missing Data #Giuseppe
-- [ ] Distribution Analysis (Red, White, Both) & Class Options (10 classes, 2 classes, 3 classes)
-- [ ] Attribute Distribution By Class
+- [x] Distribution Analysis (Red, White, Both) & Class Options (10 classes, 2 classes, 3 classes) #Mirco
+- [ ] Attribute Distribution By Class #Mirco
 - [ ] Box Plot #Giuseppe
-- [ ] Correlation Map
-- [ ] PCA
+- [ ] Correlation Map #Giuseppe
+- [ ] PCA #Gaetano
 
 ### Preprocessing
 
-- [ ] Class Attribute
-- [ ] Normalization / Standardization
-- [ ] Feature Selection (if needed)
+- [ ] Class Attribute #Giuseppe
+- [ ] Normalization / Standardization #Giuseppe
+- [ ] Feature Selection (if needed) #Gaetano
 
 ### Classification
 
 - [x] Naive Bayes #Giuseppe
-- [ ] Other Model (to be decided) 
-- [x] Train, Test
+- [ ] Other Model (to be decided) #Geatano
+- [x] Train, Test #Gaetano, Giuseppe
 
 ### Model Evaluation
 
-- [x] Confusion Matrix
-- [x] F1, Accuracy, Recall, ...
+- [x] Confusion Matrix #Gaetano
+- [x] F1, Accuracy, Recall, ... #Gaetano
+- [x] AUCs ROC & PRC #Gaetano
 - [ ] Model Comparison
 - [ ] Computational Time
