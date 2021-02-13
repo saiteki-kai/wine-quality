@@ -35,6 +35,62 @@
     )
 }
 
+#'
+.plot_hist_and_boxplot <- function(dataset, attribute) {
+  values <- dataset[[attribute]]
+  outlier_bounds <- detect_outliers(values)
+
+  min_attribute <- min(values)
+  max_attribute <- max(values)
+
+  x_scale <- scale_x_continuous(limits = c(min_attribute, max_attribute), breaks = pretty(values, n = 5))
+
+  boxplot <- dataset %>%
+    ggplot(aes_string(x = attribute)) +
+    geom_boxplot(aes(y = ""), outlier.shape = "cross") +
+    geom_vline(xintercept = outlier_bounds$lower, linetype = 'dotted') +
+    geom_vline(xintercept = outlier_bounds$upper, linetype = 'dotted') +
+    labs(y = NULL) +
+    x_scale +
+    theme(axis.text.y = element_blank())
+
+  histogram <- dataset %>%
+    ggplot(aes_string(x = attribute), show.legend = TRUE) +
+    geom_histogram(aes(y = ..density..), position = "identity", alpha = 0.5) +
+    geom_vline(xintercept = outlier_bounds$lower, linetype = 'dotted') +
+    geom_vline(xintercept = outlier_bounds$upper, linetype = 'dotted') +
+    annotate(
+      x = outlier_bounds$lower,
+      y = +Inf,
+      label = "\nQ1 - 1.5 * IQR",
+      hjust = 2,
+      angle = 90,
+      geom = "text"
+    ) +
+    annotate(
+      x = outlier_bounds$upper,
+      y = +Inf,
+      label = "\nQ3 + 1.5 * IQR",
+      hjust = 2,
+      angle = 90,
+      geom = "text"
+    ) +
+    labs(y = "count", x = NULL) +
+    x_scale +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      legend.position = c(.95, .95),
+      legend.justification = c("right", "top"),
+      legend.box.just = "right",
+      legend.margin = margin(6, 6, 6, 6)
+    )
+
+  (histogram / boxplot) + plot_layout(heights = c(5, 1), guides = "collect")
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+
 # Install packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(ggplot2, dplyr, naniar, patchwork)
@@ -45,7 +101,15 @@ source("./utils.R")
 dataset <- read.csv("./dataset/winequality-combined.csv")
 dataset$quality <- factor(dataset$quality) # IMPORTANT
 
-# Print a scatter plot for each attribute with and without outliers
+# Print histogram and boxplot for each attribute
+for (attribute in names(dataset)) {
+  if (is.numeric(dataset[[attribute]])) {
+    p <- .plot_hist_and_boxplot(dataset, attribute)
+    print(p)
+  }
+}
+
+# Print scatter plot for each attribute with and without outliers
 for (label in c("quality", "type")) {
   for (attribute in names(dataset)) {
     if (is.numeric(dataset[[attribute]])) {
@@ -56,9 +120,9 @@ for (label in c("quality", "type")) {
   }
 }
 
-
-# Analyse Outliers
-# dataset <- preprocess_dataset(dataset, 1)
+# Visualize the number of outliers per attribute
+dataset <- read.csv("./dataset/winequality-combined.csv")
+dataset <- preprocess_dataset(dataset, 1)
 dataset <- remove_outliers(dataset)
-#gg_miss_var(dataset, quality)
-#gg_miss_fct(dataset, quality)
+gg_miss_var(dataset, quality)
+gg_miss_fct(dataset, quality)
