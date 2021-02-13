@@ -18,7 +18,7 @@ repository [https://archive.ics.uci.edu/ml/datasets/wine+quality](https://archiv
 - [x] Distribution Analysis (Red, White, Both) & Class Options (10 classes, 2 classes, 3 classes) #Mirco
 - [ ] Attribute Distribution By Class #Mirco
 - [ ] Box Plot #Giuseppe
-- [ ] Correlation Map #Giuseppe
+- [ ] Correlation Map #Gaetano
 - [ ] PCA #Gaetano
 
 ### Preprocessing
