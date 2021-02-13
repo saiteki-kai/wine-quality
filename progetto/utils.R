@@ -1,11 +1,13 @@
 #' Convert the quality attribute based on the configuration
 #' @param dataset a dataset
-#' @param config the followings:
-#' (config = 1) -> (0 -> bad-quality, 1 -> good-quality)
-#' (config = 2) -> (0 -> low-quality, 1 -> medium-quality, 2 -> high-quality)
-#' (config = 3) -> (0 -> low-quality, ..., 10 -> high-quality levels of quality)
+#' @param config indicates the class configuration to be used
+#'
+#' @details
+#' config = 1  -> 2 classes (0: bad-quality, 1: good-quality)
+#' config = 2  -> 3 classes (0: low-quality, 1: medium-quality, 2: high-quality)
+#' config = 3 (default) -> 10 classes (0: low-quality, ..., 10: high-quality)
 #' @return the processed dataset
-preprocess_dataset <- function(dataset, config) {
+preprocess_dataset <- function(dataset, config = 3) {
   dataset$type <- NULL
 
   if (config == 1) {
@@ -15,10 +17,11 @@ preprocess_dataset <- function(dataset, config) {
     dataset$quality <- ifelse(dataset$quality <= 5, 0, ifelse(dataset$quality <= 7, 1, 2))
     dataset$quality <- factor(dataset$quality, levels = c(0, 1, 2)) # labels = c("low", "medium", "high")
   }
+
   dataset
 }
 
-#' Patition the dataset based on the class attribute
+#' Partion the dataset based on the class attribute
 #'
 #' @param dataset a dataset
 #' @return the partition composed of train and test
@@ -72,7 +75,7 @@ evaluate_model <- function(model, dataset) {
     recall = cm$byClass["Recall"]
   )
 
- out <- list(cm = cm, measures = measures, pred_time = time)
+  out <- list(cm = cm, measures = measures, pred_time = time)
 }
 
 #' Combine the red and the white datasets and add type attribute.
@@ -126,7 +129,7 @@ plot_roc_and_prc_all <- function(dataset, models) {
 #' @param train_time training time
 #' @param pred_time prediction time
 #'
-write_log <- function (model_name, measures, train_time, pred_time) {
+write_log <- function(model_name, measures, train_time, pred_time) {
   file <- file.path("./results", paste0(model_name, "_.log"))
   write.table(paste("model_name: ", model_name), file, row.names = FALSE, col.names = FALSE)
   write.table(paste("pred_time: ", pred_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
@@ -136,6 +139,42 @@ write_log <- function (model_name, measures, train_time, pred_time) {
   write.table(paste("f1: ", measures$f1), file, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(paste("precision: ", measures$precision), file, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(paste("recall: ", measures$recall), file, row.names = FALSE, col.names = FALSE, append = TRUE)
+}
+
+#' Detect outliers using the Interquartile Range (IQR) approach.
+#' All points that lie outside the upper limit or below the lower limit can be considered outliers.
+#'
+#' @param data numeric array
+#'
+#' @details
+#' IQR = 75th quantile - 25th quantile
+#' Lower Limit = 25th quantile - 1.5 * IQR
+#' Upper Limit = 75th quantile + 1.5 * IQR
+#'
+#' @return a list containing the lower and upper limits
+detect_outliers <- function(data) {
+  quantiles <- quantile(data, c(0.25, 0.75), names = FALSE)
+  lower <- quantiles[1] - 1.5 * IQR(data)
+  upper <- quantiles[2] + 1.5 * IQR(data)
+
+  list(lower = lower, upper = upper)
+}
+
+#' Remove the outliers setting values to NA
+#'
+#' @param dataset a dataset
+#' @return the dataset without outliers
+remove_outliers <- function(dataset) {
+  out <- dataset
+  for (i in names(out)) {
+    values <- out[[i]]
+    if (is.numeric(values)) {
+      bounds <- detect_outliers(values)
+      is_outlier <- values < bounds$lower | values > bounds$upper
+      out[[i]][is_outlier] <- NA
+    }
+  }
+  out
 }
 
 #' Feature Reduction with PCA
