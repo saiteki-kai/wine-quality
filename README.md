@@ -39,4 +39,4 @@ repository [https://archive.ics.uci.edu/ml/datasets/wine+quality](https://archiv
 - [x] F1, Accuracy, Recall, ... #Gaetano
 - [x] AUCs ROC & PRC #Gaetano
 - [ ] Model Comparison
-- [ ] Computational Time
+- [ ] Computational Time #Gaetano
