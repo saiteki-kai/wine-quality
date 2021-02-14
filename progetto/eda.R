@@ -104,60 +104,79 @@ config1 <- preprocess_dataset(whitewine, 1)
 
 #Attribute Distribution By Class
 #fixed.acidity
-ggplot(combined, aes(x=combined$fixed.acidity, title=fixed.acidity)) +
-  geom_histogram(color="red") +
+ggplot(combined, aes(x=fixed.acidity, title=fixed.acidity)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
   geom_freqpoly(color="blue")
 
 #volatile.acidity
 ggplot(combined, aes(x=combined$volatile.acidity, title=volatile.acidity)) +
-  geom_histogram(color="red") +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
   geom_freqpoly(color="blue")
 
 #citric.acid
-ggplot(combined, aes(x=combined$citric.acid, title=citric.acid)) +
-  geom_histogram(color="red") +
+ggplot(combined, aes(x=citric.acid, title=citric.acid)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
   geom_freqpoly(color="blue")
 
-
 #residual.sugar
-ggplot(combined, aes(x=combined$residual.sugar, title=residual.sugar)) +
-  geom_histogram(color="red") +
+ggplot(combined, aes(x=residual.sugar, title=residual.sugar)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
   geom_freqpoly(color="blue")
 
 #chlorides
-ggplot(combined, aes(x=combined$chlorides, title=chlorides)) +
-  geom_histogram(color="red") +
+ggplot(combined, aes(x=chlorides, title=chlorides)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
   geom_freqpoly(color="blue")
 
 #free.sulfur.dioxide
-ggplot(combined, aes(x=combined$free.sulfur.dioxide, title=free.sulfur.dioxide)) +
-  geom_histogram(color="red") +
+ggplot(combined, aes(x=free.sulfur.dioxide, title=free.sulfur.dioxide)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
   geom_freqpoly(color="blue")
 
 #total.sulfur.dioxide
-ggplot(combined, aes(x=combined$total.sulfur.dioxide, title=fixed.aciditytotal.sulfur.dioxide)) +
-  geom_histogram(color="red") +
+ggplot(combined, aes(x=total.sulfur.dioxide, title=total.sulfur.dioxide)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
   geom_freqpoly(color="blue")
 
 #density
-ggplot(combined, aes(x=combined$density, title=density)) +
-  geom_histogram(color="red") +
+ggplot(combined, aes(x=density, title=density)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
   geom_freqpoly(color="blue")
 
 #pH
-ggplot(combined, aes(x=combined$pH, title=pH)) +
-  geom_histogram(color="red") +
+ggplot(combined, aes(x=pH, title=pH)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
   geom_freqpoly(color="blue")
 
 #sulphates
-ggplot(combined, aes(x=combined$sulphates, title=sulphates)) +
-  geom_histogram(color="red") +
+ggplot(combined, aes(x=sulphates, title=sulphates)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
   geom_freqpoly(color="blue")
 
 #alcohol
-ggplot(combined, aes(x=combined$alcohol, title=alcohol)) +
-  geom_histogram(color="red") +
+ggplot(combined, aes(x=alcohol, title=alcohol)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
   geom_freqpoly(color="blue")
+
+
+
+config1_0<-config1 %>% filter(quality == 0)
+config1_1<-config1 %>% filter(quality == 1)
+
+p1<-ggplot(config1_0, aes(x=pH)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
+  ylim(0,750) +
+  ggtitle("ph quality 0")
+
+p2<-ggplot(config1_1, aes(x=pH)) +
+  geom_histogram(alpha=0.7, color="red", fill="#FF6666") +
+  ylim(0,750) +
+  ggtitle("ph quality 1")
+
+p1+p2
+
+
+
 
 # Plot boxplot
 .plot_variable_boxplot(config1, "pH", "quality")
