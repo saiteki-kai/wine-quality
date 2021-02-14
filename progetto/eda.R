@@ -57,50 +57,70 @@ summary(combined)
 # Check Missing Values
 miss_var_summary(combined)
 
-# Distribuzione Dati Red & White
-.plot_class_barplot(combined, "quality")
-
-# Distribuzione Dati Red Only
-.plot_class_barplot(redwine, "quality")
-
-# Distribuzione Dati White Only
-.plot_class_barplot(whitewine, "quality")
-
-# Distribuzione Dati Red & White Configurazione 1: Multiclasse
-config3 <- preprocess_dataset(combined, 3)
-.plot_class_barplot(config3, "quality")
-
-# Distribuzione Dati Red & White Configurazione 2: 3 Classi
-config2 <- preprocess_dataset(combined, 2)
-.plot_class_barplot(config2, "quality")
-
-# Distribuzione Dati Red & White Configurazione 3: 2 Classi
+#red AND white wine quality by different class
+#combined separate by two class of quality
 config1 <- preprocess_dataset(combined, 1)
-.plot_class_barplot(config1, "quality")
 
-# Distribuzione Dati Red only Configurazione 1: Multiclasse
-config3 <- preprocess_dataset(redwine, 3)
-.plot_class_barplot(config3, "quality")
+#combined separate by three class of quality
+config2 <- preprocess_dataset(combined, 2)
 
-# Distribuzione Dati Red only Configurazione 2: 3 Classi
-config2 <- preprocess_dataset(redwine, 2)
-.plot_class_barplot(config2, "quality")
+#red and white wine quality
+p1 <- ggplot(combined, aes(x=quality, fill=type)) +
+  geom_bar() +
+  ggtitle("red and white quality")
 
-# Distribuzione Dati Red only Configurazione 3: 2 Classi
-config1 <- preprocess_dataset(redwine, 1)
-.plot_class_barplot(config1, "quality")
+#red and white quality by two class
+p2 <- ggplot(config1, aes(x=quality, fill=type)) +
+  geom_bar() +
+  ggtitle("quality by two class")
 
-# Distribuzione Dati white only Configurazione 1: Multiclasse
-config3 <- preprocess_dataset(whitewine, 3)
-.plot_class_barplot(config3, "quality")
+#red and white quality by three class
+p3 <- ggplot(config2, aes(x=quality, fill=type)) +
+  geom_bar() +
+  ggtitle("quality by three class")
 
-# Distribuzione Dati white only Configurazione 2: 3 Classi
-config2 <- preprocess_dataset(whitewine, 2)
-.plot_class_barplot(config2, "quality")
+p1 + p3 + p2
 
-# Distribuzione Dati white only Configurazione 3: 2 Classi
-config1 <- preprocess_dataset(whitewine, 1)
-.plot_class_barplot(config1, "quality")
+#red OR white wine quality by different class
+#red and white wine separate by two class
+config1_redwine <- preprocess_dataset(redwine, 1)
+config1_whitewine <- preprocess_dataset(whitewine, 1)
+
+#red and white wine separate by three class
+config2_redwine <- preprocess_dataset(redwine, 2)
+config2_whitewine <- preprocess_dataset(whitewine, 2)
+
+#red wine quality
+p1 <- ggplot(redwine, aes(x=quality)) +
+  geom_bar(alpha=0.7, color="red", fill="#FF6666") +
+  ggtitle("red wine")
+
+#red wine quality by two class
+p2 <- ggplot(config1_redwine, aes(x=quality)) +
+  geom_bar(alpha=0.7, color="red", fill="#FF6666") +
+  ggtitle("red wine by two class")
+
+#red wine quality by three class
+p3 <- ggplot(config2_redwine, aes(x=quality)) +
+  geom_bar(alpha=0.7, color="red", fill="#FF6666") +
+  ggtitle("red wine by three class")
+
+#white wine quality
+p4 <- ggplot(whitewine, aes(x=quality)) +
+  geom_bar(alpha=0.7, color="black", fill="#FFFFFF") +
+  ggtitle("white wine")
+
+#white wine quality by two class
+p5 <- ggplot(config1_whitewine, aes(x=quality)) +
+  geom_bar(alpha=0.7, color="black", fill="#FFFFFF") +
+  ggtitle("white wine by two class")
+
+#white wine quality by three class
+p6 <- ggplot(config2_whitewine, aes(x=quality)) +
+  geom_bar(alpha=0.7, color="black", fill="#FFFFFF") +
+  ggtitle("white wine by three class")
+
+(p1 + p3 + p2) / (p4 + p6 +p5)
 
 #Attribute Distribution By Class
 config1_0<-config1 %>% filter(quality == 0)

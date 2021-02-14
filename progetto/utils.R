@@ -8,7 +8,7 @@
 #' config = 3 (default) -> 10 classes (0: low-quality, ..., 10: high-quality)
 #' @return the processed dataset
 preprocess_dataset <- function(dataset, config = 3) {
-  dataset$type <- NULL
+  #dataset$type <- NULL
 
   if (config == 1) {
     dataset$quality <- ifelse(dataset$quality > 6, 0, 1)
