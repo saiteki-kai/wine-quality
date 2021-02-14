@@ -16,7 +16,7 @@ repository [https://archive.ics.uci.edu/ml/datasets/wine+quality](https://archiv
 - [x] Variable Summary #Giuseppe
 - [x] Check Null, Missing Data #Giuseppe
 - [x] Distribution Analysis (Red, White, Both) & Class Options (10 classes, 2 classes, 3 classes) #Mirco
-- [ ] Attribute Distribution By Class #Mirco
+- [x] Attribute Distribution By Class #Mirco
 - [x] Box Plot #Giuseppe
 - [ ] Correlation Map #Gaetano
 - [ ] PCA #Gaetano
