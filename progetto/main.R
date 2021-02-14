@@ -1,6 +1,13 @@
+.get_model <- function(name) {
+  filename <- file.path("./models", paste0(name, "_model.RDS"))
+  if (file.exists(filename)) {
+    readRDS(filename)
+  }
+}
+
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, dplyr, doParallel, ggplot2, grid, precrec, factoextra)
+pacman::p_load(caret, doParallel, ggplot2, grid, precrec, factoextra, wrapr, dplyr)
 
 # Local functions
 source("./utils.R")
@@ -27,11 +34,11 @@ cores <- detectCores()
 registerDoParallel(cores = cores)
 cluster <- makeCluster(cores)
 
-# Train the model
-m1 <- nb_classification(combined$train)
-m2 <- dt_classification(combined$train)
-m3 <- svm_classification(combined$train)
-m4 <- nn_classification(combined$train)
+# Train the models
+m1 <- .get_model("nb") %??% nb_classification(combined$train)
+m2 <- .get_model("dt") %??% dt_classification(combined$train)
+m3 <- .get_model("svm") %??% svm_classification(combined$train)
+m4 <- .get_model("nn") %??% nn_classification(combined$train)
 
 # Stop using parallel computing
 stopCluster(cluster)
@@ -43,10 +50,10 @@ res3 <- evaluate_model(m3$model, combined$test)
 res4 <- evaluate_model(m4$model, combined$test)
 
 # Plot AUCs ROC & PRC
-plot_roc_and_prc_all(combined$test, list(nb_model=m1$model,
-                                         dt_model=m2$model,
-                                         svm_model=m3$model,
-                                         nn_model=m4$model))
+plot_roc_and_prc_all(combined$test, list(nb_model = m1$model,
+                                         dt_model = m2$model,
+                                         svm_model = m3$model,
+                                         nn_model = m4$model))
 
 # Write Logs
 write_log(m1$model$method, res1$measures, m1$train_time, res1$pred_time)
