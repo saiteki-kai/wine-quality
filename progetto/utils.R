@@ -187,3 +187,8 @@ calculate_pca <- function(dataset) {
   dataset <- data.frame(quality = dataset$quality, components)
   dataset
 }
+
+save_plot_png <- function(filename, plot, wide = FALSE) {
+  ggsave(filename, plot = plot, device = "png", height = 6.67, width = ifelse(wide, 13.34, 6.67))
+}
+
