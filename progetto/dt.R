@@ -38,7 +38,7 @@ dt_classification <- function(trainset) {
   fancyRpartPlot(dt_model$finalModel)
 
   # Save the model
-  save(dt_model, file = "./models/dt_model.RData")
+  saveRDS(dt_model, file = "./models/dt_model.RDS")
 
   # Return
   list(model = dt_model, train_time = time)

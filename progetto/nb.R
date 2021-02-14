@@ -30,7 +30,7 @@ nb_classification <- function(trainset) {
   time <- end_time - start_time
 
   # Save the model
-  save(nb_model, file = "./models/nb_model.RData")
+  saveRDS(nb_model, file = "./models/nb_model.RDS")
 
   # Return
   list(model = nb_model, train_time = time)

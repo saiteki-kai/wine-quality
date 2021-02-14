@@ -39,7 +39,7 @@ svm_classification <- function(trainset) {
   time <- end_time - start_time
 
   # Save the model
-  save(svm_model, file = "./models/svm_model.RData")
+  saveRDS(svm_model, file = "./models/svm_model.RDS")
 
   # Return
   list(model = svm_model, train_time = time)

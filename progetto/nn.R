@@ -31,7 +31,7 @@ nn_classification <- function(trainset) {
   time <- end_time - start_time
 
   # Save the model
-  save(nn_model, file = "./models/nn_model.RData")
+  saveRDS(nn_model, file = "./models/nn_model.RDS")
 
   # Return
   list(model = nn_model, train_time = time)
