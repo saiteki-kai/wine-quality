@@ -91,6 +91,7 @@ config2 <- preprocess_dataset(combined, 2)
 
 # Plot correlation matrix
 .plot_correlation_heatmap(config2)
+# corrplot.mixed(cor(config1[names(config1) != "quality"]), tl.pos = "lt", tl.cex = .8, number.cex = .8)
 
 config2$alcohol <- log10(config2$alcohol)
 config2$density <- log10(config2$density)
@@ -142,10 +143,9 @@ But since, only below four contributes towards wine quality : (alcohol, density,
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-pca <- prcomp(dataset, scale = TRUE, center = TRUE)
 dataset$quality <- NULL
 dataset$type <- NULL
+pca <- prcomp(dataset, scale = TRUE, center = TRUE)
 eig <- get_eig(pca)
 keep <- eig$cumulative.variance.percent < 95
-new_dataset <- (pca$x %*% pca$rotation[, keep]) *
-  pca$scale[keep] - pca$center[keep]  # NON sono sicuro di questo filtro (ordine delle cose??)
+# new_dataset <- (((pca$x + pca$center) * pca$scale)  %*% pca$rotation[, keep])
