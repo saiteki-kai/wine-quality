@@ -5,8 +5,8 @@
 
 .global_distribution <- function(data, attribute) {
   p <- data %>% ggplot(aes_string(x = attribute, title = attribute)) +
-    geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666") +
-    geom_freqpoly(color = "blue")
+    geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
+    geom_freqpoly(color = "blue", bins = 40)
   print(p)
 }
 
@@ -14,29 +14,31 @@
   p1 <- data %>%
     filter(quality == 0) %>%
     ggplot(aes_string(x = attribute)) +
-    geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666") +
+    geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
     ylim(0, ymax) +
     ggtitle(paste(attribute, "quality 0"))
 
   p2 <- data %>%
     filter(quality == 1) %>%
     ggplot(aes_string(x = attribute)) +
-    geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666") +
+    geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
     ylim(0, ymax) +
     ggtitle(paste(attribute, "quality 1"))
 
   print(p1 + p2)
 }
 
-.quality_barplot <- function(data, color, title) {
+.type_barplot <- function(data, color, title) {
   data %>% ggplot(aes(x = quality)) +
     geom_bar(alpha = 0.7, color = "black", fill = color) +
+    ylim(0, 4000) +
     ggtitle(title)
 }
 
-.type_barplot <- function(data, title) {
-  data %>% ggplot(aes(x = quality, fill = type)) +
-    geom_bar() +
+.combined_barplot <- function(data, title) {
+  data %>% ggplot(aes(x = quality)) +
+    scale_fill_manual(values = c("red" = "#FF6666", "white" = "white")) +
+    geom_bar(aes(fill = type), position = "dodge2", alpha = 0.7, color = "black") +
     ggtitle(title)
 }
 
@@ -66,9 +68,9 @@ config1 <- preprocess_dataset(combined, 1)
 config2 <- preprocess_dataset(combined, 2)
 
 #red and white wine quality
-p1 <- .type_barplot(combined, "red and white quality")
-p2 <- .type_barplot(config1, "quality by two class")
-p3 <- .type_barplot(config2, "quality by three class")
+p1 <- .combined_barplot(combined, "red and white quality")
+p2 <- .combined_barplot(config1, "quality by two class")
+p3 <- .combined_barplot(config2, "quality by three class")
 
 print(p1 + p3 + p2)
 
@@ -81,13 +83,13 @@ config1_whitewine <- preprocess_dataset(whitewine, 1)
 config2_redwine <- preprocess_dataset(redwine, 2)
 config2_whitewine <- preprocess_dataset(whitewine, 2)
 
-p1 <- .quality_barplot(redwine, "#FF6666", "red wine")
-p2 <- .quality_barplot(config1_redwine, "#FF6666", "red wine by two class")
-p3 <- .quality_barplot(config2_redwine, "#FF6666", "red wine by three class")
+p1 <- .type_barplot(redwine, "#FF6666", "red wine")
+p2 <- .type_barplot(config1_redwine, "#FF6666", "red wine by two class")
+p3 <- .type_barplot(config2_redwine, "#FF6666", "red wine by three class")
 
-p4 <- .quality_barplot(whitewine, "#FFFFFF", "white wine")
-p5 <- .quality_barplot(config1_whitewine, "#FFFFFF", "white wine by two class")
-p6 <- .quality_barplot(config2_whitewine, "#FFFFFF", "white wine by three class")
+p4 <- .type_barplot(whitewine, "#FFFFFF", "white wine")
+p5 <- .type_barplot(config1_whitewine, "#FFFFFF", "white wine by two class")
+p6 <- .type_barplot(config2_whitewine, "#FFFFFF", "white wine by three class")
 
 print((p1 + p3 + p2) / (p4 + p6 + p5))
 
@@ -105,12 +107,12 @@ ymax <- data.frame(
   alcohol = 400
 )
 
-for (i in select(combined, -c("type", "quality")) %>% names()) {
-  if (is.numeric(combined[[i]])) {
-    .global_distribution(combined, i)
-    .class_distribution(config1, i, ymax[[i]])
-  }
-}
+# for (i in select(combined, -c("type", "quality")) %>% names()) {
+#   if (is.numeric(combined[[i]])) {
+#     .global_distribution(combined, i)
+#     .class_distribution(config1, i, ymax[[i]])
+#   }
+# }
 
 # source("./outliers.R")
 # source("./multivariate.R")
