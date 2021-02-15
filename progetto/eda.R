@@ -12,27 +12,11 @@
 
 #.class_distribution <- function(data, attribute, ymax) {
 .class_distribution <- function(data, attribute) {
-  # p1 <- data %>%
-  #   filter(quality == 0) %>%
-  #   ggplot(aes_string(x = attribute)) +
-  #   geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
-  #   ylim(0, ymax) +
-  #   ggtitle(paste(attribute, "quality 0"))
-  # 
-  # p2 <- data %>%
-  #   filter(quality == 1) %>%
-  #   ggplot(aes_string(x = attribute)) +
-  #   geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
-  #   ylim(0, ymax) +
-  #   ggtitle(paste(attribute, "quality 1"))
-  # 
-  # print(p1 + p2)
-  p1<-data %>%
+  p<-data %>%
     ggplot(aes_string(x = attribute, fill = "quality", color = "quality")) +
-    geom_histogram(aes(y = ..density..), position = "identity", alpha = 0.5) +
-    geom_density(alpha = 0.2) +
+    geom_density(alpha = 0.2, bins = 40) +
     ggtitle(attribute)
-  print(p1)
+  print(p)
 }
 
 .type_barplot <- function(data, color, title) {
@@ -108,25 +92,11 @@ p6 <- .type_barplot(config2_whitewine, "#FFFFFF", "white wine by three class")
 
 print((p1 + p3 + p2) / (p4 + p6 + p5))
 
-ymax <- data.frame(
-  fixed.acidity = 800,
-  volatile.acidity = 800,
-  citric.acid = 1100,
-  residual.sugar = 1300,
-  chlorides = 1700,
-  free.sulfur.dioxide = 900,
-  total.sulfur.dioxide = 600,
-  density = 900,
-  pH = 500,
-  sulphates = 500,
-  alcohol = 400
-)
-
 for (i in select(combined, -c("type", "quality")) %>% names()) {
   if (is.numeric(combined[[i]])) {
     .global_distribution(combined, i)
-    #.class_distribution(config1, i, ymax[[i]])
     .class_distribution(config1, i)
+    .class_distribution(config2, i)
   }
 }
 #
