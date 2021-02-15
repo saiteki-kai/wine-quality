@@ -10,22 +10,29 @@
   print(p)
 }
 
-.class_distribution <- function(data, attribute, ymax) {
-  p1 <- data %>%
-    filter(quality == 0) %>%
-    ggplot(aes_string(x = attribute)) +
-    geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
-    ylim(0, ymax) +
-    ggtitle(paste(attribute, "quality 0"))
-
-  p2 <- data %>%
-    filter(quality == 1) %>%
-    ggplot(aes_string(x = attribute)) +
-    geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
-    ylim(0, ymax) +
-    ggtitle(paste(attribute, "quality 1"))
-
-  print(p1 + p2)
+#.class_distribution <- function(data, attribute, ymax) {
+.class_distribution <- function(data, attribute) {
+  # p1 <- data %>%
+  #   filter(quality == 0) %>%
+  #   ggplot(aes_string(x = attribute)) +
+  #   geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
+  #   ylim(0, ymax) +
+  #   ggtitle(paste(attribute, "quality 0"))
+  # 
+  # p2 <- data %>%
+  #   filter(quality == 1) %>%
+  #   ggplot(aes_string(x = attribute)) +
+  #   geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
+  #   ylim(0, ymax) +
+  #   ggtitle(paste(attribute, "quality 1"))
+  # 
+  # print(p1 + p2)
+  p1<-data %>%
+    ggplot(aes_string(x = attribute, fill = "quality", color = "quality")) +
+    geom_histogram(aes(y = ..density..), position = "identity", alpha = 0.5) +
+    geom_density(alpha = 0.2) +
+    ggtitle(attribute)
+  print(p1)
 }
 
 .type_barplot <- function(data, color, title) {
@@ -118,7 +125,8 @@ ymax <- data.frame(
 for (i in select(combined, -c("type", "quality")) %>% names()) {
   if (is.numeric(combined[[i]])) {
     .global_distribution(combined, i)
-    .class_distribution(config1, i, ymax[[i]])
+    #.class_distribution(config1, i, ymax[[i]])
+    .class_distribution(config1, i)
   }
 }
 #
