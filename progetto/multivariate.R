@@ -1,7 +1,7 @@
 .plot_pca <- function(dataset) {
-  normalized <- normalize_dataset(dataset)
+  dataset$quality <- NULL
 
-  pca <- prcomp(cov(normalized[1:11]))
+  pca <- prcomp(dataset, center = TRUE, scale = TRUE)
   eig <- get_eigenvalue(pca)
   var <- get_pca_var(pca)
 
@@ -14,7 +14,7 @@
   fviz_pca_var(pca, col.var = 'black')
 
   print('b')
-  corrplot(var$cos2, is.corr=FALSE)
+  corrplot(var$cos2, is.corr = FALSE)
 
   print('c')
   fviz_pca_var(pca, col.var = 'cos2',
@@ -22,12 +22,12 @@
                repel = TRUE)
 
   print('c')
-  corrplot(var$contrib, is.corr=FALSE)
+  corrplot(var$contrib, is.corr = FALSE)
 
   print('d')
   fviz_pca_var(pca, col.var = 'contrib',
-             gradient.cols = c('#00AFBB', '#E7B800', '#FC4E07'),
-             repel = TRUE)
+               gradient.cols = c('#00AFBB', '#E7B800', '#FC4E07'),
+               repel = TRUE)
 
   print('e')
 }
@@ -40,27 +40,27 @@
 }
 
 .plot_scatter <- function(dataset, attr1, attr2, color, title) {
-  ggplot(dataset, aes_string(x=attr1, y=attr2)) +
-      geom_jitter(aes_string(color = color), size=2, alpha=0.7) +
-      geom_smooth(method='lm', formula= y~x) +
-      ggtitle(title)
+  ggplot(dataset, aes_string(x = attr1, y = attr2)) +
+    geom_jitter(aes_string(color = color), size = 2, alpha = 0.7) +
+    geom_smooth(method = 'lm', formula = y ~ x) +
+    ggtitle(title)
 }
 
 .plot_median_barplot <- function(dataset, attr1) {
-  x <- aggregate(dataset[[attr1]], by=list(dataset$quality), FUN=median)
-  ggplot(data=x, aes_string(x="Group.1", y="x")) +
-    geom_bar(stat="identity", aes_string(fill="Group.1")) +
+  x <- aggregate(dataset[[attr1]], by = list(dataset$quality), FUN = median)
+  ggplot(data = x, aes_string(x = "Group.1", y = "x")) +
+    geom_bar(stat = "identity", aes_string(fill = "Group.1")) +
     ggtitle(paste0("variable", " = ", attr1))
 }
 
 .plot_correlation_heatmap <- function(dataset) {
   dataset$quality <- as.numeric(dataset$quality) - 1
-  cormat <- round(cor(dataset),3)
-  ggplot(data = melt(cormat), aes(Var1, Var2, fill=value)) +
+  cormat <- round(cor(dataset), 3)
+  ggplot(data = melt(cormat), aes(Var1, Var2, fill = value)) +
     geom_tile(color = 'white') +
     scale_fill_gradient2(low = 'blue', high = 'red', mid = 'white',
-     midpoint = 0, limit = c(-1,1), space = 'Lab',
-     name='Pearson\nCorrelation') +
+                         midpoint = 0, limit = c(-1, 1), space = 'Lab',
+                         name = 'Pearson\nCorrelation') +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, vjust = 1,
                                      size = 12, hjust = 1)) +
@@ -84,10 +84,10 @@ combined <- read.csv('./dataset/winequality-combined.csv')
 
 # Distribuzione Dati Combined Configurazione 2: 3 Classi
 config2 <- preprocess_dataset(combined, 2)
-.plot_class_barplot(config2, 'quality')
+# .plot_class_barplot(config2, 'quality')
 
 # Plot paris
-pairs(config2, col=config2$quality)
+# pairs(config2, col=config2$quality)
 
 # Plot correlation matrix
 .plot_correlation_heatmap(config2)
@@ -139,3 +139,13 @@ But since, only below four contributes towards wine quality : (alcohol, density,
 - Decrease in the volatile acidity of the wine, increases the quality of the wine.
 - Decrease in chlorides, increases the quality of the wine.
 "
+
+# ---------------------------------------------------------------------------------------------------------------------
+
+pca <- prcomp(dataset, scale = TRUE, center = TRUE)
+dataset$quality <- NULL
+dataset$type <- NULL
+eig <- get_eig(pca)
+keep <- eig$cumulative.variance.percent < 95
+new_dataset <- (pca$x %*% pca$rotation[, keep]) *
+  pca$scale[keep] - pca$center[keep]  # NON sono sicuro di questo filtro (ordine delle cose??)
