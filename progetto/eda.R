@@ -39,6 +39,13 @@
   data %>% ggplot(aes(x = quality)) +
     scale_fill_manual(values = c("red" = "#FF6666", "white" = "white")) +
     geom_bar(aes(fill = type), position = "dodge2", alpha = 0.7, color = "black") +
+    # stat_count(
+    #   aes(y = ..count..),
+    #   label = y ,
+    #   geom = "text",
+    #   position = position_dodge(width = 1),
+    #   vjust = -0.5, size = 2,
+    #   color = "black") +
     ggtitle(title)
 }
 
@@ -67,12 +74,13 @@ config1 <- preprocess_dataset(combined, 1)
 #combined separate by three class of quality
 config2 <- preprocess_dataset(combined, 2)
 
+
 #red and white wine quality
 p1 <- .combined_barplot(combined, "red and white quality")
 p2 <- .combined_barplot(config1, "quality by two class")
 p3 <- .combined_barplot(config2, "quality by three class")
 
-print(p1 + p3 + p2)
+print((p1 + p3 + p2) + plot_layout(guides = "collect"))
 
 #red OR white wine quality by different class
 #red and white wine separate by two class
@@ -107,12 +115,12 @@ ymax <- data.frame(
   alcohol = 400
 )
 
-# for (i in select(combined, -c("type", "quality")) %>% names()) {
-#   if (is.numeric(combined[[i]])) {
-#     .global_distribution(combined, i)
-#     .class_distribution(config1, i, ymax[[i]])
-#   }
-# }
-
+for (i in select(combined, -c("type", "quality")) %>% names()) {
+  if (is.numeric(combined[[i]])) {
+    .global_distribution(combined, i)
+    .class_distribution(config1, i, ymax[[i]])
+  }
+}
+#
 # source("./outliers.R")
 # source("./multivariate.R")
