@@ -68,14 +68,7 @@ evaluate_model <- function(model, dataset) {
   # Print confusion matrix
   cm <- confusionMatrix(data = pred, reference = dataset$quality, mode = 'prec_recall')
 
-  measures <- data.frame(
-    accuracy = cm$overall["Accuracy"],
-    f1 = cm$byClass["F1"],
-    precision = cm$byClass["Precision"],
-    recall = cm$byClass["Recall"]
-  )
-
-  out <- list(cm = cm, measures = measures, pred_time = time)
+  out <- list(cm = cm, pred_time = time)
 }
 
 #' Combine the red and the white datasets and add type attribute.
@@ -102,43 +95,55 @@ combine_redwhite <- function() {
 #' @param models a list of models
 #'
 #' @return AUCs for ROC and PRC for all the models
-plot_roc_and_prc_all <- function(dataset, models) {
-  nb_pred <- as.numeric(predict(models$nb_model, dataset[names(dataset) != "quality"]))
-  dt_pred <- as.numeric(predict(models$dt_model, dataset[names(dataset) != "quality"]))
-  svm_pred <- as.numeric(predict(models$svm_model, dataset[names(dataset) != "quality"]))
-  nn_pred <- as.numeric(predict(models$nn_model, dataset[names(dataset) != "quality"]))
+plot_roc_and_prc_all <- function(dataset, models, n_classes) {
+  nb_pred <- predict(models$nb_model, dataset[names(dataset) != "quality"])
+  dt_pred <- predict(models$dt_model, dataset[names(dataset) != "quality"])
+  svm_pred <- predict(models$svm_model, dataset[names(dataset) != "quality"])
+  nn_pred <- predict(models$nn_model, dataset[names(dataset) != "quality"])
 
-  scores <- join_scores(nb_pred, dt_pred, svm_pred, nn_pred)
-  labels <- join_labels(dataset$quality, dataset$quality, dataset$quality, dataset$quality)
-  mmmdat <- mmdata(scores, labels, modnames = c("nb", "dt", "svm", "nn"), dsids = c(1, 2, 3, 4))
-  sscurves <- evalmod(mmmdat) # mode = 'aucroc'
+  if (n_classes == 2) {
+    nb_pred <- as.numeric(nb_pred)
+    dt_pred <- as.numeric(dt_pred)
+    svm_pred <- as.numeric(svm_pred)
+    nn_pred <- as.numeric(nn_pred)
 
-  # Plot ROC and PRC
-  autoplot(sscurves)
+    scores <- join_scores(nb_pred, dt_pred, svm_pred, nn_pred)
+    y <- as.numeric(dataset$quality)
+    labels <- join_labels(y, y, y, y)
+    mmmdat <- mmdata(scores, labels, modnames = c("nb", "dt", "svm", "nn"), dsids = c(1, 2, 3, 4))
+    res <- evalmod(mmmdat) # mode = 'aucroc'
 
-  # Calculate CI of AUCs with normal distibution
-  auc_ci <- auc_ci(sscurves)
+    # Calculate CI of AUCs with normal distibution
+    auc_ci <- auc_ci(res)
 
-  # Use knitr::kable to display the result in a table format
-  knitr::kable(auc_ci)
+    # Use knitr::kable to display the result in a table format
+    knitr::kable(auc_ci)
+
+    # Plot ROC and PRC
+    autoplot(res)
+
+    return(res)
+  } else {
+    res1 <- .multiclasses_roc(dataset, nb_pred)
+    res2 <- .multiclasses_roc(dataset, dt_pred)
+    res3 <- .multiclasses_roc(dataset, svm_pred)
+    res4 <- .multiclasses_roc(dataset, nn_pred)
+    return(list(res1, res2, res3, res4))
+  }
 }
 
 #' Write a log file
 #' @param model_name model's name
-#' @param measures model's measures after training
+#' @param cm a confusion matrix
 #' @param train_time training time
 #' @param pred_time prediction time
 #'
-write_log <- function(model_name, measures, train_time, pred_time) {
+write_log <- function(model_name, cm, train_time, pred_time) {
   file <- file.path("./results", paste0(model_name, "_.log"))
   write.table(paste("model_name: ", model_name), file, row.names = FALSE, col.names = FALSE)
   write.table(paste("pred_time: ", pred_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(paste("train_time: ", train_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table("metrics: ", file, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table(paste("accuracy: ", measures$accuracy), file, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table(paste("f1: ", measures$f1), file, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table(paste("precision: ", measures$precision), file, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table(paste("recall: ", measures$recall), file, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table(capture.output(cm), file, row.names = FALSE, col.names = FALSE, append = TRUE)
 }
 
 #' Detect outliers using the Interquartile Range (IQR) approach.
@@ -177,18 +182,31 @@ remove_outliers <- function(dataset) {
   out
 }
 
-#' Feature Reduction with PCA
-#' @param dataset a dataset
-#'
-#' @return a data.frame with the reduced features + target
-calculate_pca <- function(dataset) {
-  pca <- prcomp(cov(dataset[1:11]))
-  components <- as.matrix(dataset[1:11]) %*% pca$x[, 1:4]
-  dataset <- data.frame(quality = dataset$quality, components)
-  dataset
-}
-
 save_plot_png <- function(filename, plot, wide = FALSE) {
   ggsave(filename, plot = plot, device = "png", height = 6.67, width = ifelse(wide, 13.34, 6.67))
 }
 
+.multiclasses_roc <- function(dataset, predictions) {
+  n0_true <- as.numeric(dataset$quality == 0)
+  n1_true <- as.numeric(dataset$quality == 1)
+  n2_true <- as.numeric(dataset$quality == 2)
+
+  S4_pred_m1 <- data.frame(predictions)
+  n0_pred_m1 <- as.numeric(S4_pred_m1 == 0)
+  n1_pred_m1 <- as.numeric(S4_pred_m1 == 1)
+  n2_pred_m1 <- as.numeric(S4_pred_m1 == 2)
+
+  final_df <- data.frame(n0_true, n1_true, n2_true,
+                         n0_pred_m1, n1_pred_m1, n2_pred_m1)
+
+  roc_res <- multi_roc(final_df, force_diag=T)
+  pr_res <- multi_pr(final_df, force_diag=T)
+
+  plot_roc_df <- plot_roc_data(roc_res)
+  plot_pr_df <- plot_pr_data(pr_res)
+
+  prc <- ggplot(plot_pr_df, aes(x=Recall, y=Precision)) + geom_path(aes(color = Group, linetype=Method), size=1.5) + theme_bw() + theme(plot.title = element_text(hjust = 0.5), legend.justification=c(1, 0), legend.position=c(.95, .05), legend.title=element_blank(), legend.background = element_rect(fill=NULL, size=0.5, linetype="solid", colour ="black"))
+  roc <- ggplot(plot_roc_df, aes(x = 1-Specificity, y=Sensitivity)) + geom_path(aes(color = Group, linetype=Method)) + geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), colour='grey', linetype = 'dotdash') + theme_bw() + theme(plot.title = element_text(hjust = 0.5), legend.justification=c(1, 0), legend.position=c(.95, .05), legend.title=element_blank(), legend.background = element_rect(fill=NULL, size=0.5, linetype="solid", colour ="black"))
+
+  list(roc, prc)
+}
