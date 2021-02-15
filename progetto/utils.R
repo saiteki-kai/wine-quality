@@ -8,7 +8,7 @@
 #' config = 3 (default) -> 10 classes (0: low-quality, ..., 10: high-quality)
 #' @return the processed dataset
 preprocess_dataset <- function(dataset, config = 3) {
-  #dataset$type <- NULL
+  #dataset$type <- factor(dataset$type)
 
   if (config == 1) {
     dataset$quality <- ifelse(dataset$quality > 6, 0, 1)
@@ -38,7 +38,7 @@ partition_dataset <- function(dataset) {
 #' @param dataset a dataset
 #' @return the normalized dataset
 normalize_dataset <- function(dataset) {
-  scaled <- scale(dataset[names(dataset) != "quality"])
+  scaled <- scale(dataset %>% select(where(is.numeric)))
   scaled <- as.data.frame(scaled)
 
   scaled$quality <- dataset$quality
@@ -199,14 +199,21 @@ save_plot_png <- function(filename, plot, wide = FALSE) {
   final_df <- data.frame(n0_true, n1_true, n2_true,
                          n0_pred_m1, n1_pred_m1, n2_pred_m1)
 
-  roc_res <- multi_roc(final_df, force_diag=T)
-  pr_res <- multi_pr(final_df, force_diag=T)
+  roc_res <- multi_roc(final_df, force_diag = T)
+  pr_res <- multi_pr(final_df, force_diag = T)
 
   plot_roc_df <- plot_roc_data(roc_res)
   plot_pr_df <- plot_pr_data(pr_res)
 
-  prc <- ggplot(plot_pr_df, aes(x=Recall, y=Precision)) + geom_path(aes(color = Group, linetype=Method), size=1.5) + theme_bw() + theme(plot.title = element_text(hjust = 0.5), legend.justification=c(1, 0), legend.position=c(.95, .05), legend.title=element_blank(), legend.background = element_rect(fill=NULL, size=0.5, linetype="solid", colour ="black"))
-  roc <- ggplot(plot_roc_df, aes(x = 1-Specificity, y=Sensitivity)) + geom_path(aes(color = Group, linetype=Method)) + geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), colour='grey', linetype = 'dotdash') + theme_bw() + theme(plot.title = element_text(hjust = 0.5), legend.justification=c(1, 0), legend.position=c(.95, .05), legend.title=element_blank(), legend.background = element_rect(fill=NULL, size=0.5, linetype="solid", colour ="black"))
+  prc <- ggplot(plot_pr_df, aes(x = Recall, y = Precision)) +
+    geom_path(aes(color = Group, linetype = Method), size = 1.5) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5), legend.justification = c(1, 0), legend.position = c(.95, .05), legend.title = element_blank(), legend.background = element_rect(fill = NULL, size = 0.5, linetype = "solid", colour = "black"))
+  roc <- ggplot(plot_roc_df, aes(x = 1 - Specificity, y = Sensitivity)) +
+    geom_path(aes(color = Group, linetype = Method)) +
+    geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), colour = 'grey', linetype = 'dotdash') +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5), legend.justification = c(1, 0), legend.position = c(.95, .05), legend.title = element_blank(), legend.background = element_rect(fill = NULL, size = 0.5, linetype = "solid", colour = "black"))
 
   list(roc, prc)
 }
