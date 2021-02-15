@@ -97,6 +97,7 @@ for (i in select(combined, -c("type", "quality")) %>% names()) {
     .global_distribution(combined, i)
     .class_distribution(config1, i)
     .class_distribution(config2, i)
+    .class_distribution(combined, i)
   }
 }
 #
