@@ -28,15 +28,15 @@ combined <- read.csv("./dataset/winequality-combined.csv") %>%
 combined$test <- normalize_dataset(combined$test)
 
 # Feature Selection 1
-combined$test$alcohol <- NULL
-combined$test$density <- NULL
+#combined$test$alcohol <- NULL
+#combined$test$density <- NULL
 #combined$test$volatile.acidity <- NULL
 #combined$test$chlorides <- NULL
-combined$test$residual.sugar <- NULL
-combined$test$sulphates <- NULL
-combined$test$citric.acid <- NULL
-combined$test$pH <- NULL
-combined$test$free.sulfur.dioxide <- NULL
+#combined$test$residual.sugar <- NULL
+#combined$test$sulphates <- NULL
+#combined$test$citric.acid <- NULL
+#combined$test$pH <- NULL
+#combined$test$free.sulfur.dioxide <- NULL
 #combined$test$total.sulfur.dioxide <- NULL
 
 m1 <- .get_model("nb")
@@ -45,10 +45,10 @@ m3 <- .get_model("svm")
 m4 <- .get_model("nn")
 
 # Evaluate the model
-res_eval_1 <- evaluate_model(m1, combined$test)
-res_eval_2 <- evaluate_model(m2, combined$test)
-res_eval_3 <- evaluate_model(m3, combined$test)
-res_eval_4 <- evaluate_model(m4, combined$test)
+res1 <- evaluate_model(m1, combined$test)
+res2 <- evaluate_model(m2, combined$test)
+res3 <- evaluate_model(m3, combined$test)
+res4 <- evaluate_model(m4, combined$test)
 
 # Plot AUCs ROC & PRC
 n_classes <- length(unique(as.numeric(combined$test$quality) - 1))
