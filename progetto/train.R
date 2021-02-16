@@ -13,7 +13,7 @@ source("./nn.R")
 combined <- read.csv("./dataset/winequality-combined.csv") %>%
   mutate(type = NULL) %>%
   preprocess_dataset(2) %>%
-  remove_outliers() %>%
+  treat_outliers() %>%
   na.omit() %>%
   partition_dataset()
 
