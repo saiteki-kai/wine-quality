@@ -148,7 +148,7 @@ plot_roc_and_prc_all <- function(dataset, models, n_classes) {
 #' @param pred_time prediction time
 #'
 write_log <- function(model_name, cm, train_time, pred_time) {
-  file <- file.path("./results", paste0(model_name, "_.log"))
+  file <- file.path("./results/models", paste0(model_name, "_.log"))
   write.table(paste("model_name: ", model_name), file, row.names = FALSE, col.names = FALSE)
   write.table(paste("pred_time: ", pred_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(paste("train_time: ", train_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)

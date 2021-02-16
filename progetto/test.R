@@ -11,10 +11,10 @@ pacman::p_load(caret, doParallel, ggplot2, grid, precrec, factoextra, checkmate,
 
 # Local functions
 source("./utils.R")
-source("./dt.R")
-source("./nb.R")
-source("./svm.R")
-source("./nn.R")
+source("models/dt.R")
+source("models/nb.R")
+source("models/svm.R")
+source("models/nn.R")
 
 # Prepare the dataset
 combined <- read.csv("./dataset/winequality-combined.csv") %>%

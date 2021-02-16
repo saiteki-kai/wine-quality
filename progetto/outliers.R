@@ -106,7 +106,7 @@ for (attribute in names(dataset)) {
   if (is.numeric(dataset[[attribute]])) {
     p <- .plot_hist_and_boxplot(dataset, attribute)
 
-    filename <- file.path("./plots/outliers", paste0(attribute, "_histbox.png"))
+    filename <- file.path("./results/plots/outliers", paste0(attribute, "_histbox.png"))
     save_plot_png(filename, plot = p)
 
     # print(p)
@@ -120,7 +120,7 @@ for (label in c("quality", "type")) {
       p <- .plot_scatter(dataset, attribute, label) +
         .plot_scatter(dataset, attribute, label, hide.outliers = TRUE)
 
-      filename <- file.path("./plots/outliers", paste(attribute, label, "scatter.png", sep = "_"))
+      filename <- file.path("./results/plots/outliers", paste(attribute, label, "scatter.png", sep = "_"))
       save_plot_png(filename, plot = p, wide = TRUE)
 
       #print(p)
