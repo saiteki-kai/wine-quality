@@ -13,7 +13,8 @@ source("models/svm.R")
 source("models/nn.R")
 
 # Prepare the dataset
-dataset <- read.csv("./dataset/winequality-test.csv")
+dataset <- read.csv("./dataset/winequality-test.csv") %>%
+  mutate(quality = factor(quality))
 
 # Normalize the data
 dataset <- normalize_dataset(dataset)

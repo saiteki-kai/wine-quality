@@ -4,7 +4,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(doParallel)
+pacman::p_load(doParallel, dplyr)
 
 # Local functions
 source("./utils.R")
@@ -15,8 +15,9 @@ source("models/nn.R")
 
 .train <- function(scale_method, pca = FALSE) {
   # Prepare the dataset
-  dataset <- read.csv("./dataset/winequality-train.csv")
-  dataset <- lapply(dataset, function(x) treat_outliers(x, method = "IQR"))
+  dataset <- read.csv("./dataset/winequality-train.csv") %>%
+    mutate(quality = factor(quality)) %>%
+    lapply(function(x) treat_outliers(x, method = "IQR"))
 
   if (pca) {
     dataset <- feature_selection_pca(dataset)
