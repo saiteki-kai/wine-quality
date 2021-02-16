@@ -38,6 +38,5 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# Trained Models
-models/
+# Results
 results/
