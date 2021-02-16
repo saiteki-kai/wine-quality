@@ -26,7 +26,7 @@ preprocess_dataset <- function(dataset, config = 3) {
 #' @param dataset a dataset
 #' @return the partition composed of train and test
 partition_dataset <- function(dataset) {
-  index <- createDataPartition(dataset$quality, p = 0.75, list = FALSE)
+  index <- createDataPartition(dataset$quality, p = 0.80, list = FALSE)
   train <- dataset[index,]
   test <- dataset[-index,]
 
@@ -34,7 +34,7 @@ partition_dataset <- function(dataset) {
 }
 
 
-.norm_minmax <- function(x){ (x- min(x)) /(max(x)-min(x)) }
+.norm_minmax <- function(x) { (x - min(x)) / (max(x) - min(x)) }
 
 #' Normalize the dataset using z-score normalization
 #'
@@ -45,8 +45,8 @@ normalize_dataset <- function(dataset, method) {
 
   if (method == "min_max") {
     scaled <- scale(to_scale)
-  } else if(method == "z_score") {
-   scaled <- lapply(to_scale, .norm_minmax)
+  } else if (method == "z_score") {
+    scaled <- lapply(to_scale, .norm_minmax)
   }
 
   scaled <- as.data.frame(scaled)
@@ -255,5 +255,15 @@ feature_selection_pca <- function(dataset) {
   eig <- get_eig(pca)
   keep <- eig$cumulative.variance.percent < 90
   features <- pca$x[, keep]
-  out <- data.frame(features, quality=dataset$quality)
+  out <- data.frame(features, quality = dataset$quality)
+}
+
+create_dataset <- function(dataset) {
+  partition <- dataset %>%
+    mutate(type = NULL) %>%
+    preprocess_dataset(1) %>%
+    partition_dataset()
+
+  write.csv(partition$train, "./dataset/winequality-train.csv", row.names = FALSE)
+  write.csv(partition$test, "./dataset/winequality-test.csv", row.names = FALSE)
 }
