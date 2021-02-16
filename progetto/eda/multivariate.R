@@ -74,17 +74,15 @@ if (!require('pacman')) install.packages('pacman')
 pacman::p_load(corrplot, ggplot2, dplyr, naniar, patchwork, factoextra, reshape2)
 
 # Local functions
-source('./utils.R')
+source('../utils.R')
 
 
 # Import datasets
-combined <- read.csv('./dataset/winequality-combined.csv')
+combined <- read.csv('../dataset/winequality-combined.csv')
 #redwine <- read.csv('./dataset/winequality-red.csv')
 #whitewine <- read.csv('./dataset/winequality-white.csv')
 
-# Distribuzione Dati Combined Configurazione 2: 3 Classi
-config2 <- preprocess_dataset(combined, 2)
-# .plot_class_barplot(config2, 'quality')
+config2 <- preprocess_dataset(combined, 1)
 
 # Plot paris
 # pairs(config2, col=config2$quality)
@@ -141,11 +139,37 @@ But since, only below four contributes towards wine quality : (alcohol, density,
 - Decrease in chlorides, increases the quality of the wine.
 "
 
-# ---------------------------------------------------------------------------------------------------------------------
 
-dataset$quality <- NULL
-dataset$type <- NULL
-pca <- prcomp(dataset, scale = TRUE, center = TRUE)
-eig <- get_eig(pca)
-keep <- eig$cumulative.variance.percent < 95
-# new_dataset <- (((pca$x + pca$center) * pca$scale)  %*% pca$rotation[, keep])
+
+# Feature Selection 1
+#combined$train$alcohol <- NULL
+#combined$train$density <- NULL
+#combined$train$volatile.acidity <- NULL
+#combined$train$chlorides <- NULL
+#combined$train$residual.sugar <- NULL
+#combined$train$sulphates <- NULL
+#combined$train$citric.acid <- NULL
+#combined$train$pH <- NULL
+#combined$train$free.sulfur.dioxide <- NULL
+#combined$train$total.sulfur.dioxide <- NULL
+
+#combined$test$alcohol <- NULL
+#combined$test$density <- NULL
+#combined$test$volatile.acidity <- NULL
+#combined$test$chlorides <- NULL
+#combined$test$residual.sugar <- NULL
+#combined$test$sulphates <- NULL
+#combined$test$citric.acid <- NULL
+#combined$test$pH <- NULL
+#combined$test$free.sulfur.dioxide <- NULL
+#combined$test$total.sulfur.dioxide <- NULL
+
+# Feature Selection 2
+#combined$train <- calculate_pca(combined$train)
+#combined$test <- calculate_pca(combined$test)
+
+"highlyCorrelated <- findCorrelation(cor(combined$train[names(combined$train) != 'quality']), cutoff=0.5)
+print(highlyCorrelated)
+
+importance <- varImp(m3, scale=FALSE)
+plot(importance)"

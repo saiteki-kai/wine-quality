@@ -45,12 +45,12 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(corrplot, ggplot2, dplyr, naniar, patchwork, factoextra)
 
 # Local functions
-source("./utils.R")
+source("../utils.R")
 
 # Import datasets
-combined <- read.csv("./dataset/winequality-combined.csv")
-redwine <- read.csv("./dataset/winequality-red.csv")
-whitewine <- read.csv("./dataset/winequality-white.csv")
+combined <- read.csv("../dataset/winequality-combined.csv")
+redwine <- read.csv("../dataset/winequality-red.csv")
+whitewine <- read.csv("../dataset/winequality-white.csv")
 
 # Summary report
 summary(combined)
