@@ -10,9 +10,21 @@ repository [https://archive.ics.uci.edu/ml/datasets/wine+quality](https://archiv
 > P. Cortez, A. Cerdeira, F. Almeida, T. Matos and J. Reis. Modeling wine preferences by data mining from physicochemical properties. In Decision Support Systems, Elsevier, 47(4):547-553, 2009.
 
 ### Overleaf
+
 https://www.overleaf.com/2658978263bgkqnbbbfhfq
 
 ## To Do
+
+---
+
+- [ ] Use training set in EDA
+- [ ] Multivariate Analysis after Outlier Treatment
+- [ ] Outlier detection also in the test??
+- [ ] Statistical Tests for model comparison
+- [ ] Decide which models will be used
+- [ ] Documentation
+
+---
 
 ### EDA
 
@@ -21,14 +33,14 @@ https://www.overleaf.com/2658978263bgkqnbbbfhfq
 - [x] Distribution Analysis (Red, White, Both) & Class Options (10 classes, 2 classes, 3 classes) #Mirco
 - [x] Attribute Distribution By Class #Mirco
 - [x] Box Plot #Giuseppe
-- [ ] Correlation Map #Gaetano
-- [ ] PCA #Gaetano
+- [x] Correlation Map #Gaetano
+- [x] PCA #Gaetano
 
 ### Preprocessing
 
 - [x] Class Attribute #Giuseppe
-- [ ] Normalization / Standardization #Giuseppe
-- [ ] Feature Selection (if needed) #Gaetano
+- [x] Normalization / Standardization #Giuseppe
+- [x] Feature Selection (if needed) #Gaetano
 
 ### Classification
 
@@ -42,5 +54,5 @@ https://www.overleaf.com/2658978263bgkqnbbbfhfq
 - [x] F1, Accuracy, Recall, ... #Gaetano
 - [x] AUCs ROC & PRC #Gaetano
 - [ ] Model Comparison
-- [ ] Statistic Tests #Giuseppe  
-- [ ] Computational Time #Gaetano
+- [ ] Statistic Tests #Giuseppe
+- [x] Computational Time #Gaetano
