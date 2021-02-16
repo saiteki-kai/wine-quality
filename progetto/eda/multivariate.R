@@ -50,28 +50,19 @@
   x <- aggregate(dataset[[attr1]], by = list(dataset$quality), FUN = median)
   ggplot(data = x, aes_string(x = "Group.1", y = "x")) +
     geom_bar(stat = "identity", aes_string(fill = "Group.1")) +
-    ggtitle(paste0("variable", " = ", attr1))
+    ggtitle(attr1)
 }
 
-.plot_correlation_heatmap <- function(dataset) {
-  dataset$quality <- as.numeric(dataset$quality) - 1
-  cormat <- round(cor(dataset), 3)
-  ggplot(data = melt(cormat), aes(Var1, Var2, fill = value)) +
-    geom_tile(color = 'white') +
-    scale_fill_gradient2(low = 'blue', high = 'red', mid = 'white',
-                         midpoint = 0, limit = c(-1, 1), space = 'Lab',
-                         name = 'Pearson\nCorrelation') +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, vjust = 1,
-                                     size = 12, hjust = 1)) +
-    coord_fixed() +
-    geom_text(aes(Var2, Var1, label = value), color = 'black', size = 4)
+.plot_mean_barplot <- function(dataset, attr1) {
+  x <- aggregate(dataset[[attr1]], by = list(dataset$quality), FUN = mean)
+  ggplot(data = x, aes_string(x = "Group.1", y = "x")) +
+    geom_bar(stat = "identity", aes_string(fill = "Group.1")) +
+    ggtitle(attr1)
 }
-
 
 # Install packages
 if (!require('pacman')) install.packages('pacman')
-pacman::p_load(corrplot, ggplot2, dplyr, naniar, patchwork, factoextra, reshape2)
+pacman::p_load(corrplot, ggplot2, dplyr, naniar, patchwork, factoextra, reshape2, ggcorrplot)
 
 # Local functions
 source('../utils.R')
@@ -79,17 +70,24 @@ source('../utils.R')
 
 # Import datasets
 combined <- read.csv('../dataset/winequality-combined.csv')
-#redwine <- read.csv('./dataset/winequality-red.csv')
-#whitewine <- read.csv('./dataset/winequality-white.csv')
 
 config2 <- preprocess_dataset(combined, 1)
+config2$type <- NULL
+#config2$type <- ifelse(config2$type == "red", 0, 1)
+config2$quality <- as.numeric(config2$quality) - 1
 
 # Plot paris
-# pairs(config2, col=config2$quality)
+#pairs(config2, col=config2$quality)
 
 # Plot correlation matrix
-.plot_correlation_heatmap(config2)
-# corrplot.mixed(cor(config1[names(config1) != "quality"]), tl.pos = "lt", tl.cex = .8, number.cex = .8)
+corr <- round(cor(config2), 3)
+corr <- corr
+p.mat <- cor_pmat(corr)
+ggcorrplot(corr,  hc.order = TRUE, lab = TRUE, p.mat = p.mat, insig = "blank")
+
+#.plot_correlation_heatmap(config2)
+#corrplot.mixed(cor(config2[names(config2) != "quality"]), tl.pos = "lt", tl.cex = .8, number.cex = .8)
+
 
 config2$alcohol <- log10(config2$alcohol)
 config2$density <- log10(config2$density)
@@ -102,35 +100,54 @@ config2$pH <- log10(config2$pH)
 config2$free.sulfur.dioxide <- log10(config2$free.sulfur.dioxide)
 config2$total.sulfur.dioxide <- log10(config2$total.sulfur.dioxide)
 
-.plot_scatter(config2, 'alcohol', 'density', 'quality', 'caso di alta correlazione tra total.sulfur.dioxide e free.sulfur.dioxide')
-.plot_scatter(config2, 'free.sulfur.dioxide', 'total.sulfur.dioxide', 'quality', 'caso di alta correlazione tra density e alcohol')
-.plot_scatter(config2, 'total.sulfur.dioxide', 'residual.sugar', 'quality', '')
-.plot_scatter(config2, 'density', 'residual.sugar', 'quality', '')
+
+.plot_scatter(config2, 'alcohol', 'density', 'quality',
+              'caso di alta correlazione tra density e alcohol')
+.plot_scatter(config2, 'free.sulfur.dioxide', 'total.sulfur.dioxide', 'quality',
+              'caso di alta correlazione tra total.sulfur.dioxide e free.sulfur.dioxide')
+.plot_scatter(config2, 'total.sulfur.dioxide', 'residual.sugar', 'quality',
+              'caso di media correlazione tra total.sulfur.dioxide e residual.sugar')
+.plot_scatter(config2, 'density', 'residual.sugar', 'quality', '') #non posso dirlo!
 
 # Plot bar for the median values.
-.plot_median_barplot(config2, 'alcohol')
-.plot_median_barplot(config2, 'density')
-.plot_median_barplot(config2, 'chlorides')
-.plot_median_barplot(config2, 'residual.sugar')
-.plot_median_barplot(config2, 'volatile.acidity')
-.plot_median_barplot(config2, 'sulphates')
-.plot_median_barplot(config2, 'citric.acid')
+.plot_median_barplot(config2, 'alcohol') +
+.plot_median_barplot(config2, 'density') +
+.plot_median_barplot(config2, 'volatile.acidity') +
+.plot_median_barplot(config2, 'chlorides') +
+.plot_median_barplot(config2, 'citric.acid') +
+.plot_median_barplot(config2, 'fixed.acidity') +
+.plot_median_barplot(config2, 'free.sulfur.dioxide') +
+.plot_median_barplot(config2, 'total.sulfur.dioxide') +
+.plot_median_barplot(config2, 'sulphates') +
+.plot_median_barplot(config2, 'residual.sugar') +
 .plot_median_barplot(config2, 'pH')
-.plot_median_barplot(config2, 'free.sulfur.dioxide')
-.plot_median_barplot(config2, 'total.sulfur.dioxide')
+
+# Plot bar for the mean values
+.plot_mean_barplot(config2, 'alcohol') +
+.plot_mean_barplot(config2, 'density') +
+.plot_mean_barplot(config2, 'volatile.acidity') +
+.plot_mean_barplot(config2, 'chlorides') +
+.plot_mean_barplot(config2, 'citric.acid') +
+.plot_mean_barplot(config2, 'fixed.acidity') +
+.plot_mean_barplot(config2, 'free.sulfur.dioxide') +
+.plot_mean_barplot(config2, 'total.sulfur.dioxide') +
+.plot_mean_barplot(config2, 'sulphates') +
+.plot_mean_barplot(config2, 'residual.sugar') +
+.plot_mean_barplot(config2, 'pH')
 
 "
-1 - As alcohol level increase ==> Quality increases
-2 - As chlorides level decreases ==> Quality increases
-3 - As citric acid level increases ==> Quality increases
-4 - As density decreases ==> Quality increases
-5 - fixed acidity ==> can’t say impact on Quality
-6 - As free sulfur dioxide increases ==> Quality increases
-7 - pH ==> can’t say impact on Quality
-8 - As residual sugar increases ==> Quality increases
-9 - sulphates ==> can’t say impact on Quality
-10 - total sulfur dioxide ==> can’t say impact on Quality
-11 - As the volatile acidity decreases ==> Quality increases
+As alcohol level increase ==> Quality increases
+As density decreases ==> Quality increases
+As the volatile acidity decreases ==> Quality increases
+As chlorides level decreases ==> Quality increases
+As citric acid level increases ==> Quality increases
+
+fixed acidity ==> can’t say impact on Quality
+As free sulfur dioxide increases ==> Quality increases
+total sulfur dioxide ==> can’t say impact on Quality
+sulphates ==> can’t say impact on Quality
+As residual sugar increases ==> Quality increases
+pH ==> can’t say impact on Quality
 
 But since, only below four contributes towards wine quality : (alcohol, density, volatile acidity, chlorides)
 - Increase in the alcohol qty, increases the quality of the wine.
