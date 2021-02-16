@@ -131,9 +131,9 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(ggplot2, dplyr, naniar, patchwork)
 
 # Import local functions
-source("./utils.R")
+source("../utils.R")
 
-# dataset <- read.csv("./dataset/winequality-combined.csv")
+# dataset <- read.csv("../dataset/winequality-combined.csv")
 # dataset <- preprocess_dataset(dataset, 1)
 # dataset$quality <- factor(dataset$quality) # IMPORTANT
 
@@ -142,7 +142,7 @@ source("./utils.R")
 #   if (is.numeric(dataset[[attribute]])) {
 #     p <- .plot_hist_and_boxplot(dataset, attribute)
 #
-#     #filename <- file.path("./plots/outliers", paste0(attribute, "_histbox.png"))
+#     #filename <- file.path("../results/plots/outliers", paste0(attribute, "_histbox.png"))
 #     #save_plot_png(filename, plot = p)
 #
 #     print(p)
@@ -157,7 +157,7 @@ source("./utils.R")
 #       p <- .plot_scatter(dataset, attribute, label) +
 #         .plot_scatter(dataset, attribute, label, hide.outliers = TRUE)
 #
-#       #filename <- file.path("./plots/outliers", paste(attribute, label, "scatter.png", sep = "_"))
+#       #filename <- file.path("../results/plots/outliers", paste(attribute, label, "scatter.png", sep = "_"))
 #       #save_plot_png(filename, plot = p, wide = TRUE)
 #
 #       print(p)
@@ -165,7 +165,7 @@ source("./utils.R")
 #   }
 # }
 
-dataset <- read.csv("./dataset/winequality-combined.csv")
+dataset <- read.csv("../dataset/winequality-combined.csv")
 dataset <- preprocess_dataset(dataset, 1)
 
 .plot_boxplot <- function(data, attribute, title, limits) {

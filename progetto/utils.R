@@ -33,14 +33,23 @@ partition_dataset <- function(dataset) {
   list(train = train, test = test)
 }
 
+
+.norm_minmax <- function(x){ (x- min(x)) /(max(x)-min(x)) }
+
 #' Normalize the dataset using z-score normalization
 #'
 #' @param dataset a dataset
 #' @return the normalized dataset
-normalize_dataset <- function(dataset) {
-  scaled <- scale(dataset %>% select(where(is.numeric)))
-  scaled <- as.data.frame(scaled)
+normalize_dataset <- function(dataset, method) {
+  to_scale <- dataset %>% select(where(is.numeric))
 
+  if (method == "min_max") {
+    scaled <- scale(to_scale)
+  } else if(method == "z_score") {
+   scaled <- lapply(to_scale, .norm_minmax)
+  }
+
+  scaled <- as.data.frame(scaled)
   scaled$quality <- dataset$quality
   scaled
 }
@@ -139,7 +148,7 @@ plot_roc_and_prc_all <- function(dataset, models, n_classes) {
 #' @param pred_time prediction time
 #'
 write_log <- function(model_name, cm, train_time, pred_time) {
-  file <- file.path("./results", paste0(model_name, "_.log"))
+  file <- file.path("./results/models", paste0(model_name, "_.log"))
   write.table(paste("model_name: ", model_name), file, row.names = FALSE, col.names = FALSE)
   write.table(paste("pred_time: ", pred_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(paste("train_time: ", train_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
@@ -237,4 +246,14 @@ save_plot_png <- function(filename, plot, wide = FALSE) {
     theme(plot.title = element_text(hjust = 0.5), legend.justification = c(1, 0), legend.position = c(.95, .05), legend.title = element_blank(), legend.background = element_rect(fill = NULL, size = 0.5, linetype = "solid", colour = "black"))
 
   list(roc, prc)
+}
+
+feature_selection_pca <- function(dataset) {
+  # new_dataset <- (((pca$x + pca$center) * pca$scale)  %*% pca$rotation[, keep])
+  x <- dataset %>% select(where(is.numeric))
+  pca <- prcomp(x, scale = TRUE, center = TRUE)
+  eig <- get_eig(pca)
+  keep <- eig$cumulative.variance.percent < 90
+  features <- pca$x[, keep]
+  out <- data.frame(features, quality=dataset$quality)
 }
