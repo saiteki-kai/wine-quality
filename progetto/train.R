@@ -4,7 +4,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, doParallel, ggplot2, grid, precrec, factoextra, checkmate, multiROC, dummies, mlbench, dplyr)
+pacman::p_load(doParallel)
 
 # Local functions
 source("./utils.R")
@@ -24,6 +24,18 @@ source("models/nn.R")
     dataset <- normalize_dataset(dataset, method = scale_method)
   }
 
+  # Feature Selection 1
+  #dataset$alcohol <- NULL
+  #dataset$density <- NULL
+  #dataset$volatile.acidity <- NULL
+  #dataset$chlorides <- NULL
+  #dataset$residual.sugar <- NULL
+  #dataset$sulphates <- NULL
+  #dataset$citric.acid <- NULL
+  #dataset$pH <- NULL
+  #dataset$free.sulfur.dioxide <- NULL
+  #dataset$total.sulfur.dioxide <- NULL
+
   # Register parallel processing
   cluster <- makeCluster(detectCores())
   registerDoParallel(cluster)
@@ -31,7 +43,7 @@ source("models/nn.R")
   # Train the models
   m1 <- nb_classification(dataset)
   #m2 <- dt_classification(dataset)
-  m3 <- svm_classification(dataset)
+  # m3 <- svm_classification(dataset)
   #m4 <- nn_classification(dataset)
 
   # Stop using parallel computing

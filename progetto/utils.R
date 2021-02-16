@@ -1,3 +1,7 @@
+# Install packages
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(caret, precrec, factoextra, multiROC, ggplot2, dplyr)
+
 #' Convert the quality attribute based on the configuration
 #' @param dataset a dataset
 #' @param config indicates the class configuration to be used
@@ -59,9 +63,6 @@ normalize_dataset <- function(dataset, method) {
 #' @param model classification model
 #' @param dataset a dataset to predict
 evaluate_model <- function(model, dataset) {
-  if (!require("pacman")) install.packages("pacman")
-  pacman::p_load(rjson)
-
   # Predict
   start_time <- Sys.time()
   pred <- predict(model, dataset[names(dataset) != "quality"])
