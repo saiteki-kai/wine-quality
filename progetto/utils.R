@@ -37,7 +37,6 @@ partition_dataset <- function(dataset) {
   list(train = train, test = test)
 }
 
-
 .norm_minmax <- function(x) { (x - min(x)) / (max(x) - min(x)) }
 
 #' Normalize the dataset using z-score normalization
@@ -45,7 +44,7 @@ partition_dataset <- function(dataset) {
 #' @param dataset a dataset
 #' @return the normalized dataset
 normalize_dataset <- function(dataset, method) {
-  to_scale <- dataset %>% select(where(is.numeric))
+  to_scale <- dataset %>% dplyr::select(where(is.numeric))
 
   if (method == "min_max") {
     scaled <- scale(to_scale)
@@ -63,9 +62,11 @@ normalize_dataset <- function(dataset, method) {
 #' @param model classification model
 #' @param dataset a dataset to predict
 evaluate_model <- function(model, dataset) {
+  transformed <- predict(model$preProcess, dataset)
+
   # Predict
   start_time <- Sys.time()
-  pred <- predict(model, dataset[names(dataset) != "quality"])
+  pred <- predict(model, transformed[names(transformed) != "quality"])
   end_time <- Sys.time()
   time <- end_time - start_time
 
@@ -105,54 +106,47 @@ combine_redwhite <- function() {
 #' @param models a list of models
 #'
 #' @return AUCs for ROC and PRC for all the models
-plot_roc_and_prc_all <- function(dataset, models, n_classes) {
+plot_roc_and_prc_all <- function(dataset, models) {
   nb_pred <- predict(models$nb_model, dataset[names(dataset) != "quality"])
   dt_pred <- predict(models$dt_model, dataset[names(dataset) != "quality"])
   svm_pred <- predict(models$svm_model, dataset[names(dataset) != "quality"])
   nn_pred <- predict(models$nn_model, dataset[names(dataset) != "quality"])
 
-  if (n_classes == 2) {
-    nb_pred <- as.numeric(nb_pred)
-    dt_pred <- as.numeric(dt_pred)
-    svm_pred <- as.numeric(svm_pred)
-    nn_pred <- as.numeric(nn_pred)
+  nb_pred <- as.numeric(nb_pred)
+  dt_pred <- as.numeric(dt_pred)
+  svm_pred <- as.numeric(svm_pred)
+  nn_pred <- as.numeric(nn_pred)
 
-    scores <- join_scores(nb_pred, dt_pred, svm_pred, nn_pred)
-    y <- as.numeric(dataset$quality)
-    labels <- join_labels(y, y, y, y)
-    mmmdat <- mmdata(scores, labels, modnames = c("nb", "dt", "svm", "nn"), dsids = c(1, 2, 3, 4))
-    res <- evalmod(mmmdat) # mode = 'aucroc'
+  scores <- join_scores(nb_pred, dt_pred, svm_pred, nn_pred)
+  #scores <- join_scores(nb_pred, svm_pred)
+  y <- as.numeric(dataset$quality)
+  labels <- join_labels(y, y, y, y)
+  #labels <- join_labels(y, y)
+  mmmdat <- mmdata(scores, labels, modnames = c("nb", "dt", "svm", "nn"), dsids = c(1, 2, 3, 4))
+  #mmmdat <- mmdata(scores, labels, modnames = c("nb", "svm"), dsids = c(1, 2))
+  res <- evalmod(mmmdat) # mode = 'aucroc'
 
-    # Calculate CI of AUCs with normal distibution
-    auc_ci <- auc_ci(res)
+  # Calculate CI of AUCs with normal distibution
+  auc_ci <- auc_ci(res)
 
-    # Use knitr::kable to display the result in a table format
-    knitr::kable(auc_ci)
+  # Use knitr::kable to display the result in a table format
+  knitr::kable(auc_ci)
 
-    # Plot ROC and PRC
-    autoplot(res)
+  # Plot ROC and PRC
+  autoplot(res)
 
-    return(res)
-  } else {
-    res1 <- .multiclasses_roc(dataset, nb_pred)
-    res2 <- .multiclasses_roc(dataset, dt_pred)
-    res3 <- .multiclasses_roc(dataset, svm_pred)
-    res4 <- .multiclasses_roc(dataset, nn_pred)
-    return(list(res1, res2, res3, res4))
-  }
+  return(res)
 }
 
 #' Write a log file
 #' @param model_name model's name
 #' @param cm a confusion matrix
-#' @param train_time training time
 #' @param pred_time prediction time
 #'
-write_log <- function(model_name, cm, train_time, pred_time) {
+write_log <- function(model_name, cm, pred_time) {
   file <- file.path("./results/models", paste0(model_name, "_.log"))
   write.table(paste("model_name: ", model_name), file, row.names = FALSE, col.names = FALSE)
   write.table(paste("pred_time: ", pred_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table(paste("train_time: ", train_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(capture.output(cm), file, row.names = FALSE, col.names = FALSE, append = TRUE)
 }
 
@@ -217,44 +211,13 @@ save_plot_png <- function(filename, plot, wide = FALSE) {
   ggsave(filename, plot = plot, device = "png", height = 6.67, width = ifelse(wide, 13.34, 6.67))
 }
 
-.multiclasses_roc <- function(dataset, predictions) {
-  n0_true <- as.numeric(dataset$quality == 0)
-  n1_true <- as.numeric(dataset$quality == 1)
-  n2_true <- as.numeric(dataset$quality == 2)
-
-  S4_pred_m1 <- data.frame(predictions)
-  n0_pred_m1 <- as.numeric(S4_pred_m1 == 0)
-  n1_pred_m1 <- as.numeric(S4_pred_m1 == 1)
-  n2_pred_m1 <- as.numeric(S4_pred_m1 == 2)
-
-  final_df <- data.frame(n0_true, n1_true, n2_true,
-                         n0_pred_m1, n1_pred_m1, n2_pred_m1)
-
-  roc_res <- multi_roc(final_df, force_diag = T)
-  pr_res <- multi_pr(final_df, force_diag = T)
-
-  plot_roc_df <- plot_roc_data(roc_res)
-  plot_pr_df <- plot_pr_data(pr_res)
-
-  prc <- ggplot(plot_pr_df, aes(x = Recall, y = Precision)) +
-    geom_path(aes(color = Group, linetype = Method), size = 1.5) +
-    theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5), legend.justification = c(1, 0), legend.position = c(.95, .05), legend.title = element_blank(), legend.background = element_rect(fill = NULL, size = 0.5, linetype = "solid", colour = "black"))
-  roc <- ggplot(plot_roc_df, aes(x = 1 - Specificity, y = Sensitivity)) +
-    geom_path(aes(color = Group, linetype = Method)) +
-    geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), colour = 'grey', linetype = 'dotdash') +
-    theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5), legend.justification = c(1, 0), legend.position = c(.95, .05), legend.title = element_blank(), legend.background = element_rect(fill = NULL, size = 0.5, linetype = "solid", colour = "black"))
-
-  list(roc, prc)
-}
-
 feature_selection_pca <- function(dataset) {
   # new_dataset <- (((pca$x + pca$center) * pca$scale)  %*% pca$rotation[, keep])
-  x <- dataset %>% select(where(is.numeric))
+  x <- dataset %>% dplyr::select(where(is.numeric))
   pca <- prcomp(x, scale = TRUE, center = TRUE)
   eig <- get_eig(pca)
   keep <- eig$cumulative.variance.percent < 90
+  print(keep)
   features <- pca$x[, keep]
   out <- data.frame(features, quality = dataset$quality)
 }
@@ -267,4 +230,12 @@ create_dataset <- function(dataset) {
 
   write.csv(partition$train, "./dataset/winequality-train.csv", row.names = FALSE)
   write.csv(partition$test, "./dataset/winequality-test.csv", row.names = FALSE)
+}
+
+downsampling <- function(dataset) {
+  set.seed(314)
+  down_train <- downSample(x = dataset[, -ncol(dataset)], y = dataset$quality)
+  names(down_train)[names(down_train) == "Class"] <- "quality"
+  table(down_train$quality)
+  return(down_train)
 }

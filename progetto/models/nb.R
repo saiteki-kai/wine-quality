@@ -3,17 +3,10 @@
 #' add description.
 #'
 
-nb_classification <- function(trainset) {
+nb_classification <- function(trainset, method, train_control) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(caret)
-
-  # 10-Fold cross validation
-  tr_control <- trainControl(
-    method = "repeatedcv",
-    number = 10,
-    repeats = 5
-  )
 
   # Set seed for repeatability
   set.seed(314)
@@ -24,10 +17,12 @@ nb_classification <- function(trainset) {
     quality ~ .,
     data = trainset,
     method = "nb",
-    trControl = tr_control
+    trControl = train_control,
+    preProc = method
   )
   end_time <- Sys.time()
   time <- end_time - start_time
+  print(paste0("train_time: ", time))
 
   # Save the model
   saveRDS(nb_model, file = "./results/models/nb_model.RDS")

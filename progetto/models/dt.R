@@ -3,17 +3,10 @@
 #' add description.
 #'
 
-dt_classification <- function(trainset) {
+dt_classification <- function(trainset, method, train_control) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(caret, klaR, rattle, pROC, dplyr)
-
-  # 10-Fold cross validation
-  tr_control <- trainControl(
-    method = "repeatedcv",
-    number = 10,
-    repeats = 5
-  )
 
   # Set seed for repeatability
   set.seed(314)
@@ -26,10 +19,12 @@ dt_classification <- function(trainset) {
     method = "rpart2", # rpart
     tuneGrid = expand.grid(maxdepth = 2:10),
     #tuneLength = 10,
-    trControl = tr_control
+    trControl = train_control,
+    preProc = method
   )
   end_time <- Sys.time()
   time <- end_time - start_time
+  print(paste0("train_time: ", time))
 
   # Print Tuning Process
   plot(dt_model)
