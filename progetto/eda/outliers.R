@@ -5,7 +5,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(ggplot2, dplyr, naniar, patchwork, psych)
+pacman::p_load(ggplot2, dplyr, naniar, patchwork, kableExtra)
 
 # Import local functions
 source("../utils.R")
@@ -13,10 +13,10 @@ source("../utils.R")
 dataset <- read.csv("../dataset/winequality-train.csv") %>%
   mutate(quality = factor(quality))
 
-.plot_boxplot <- function(data, attribute, title, limits) {
+.plot_distribution <- function(data, attribute, title, limits) {
   data %>% ggplot(aes_string(x = attribute)) +
-    stat_boxplot(aes(y = ""), geom = "errorbar", width = 0.5) +
-    geom_boxplot(aes(y = ""), outlier.shape = "cross") +
+    stat_distribution(aes(y = ""), geom = "errorbar", width = 0.5) +
+    geom_distribution(aes(y = ""), outlier.shape = "cross") +
     geom_jitter(aes(y = quality, colour = quality), alpha = 0.4, size = 0.5) +
     xlim(limits) +
     ggtitle(title) +
@@ -52,17 +52,17 @@ for (i in names(dataset)) {
 
     x_lims <- c(min(dataset[[i]]), max(dataset[[i]]))
 
-    p0 <- .plot_boxplot(dataset, i, "Original", x_lims)
-    p1 <- .plot_boxplot(d_iqr, i, "IQR Method", x_lims)
-    p2 <- .plot_boxplot(d_win1, i, "Winsorizing 90%", x_lims)
-    p3 <- .plot_boxplot(d_win2, i, "Winsorizing 100%", x_lims)
+    p0 <- .plot_distribution(dataset, i, "Original", x_lims)
+    p1 <- .plot_distribution(d_iqr, i, "IQR Method", x_lims)
+    p2 <- .plot_distribution(d_win1, i, "Winsorizing 90%", x_lims)
+    p3 <- .plot_distribution(d_win2, i, "Winsorizing 100%", x_lims)
 
     plot <- (p0 / p1 / p2 / p3) +
       plot_layout(guides = "collect") +
       labs(x = i)
     # print(plot)
 
-    filename <- file.path("../plots/outliers", paste0(i, "_boxplot.png"))
+    filename <- file.path("../plots/outliers", paste0(i, "_distribution.png"))
     save_plot_png(filename, plot = plot, wide = TRUE)
 
     d0 <- .plot_distribution(dataset, i, "Original", x_lims)
@@ -75,7 +75,7 @@ for (i in names(dataset)) {
       labs(x = i)
     #print(plot)
 
-    filename <- file.path("../plots/outliers", paste0(i, "_boxplot.png"))
+    filename <- file.path("../plots/outliers", paste0(i, "_distribution.png"))
     save_plot_png(filename, plot = plot, wide = TRUE)
 
     q0 <- .plot_qqplot(dataset, i, "Original")
@@ -88,22 +88,24 @@ for (i in names(dataset)) {
 
     filename <- file.path("../plots/outliers", paste0(i, "_qqplot.png"))
     save_plot_png(filename, plot = plot)
-
-
   }
 }
 
 .print_stats <- function(df) {
   df$quality <- NULL
 
-  stats <- describe(df)
+  stats <- describe(df) %>% round(2)
   stats %>%
     select(-c("mad", "trimmed", "range", "se", "n")) %>%
-    kable()
+    kbl("latex", booktabs = T) %>%
+    kable_styling(latex_options = c("striped", "scale_down"))
 }
 
-.print_stats(dataset)
-.print_stats(d_iqr)
+s1 <- .print_stats(dataset)
+s2 <- .print_stats(d_iqr)
+
+write(s1, file.path("../plots/outliers/with_outliers.tex"))
+write(s2, file.path("../plots/outliers/without_outliers.tex"))
 
 # Z-score scartato perché non tutte le distribfuzioni sono normali
 # Winsorizing 100% scartato poiché se è troppo skewed, tiene gli outliers
