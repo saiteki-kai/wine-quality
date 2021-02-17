@@ -5,7 +5,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(ggplot2, dplyr, naniar, patchwork)
+pacman::p_load(ggplot2, dplyr, naniar, patchwork, pastecs)
 
 # Import local functions
 source("../utils.R")
@@ -32,7 +32,16 @@ dataset <- read.csv("../dataset/winequality-train.csv") %>%
     theme(plot.title = element_text(hjust = 0.5))
 }
 
+.plot_distribution <- function(data, attribute, title, limits) {
+  data %>% ggplot(aes_string(x = attribute)) +
+    geom_density() +
+    xlim(limits) +
+    ggtitle(title) +
+    theme(plot.title = element_text(hjust = 0.5))
+}
+
 d_iqr <- dataset
+d_iqr_NA <- dataset
 d_win1 <- dataset
 d_win2 <- dataset
 for (i in names(dataset)) {
@@ -51,6 +60,20 @@ for (i in names(dataset)) {
     plot <- (p0 / p1 / p2 / p3) +
       plot_layout(guides = "collect") +
       labs(x = i)
+    # print(plot)
+
+    filename <- file.path("../plots/outliers", paste0(i, "_boxplot.png"))
+    save_plot_png(filename, plot = plot, wide = TRUE)
+
+    d0 <- .plot_distribution(dataset, i, "Original", x_lims)
+    d1 <- .plot_distribution(d_iqr, i, "IQR Method", x_lims)
+    d2 <- .plot_distribution(d_win1, i, "Winsorizing 90%", x_lims)
+    d3 <- .plot_distribution(d_win2, i, "Winsorizing 100%", x_lims)
+
+    plot <- (d0 + d1 + d2 + d3) +
+      plot_layout(guides = "collect") +
+      labs(x = i)
+    #print(plot)
 
     filename <- file.path("../plots/outliers", paste0(i, "_boxplot.png"))
     save_plot_png(filename, plot = plot, wide = TRUE)
@@ -61,9 +84,13 @@ for (i in names(dataset)) {
     q3 <- .plot_qqplot(d_win2, i, "Winsorizing 100")
 
     plot <- (q0 + q1 + q2 + q3) + plot_layout(guides = "collect")
+    # print(plot)
 
     filename <- file.path("../plots/outliers", paste0(i, "_qqplot.png"))
     save_plot_png(filename, plot = plot)
+
+    print(stat.desc(dataset[[i]]))
+    print(stat.desc(d_iqr[[i]]))
   }
 }
 

@@ -199,14 +199,14 @@ detect_outliers <- function(data, method = "winsorizing", win.quantiles = c(0.05
 #' @param win.quantiles quantile limits for the winsorinzing method
 #'
 #' @return the dataset without outliers
-treat_outliers <- function(data, method = "winsorizing", win.quantiles = c(0.05, 0.95)) {
+treat_outliers <- function(data, method = "winsorizing", win.quantiles = c(0.05, 0.95), outlier.rm = FALSE) {
   if (method == "winsorizing") {
     bounds <- detect_outliers(data, win.quantiles = win.quantiles)
     data[data < bounds[1]] <- bounds$lower
     data[data > bounds[2]] <- bounds$upper
   } else if (method == "IQR") {
-    bounds <- detect_outliers(data)
-    data[data < bounds$lower | data > bounds$upper] <- median(data)
+    bounds <- detect_outliers(data, method = "IQR")
+    data[data < bounds$lower | data > bounds$upper] <- ifelse(outlier.rm, NA, median(data))
   } else {
     stop("`mode` should be either `IQR` or `winsorizing`")
   }
