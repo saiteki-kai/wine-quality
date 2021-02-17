@@ -5,7 +5,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(ggplot2, dplyr, naniar, patchwork, pastecs)
+pacman::p_load(ggplot2, dplyr, naniar, patchwork, psych)
 
 # Import local functions
 source("../utils.R")
@@ -89,10 +89,21 @@ for (i in names(dataset)) {
     filename <- file.path("../plots/outliers", paste0(i, "_qqplot.png"))
     save_plot_png(filename, plot = plot)
 
-    print(stat.desc(dataset[[i]]))
-    print(stat.desc(d_iqr[[i]]))
+
   }
 }
+
+.print_stats <- function(df) {
+  df$quality <- NULL
+
+  stats <- describe(df)
+  stats %>%
+    select(-c("mad", "trimmed", "range", "se", "n")) %>%
+    kable()
+}
+
+.print_stats(dataset)
+.print_stats(d_iqr)
 
 # Z-score scartato perché non tutte le distribfuzioni sono normali
 # Winsorizing 100% scartato poiché se è troppo skewed, tiene gli outliers
