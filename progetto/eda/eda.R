@@ -10,10 +10,9 @@
   print(p)
 }
 
-#.class_distribution <- function(data, attribute, ymax) {
 .class_distribution <- function(data, attribute) {
   p<-data %>%
-    ggplot(aes_string(x = attribute, fill = "quality", color = "quality")) +
+    ggplot(aes_string(x = attribute, group="quality", fill = "quality", color = "quality")) +
     geom_density(alpha = 0.2, bins = 40) +
     ggtitle(attribute)
   print(p)
@@ -45,12 +44,12 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(corrplot, ggplot2, dplyr, naniar, patchwork, factoextra)
 
 # Local functions
-source("../utils.R")
+source("./utils.R")
 
 # Import datasets
-combined <- read.csv("../dataset/winequality-combined.csv")
-redwine <- read.csv("../dataset/winequality-red.csv")
-whitewine <- read.csv("../dataset/winequality-white.csv")
+combined <- read.csv("./dataset/winequality-combined.csv")
+redwine <- read.csv("./dataset/winequality-red.csv")
+whitewine <- read.csv("./dataset/winequality-white.csv")
 
 # Summary report
 summary(combined)
