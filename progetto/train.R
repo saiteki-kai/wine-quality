@@ -4,52 +4,42 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(doParallel, dplyr)
+pacman::p_load(doParallel, DMwR, caret, dplyr)
 
 # Local functions
 source("./utils.R")
 source("models/dt.R")
-source("models/nb.R")
 source("models/svm.R")
-source("models/nn.R")
 
-.train <- function(preprocess) {
-  # Prepare the dataset
-  dataset <- read.csv("./dataset/winequality-train.csv") %>%
-    mutate(quality = factor(quality)) %>%
-    lapply(function(x) {
-      if (is.numeric(x)) {
-        treat_outliers(x, method = 'IQR') #
-      } else { x }
-    }) %>%
-    as.data.frame() %>%
-    downsampling()
 
-  # 10-Fold cross validation
-  tr_control <- trainControl(
-    method = "repeatedcv",
-    number = 10,
-    repeats = 5,
-    preProcOptions = list(thresh = 0.9),
-    allowParallel = TRUE
-  )
+# Prepare the dataset
+dataset <- read.csv('./dataset/winequality-combined.csv')
 
-  # Register parallel processing
-  cluster <- makeCluster(detectCores())
-  registerDoParallel(cluster)
+# Setup quality
+dataset$quality <- ifelse(dataset$quality > 6, 'good', 'bad')
+dataset$quality <- factor(dataset$quality)
+dataset$type <- NULL
 
-  # Train the models
-  m1 <- nb_classification(dataset, preprocess, tr_control)
-  m2 <- dt_classification(dataset, preprocess, tr_control)
-  m3 <- svm_classification(dataset, preprocess, tr_control)
-  m4 <- nn_classification(dataset, preprocess, tr_control)
+# Create Partition
+index <- createDataPartition(dataset$quality, p = 0.75, list = FALSE)
+trainset <- dataset[index,]
+testset <- dataset[-index,]
 
-  # Stop using parallel computing
-  stopCluster(cluster)
-}
+#Subsempling
+trainset <- subsempling(trainset, "SMOTE")
 
-#method <- c("center", "scale", "pca")
-#method <- "range"
-method <- c("center", "scale")
+# Preprocess ("scale", "center", "pca", "YeoJohnson", "BoxCox")
+cols <- ncol(trainset)
+pre_proc <- preProcess(trainset[, -cols], method = "YeoJohnson", thresh = 0.9, verbose = TRUE)
 
-.train(preprocess = method)
+# 10-Fold cross validation
+train_control <- trainControl(
+  method = "repeatedcv",
+  number = 10,
+  repeats = 3,
+  allowParallel = TRUE
+)
+
+# Train the models
+m1 <- parallelTrain(trainset, train_control, pre_proc, dt_classification)
+m2 <- parallelTrain(trainset, train_control, pre_proc, svm_classification)

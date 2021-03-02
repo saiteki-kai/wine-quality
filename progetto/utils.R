@@ -11,14 +11,14 @@ pacman::p_load(caret, precrec, factoextra, multiROC, ggplot2, dplyr)
 #' config = 2  -> 3 classes (0: low-quality, 1: medium-quality, 2: high-quality)
 #' config = 3 (default) -> 10 classes (0: low-quality, ..., 10: high-quality)
 #' @return the processed dataset
-preprocess_dataset <- function(dataset, config = 3) {
+preprocess_dataset <- function(dataset, config = 1) {
   #dataset$type <- factor(dataset$type)
 
   if (config == 1) {
-    dataset$quality <- ifelse(dataset$quality > 6, 0, 1)
+    dataset$quality <- ifelse(dataset$quality > 6, 1, 0)
     dataset$quality <- factor(dataset$quality, levels = c(0, 1)) # labels = c("bad", "good")
   } else if (config == 2) {
-    dataset$quality <- ifelse(dataset$quality <= 5, 0, ifelse(dataset$quality <= 7, 1, 2))
+    dataset$quality <- ifelse(dataset$quality <= 5, 0, ifelse(dataset$quality < 7, 1, 2))
     dataset$quality <- factor(dataset$quality, levels = c(0, 1, 2)) # labels = c("low", "medium", "high")
   }
 
@@ -30,43 +30,32 @@ preprocess_dataset <- function(dataset, config = 3) {
 #' @param dataset a dataset
 #' @return the partition composed of train and test
 partition_dataset <- function(dataset) {
-  index <- createDataPartition(dataset$quality, p = 0.80, list = FALSE)
+  index <- createDataPartition(dataset$quality, p = 0.75, list = FALSE)
   train <- dataset[index,]
   test <- dataset[-index,]
 
   list(train = train, test = test)
 }
 
-.norm_minmax <- function(x) { (x - min(x)) / (max(x) - min(x)) }
-
-#' Normalize the dataset using z-score normalization
-#'
-#' @param dataset a dataset
-#' @return the normalized dataset
-normalize_dataset <- function(dataset, method) {
-  to_scale <- dataset %>% dplyr::select(where(is.numeric))
-
-  if (method == "min_max") {
-    scaled <- scale(to_scale)
-  } else if (method == "z_score") {
-    scaled <- lapply(to_scale, .norm_minmax)
-  }
-
-  scaled <- as.data.frame(scaled)
-  scaled$quality <- dataset$quality
-  scaled
-}
 
 #' Print all the measures for the model evaluation
 #'
 #' @param model classification model
 #' @param dataset a dataset to predict
-evaluate_model <- function(model, dataset) {
-  transformed <- predict(model$preProcess, dataset)
+evaluate_model <- function(model, dataset, pre_proc) {
+
+  # Apply transformations
+  if(length(pre_proc) != 0) {
+    cols <- ncol(dataset)
+    transformed <- predict(pre_proc, dataset[, -cols])
+    transformed$quality <- dataset$quality
+  } else {
+    transformed <- dataset
+  }
 
   # Predict
   start_time <- Sys.time()
-  pred <- predict(model, transformed[names(transformed) != "quality"])
+  pred <- predict(model, transformed)
   end_time <- Sys.time()
   time <- end_time - start_time
 
@@ -77,9 +66,9 @@ evaluate_model <- function(model, dataset) {
   #knitr::kable(auc_ci)
 
   # Print confusion matrix
-  cm <- confusionMatrix(data = pred, reference = dataset$quality, mode = 'prec_recall')
+  cm <- confusionMatrix(data = pred, reference = dataset$quality, mode = 'prec_recall', positive = "good")
 
-  out <- list(cm = cm, pred_time = time)
+  out <- list(cm = cm, pred = pred, pred_time = time)
 }
 
 #' Combine the red and the white datasets and add type attribute.
@@ -106,24 +95,17 @@ combine_redwhite <- function() {
 #' @param models a list of models
 #'
 #' @return AUCs for ROC and PRC for all the models
-plot_roc_and_prc_all <- function(dataset, models) {
-  nb_pred <- predict(models$nb_model, dataset[names(dataset) != "quality"])
-  dt_pred <- predict(models$dt_model, dataset[names(dataset) != "quality"])
-  svm_pred <- predict(models$svm_model, dataset[names(dataset) != "quality"])
-  nn_pred <- predict(models$nn_model, dataset[names(dataset) != "quality"])
+plot_roc_and_prc_all <- function(dataset, predictions) {
 
-  nb_pred <- as.numeric(nb_pred)
-  dt_pred <- as.numeric(dt_pred)
-  svm_pred <- as.numeric(svm_pred)
-  nn_pred <- as.numeric(nn_pred)
+  #nb_pred <- as.numeric(predictions$nb_pred)
+  dt_pred <- as.numeric(predictions$dt_pred)
+  svm_pred <- as.numeric(predictions$svm_pred)
+  #nn_pred <- as.numeric(predictions$nn_pred)
 
-  scores <- join_scores(nb_pred, dt_pred, svm_pred, nn_pred)
-  #scores <- join_scores(nb_pred, svm_pred)
+  scores <- join_scores(dt_pred, svm_pred)
   y <- as.numeric(dataset$quality)
-  labels <- join_labels(y, y, y, y)
-  #labels <- join_labels(y, y)
-  mmmdat <- mmdata(scores, labels, modnames = c("nb", "dt", "svm", "nn"), dsids = c(1, 2, 3, 4))
-  #mmmdat <- mmdata(scores, labels, modnames = c("nb", "svm"), dsids = c(1, 2))
+  labels <- join_labels(y, y)
+  mmmdat <- mmdata(scores, labels, modnames = c("nb", "svm"), dsids = c(1, 2))
   res <- evalmod(mmmdat) # mode = 'aucroc'
 
   # Calculate CI of AUCs with normal distibution
@@ -211,17 +193,6 @@ save_plot_png <- function(filename, plot, wide = FALSE) {
   ggsave(filename, plot = plot, device = "png", height = 6.67, width = ifelse(wide, 13.34, 6.67))
 }
 
-feature_selection_pca <- function(dataset) {
-  # new_dataset <- (((pca$x + pca$center) * pca$scale)  %*% pca$rotation[, keep])
-  x <- dataset %>% dplyr::select(where(is.numeric))
-  pca <- prcomp(x, scale = TRUE, center = TRUE)
-  eig <- get_eig(pca)
-  keep <- eig$cumulative.variance.percent < 90
-  print(keep)
-  features <- pca$x[, keep]
-  out <- data.frame(features, quality = dataset$quality)
-}
-
 create_dataset <- function(dataset) {
   partition <- dataset %>%
     mutate(type = NULL) %>%
@@ -232,10 +203,43 @@ create_dataset <- function(dataset) {
   write.csv(partition$test, "./dataset/winequality-test.csv", row.names = FALSE)
 }
 
-downsampling <- function(dataset) {
-  set.seed(314)
-  down_train <- downSample(x = dataset[, -ncol(dataset)], y = dataset$quality)
-  names(down_train)[names(down_train) == "Class"] <- "quality"
-  table(down_train$quality)
-  return(down_train)
+subsempling <- function(trainset, method) {
+  # Install packages
+  if (!require("pacman")) install.packages("pacman")
+    pacman::p_load(DMwR, ROSE)
+
+  set.seed(9560)
+  res <- NULL
+
+  if (method == "down") {
+    res <- downSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
+    names(res)[names(res) == "Class"] <- "quality"
+  }
+  else if (method == "up") {
+    res <- upSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
+    names(res)[names(res) == "Class"] <- "quality"
+  }
+  else if (method == "SMOTE") {
+   res <- SMOTE(quality ~ ., trainset, perc.over = 600,perc.under=100)
+  } else {
+    res <- ROSE(quality ~ ., data  = trainset)$data
+  }
+}
+
+parallelTrain <- function (trainset, train_control, pre_proc, train_func) {
+  # Install packages
+  if (!require("pacman")) install.packages("pacman")
+    pacman::p_load(doParallel)
+
+  # Register parallel processing
+  cluster <- makeCluster(detectCores())
+  registerDoParallel(cluster)
+
+  # Train the model
+  model <- train_func(trainset, train_control, pre_proc)
+
+  # Stop using parallel computing
+  stopCluster(cluster)
+
+  model
 }
