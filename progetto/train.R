@@ -39,18 +39,13 @@ trainset$quality <- factor(trainset$quality)
 #Subsempling
 trainset <- subsempling(trainset, "SMOTE")
 
-# Preprocess ("scale", "center", "pca", "YeoJohnson", "BoxCox")
-cols <- ncol(trainset)
-pre_proc <- preProcess(trainset[, -cols], method = "YeoJohnson", thresh = 0.9, verbose = TRUE)
-
-# 10-Fold cross validation
-train_control <- trainControl(
-  method = "repeatedcv",
-  number = 10,
-  repeats = 3,
-  allowParallel = TRUE
+# Tuning parameters
+grid_radial <- expand.grid(
+  sigma = 0.9, # c(0.1,0.8,0.9,1,1.1,1.2,1.3,1.4),
+  C = 1.2 # c(0.1,0.8,0.9,1,1.1,1.2,1.3,1.4)
 )
+grid_tree <- expand.grid(maxdepth = 2:10)
 
 # Train the models
-m1 <- parallelTrain(trainset, train_control, pre_proc, dt_classification)
-m2 <- parallelTrain(trainset, train_control, pre_proc, svm_classification)
+train_model(trainset, "rpart2", "pca", grid_tree)
+train_model(trainset, "svmRadial", "pca", grid_radial)
