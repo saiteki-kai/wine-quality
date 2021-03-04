@@ -40,6 +40,15 @@ dataset <- read.csv("../dataset/winequality-train.csv") %>%
     theme(plot.title = element_text(hjust = 0.5))
 }
 
+.print_or_save <- function(plot, name, save = FALSE, wide = FALSE) {
+  if (save) {
+    filename <- file.path("../results/plots/outliers", name)
+    save_plot_png(filename, plot = plot, wide = wide)
+  } else {
+    print(plot)
+  }
+}
+
 d_iqr <- dataset
 d_iqr_NA <- dataset
 d_win1 <- dataset
@@ -60,10 +69,8 @@ for (i in names(dataset)) {
     plot <- (p0 / p1 / p2 / p3) +
       plot_layout(guides = "collect") +
       labs(x = i)
-    # print(plot)
 
-    filename <- file.path("../plots/outliers", paste0(i, "_boxplot.png"))
-    save_plot_png(filename, plot = plot, wide = TRUE)
+    .print_or_save(plot, paste0(i, "_boxplot.png"), save = FALSE, wide = TRUE)
 
     d0 <- .plot_distribution(dataset, i, "Original", x_lims)
     d1 <- .plot_distribution(d_iqr, i, "IQR Method", x_lims)
@@ -73,10 +80,8 @@ for (i in names(dataset)) {
     plot <- (d0 + d1 + d2 + d3) +
       plot_layout(guides = "collect") +
       labs(x = i)
-    #print(plot)
 
-    filename <- file.path("../plots/outliers", paste0(i, "_distribution.png"))
-    save_plot_png(filename, plot = plot, wide = TRUE)
+    .print_or_save(plot, paste0(i, "_distribution.png"), save = FALSE, wide = TRUE)
 
     q0 <- .plot_qqplot(dataset, i, "Original")
     q1 <- .plot_qqplot(d_iqr, i, "IQR Method")
@@ -84,10 +89,8 @@ for (i in names(dataset)) {
     q3 <- .plot_qqplot(d_win2, i, "Winsorizing 100")
 
     plot <- (q0 + q1 + q2 + q3) + plot_layout(guides = "collect")
-    # print(plot)
 
-    filename <- file.path("../plots/outliers", paste0(i, "_qqplot.png"))
-    save_plot_png(filename, plot = plot)
+    .print_or_save(plot, name = paste0(i, "_qqplot.png"), save = FALSE)
   }
 }
 
@@ -104,15 +107,8 @@ for (i in names(dataset)) {
 s1 <- .print_stats(dataset)
 s2 <- .print_stats(d_iqr)
 
-write(s1, file.path("../plots/outliers/with_outliers.tex"))
-write(s2, file.path("../plots/outliers/without_outliers.tex"))
-
-# Z-score scartato perché non tutte le distribfuzioni sono normali
-# Winsorizing 100% scartato poiché se è troppo skewed, tiene gli outliers
-# Scelta tra IQR (con imputation median) e Winsorizing 90% tramite i Q-Q plot
-# Metodo scelto: IQR
-
-# TODO: quantificare il numero di outliers con la tecnica scelta
+write(s1, file.path("../results/plots/outliers/with_outliers.tex"))
+write(s2, file.path("../results/plots/outliers/without_outliers.tex"))
 
 # gg_miss_var(dataset, quality)
 # gg_miss_fct(dataset, quality)
