@@ -203,7 +203,7 @@ create_dataset <- function(dataset) {
   write.csv(partition$test, "./dataset/winequality-test.csv", row.names = FALSE)
 }
 
-subsempling <- function(trainset, method) {
+subsampling <- function(trainset, method) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
     pacman::p_load(DMwR, ROSE)

@@ -36,8 +36,8 @@ source("models/svm.R")
 trainset <- read.csv('./dataset/winequality-train.csv')
 trainset$quality <- factor(trainset$quality)
 
-#Subsempling
-trainset <- subsempling(trainset, "SMOTE")
+#Subsampling
+trainset <- subsampling(trainset, "SMOTE")
 
 # Tuning parameters
 grid_radial <- expand.grid(
