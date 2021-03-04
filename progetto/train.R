@@ -83,7 +83,6 @@ pacman::p_load(caret)
 
 # Local functions
 source("./utils.R")
-source("./train_model.R")
 
 # Read trainset
 trainset <- read.csv('./dataset/winequality-train.csv')
