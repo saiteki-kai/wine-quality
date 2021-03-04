@@ -49,7 +49,7 @@ train_model <- function(trainset, method, pre_proc_method, tune_grid = NULL) {
 
   # Save the model
   obj <- list(model = model, train_time = time, pre_proc = pre_proc)
-  saveRDS(obj, file = paste0("./results/models/", model, "_", pre_proc_method, ".RDS"))
+  saveRDS(obj, file = paste0("./results/models/", method, "_", pre_proc_method, ".RDS"))
 
   # Return
   obj
