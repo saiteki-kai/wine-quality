@@ -206,10 +206,9 @@ create_dataset <- function(dataset) {
 subsampling <- function(trainset, method) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
-    pacman::p_load(DMwR, ROSE)
+  pacman::p_load(DMwR, ROSE)
 
   set.seed(9560)
-  res <- NULL
 
   if (method == "down") {
     res <- downSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
@@ -220,16 +219,18 @@ subsampling <- function(trainset, method) {
     names(res)[names(res) == "Class"] <- "quality"
   }
   else if (method == "SMOTE") {
-   res <- SMOTE(quality ~ ., trainset, perc.over = 600,perc.under=100)
+    res <- SMOTE(quality ~ ., trainset, perc.over = 600,perc.under=100)
   } else {
     res <- ROSE(quality ~ ., data  = trainset)$data
   }
+
+  res
 }
 
 parallelTrain <- function (trainset, train_control, pre_proc, train_func) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
-    pacman::p_load(doParallel)
+  pacman::p_load(doParallel)
 
   # Register parallel processing
   cluster <- makeCluster(detectCores())
