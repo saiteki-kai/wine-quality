@@ -11,6 +11,7 @@ dataset$quality <- factor(dataset$quality)
 dataset$type <- NULL
 
 # Create Partition
+set.seed(444)
 index <- createDataPartition(dataset$quality, p = 0.7, list = FALSE)
 trainset <- dataset[index,]
 testset <- dataset[-index,]
