@@ -37,40 +37,6 @@ partition_dataset <- function(dataset) {
   list(train = train, test = test)
 }
 
-
-#' Print all the measures for the model evaluation
-#'
-#' @param model classification model
-#' @param dataset a dataset to predict
-evaluate_model <- function(model, dataset, pre_proc) {
-
-  # Apply transformations
-  if(length(pre_proc) != 0) {
-    cols <- ncol(dataset)
-    transformed <- predict(pre_proc, dataset[, -cols])
-    transformed$quality <- dataset$quality
-  } else {
-    transformed <- dataset
-  }
-
-  # Predict
-  start_time <- Sys.time()
-  pred <- predict(model, transformed)
-  end_time <- Sys.time()
-  time <- end_time - start_time
-
-  # ROC and PRC
-  #sscurves <- evalmod(scores = as.numeric(pred), labels = combined$test$quality)
-  #autoplot(sscurves)
-  #auc_ci <- auc_ci(sscurves)
-  #knitr::kable(auc_ci)
-
-  # Print confusion matrix
-  cm <- confusionMatrix(data = pred, reference = dataset$quality, mode = 'prec_recall', positive = "good")
-
-  out <- list(cm = cm, pred = pred, pred_time = time)
-}
-
 #' Combine the red and the white datasets and add type attribute.
 #' Save the result as a csv file
 #'
@@ -88,48 +54,6 @@ combine_redwhite <- function() {
   write.csv(wines, "./dataset/winequality-combined.csv", row.names = FALSE)
 
   wines
-}
-
-#' Plot ROC and precision_recall_curve for all the models specified
-#' @param dataset a dataset
-#' @param models a list of models
-#'
-#' @return AUCs for ROC and PRC for all the models
-plot_roc_and_prc_all <- function(dataset, predictions) {
-
-  #nb_pred <- as.numeric(predictions$nb_pred)
-  dt_pred <- as.numeric(predictions$dt_pred)
-  svm_pred <- as.numeric(predictions$svm_pred)
-  #nn_pred <- as.numeric(predictions$nn_pred)
-
-  scores <- join_scores(dt_pred, svm_pred)
-  y <- as.numeric(dataset$quality)
-  labels <- join_labels(y, y)
-  mmmdat <- mmdata(scores, labels, modnames = c("nb", "svm"), dsids = c(1, 2))
-  res <- evalmod(mmmdat) # mode = 'aucroc'
-
-  # Calculate CI of AUCs with normal distibution
-  auc_ci <- auc_ci(res)
-
-  # Use knitr::kable to display the result in a table format
-  knitr::kable(auc_ci)
-
-  # Plot ROC and PRC
-  autoplot(res)
-
-  return(res)
-}
-
-#' Write a log file
-#' @param model_name model's name
-#' @param cm a confusion matrix
-#' @param pred_time prediction time
-#'
-write_log <- function(model_name, cm, pred_time) {
-  file <- file.path("./results/models", paste0(model_name, "_.log"))
-  write.table(paste("model_name: ", model_name), file, row.names = FALSE, col.names = FALSE)
-  write.table(paste("pred_time: ", pred_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table(capture.output(cm), file, row.names = FALSE, col.names = FALSE, append = TRUE)
 }
 
 #' Detect outliers using the Interquartile Range (IQR) approach or Winsorinzing (Percentile Capping).
@@ -193,16 +117,6 @@ save_plot_png <- function(filename, plot, wide = FALSE) {
   ggsave(filename, plot = plot, device = "png", height = 6.67, width = ifelse(wide, 13.34, 6.67))
 }
 
-create_dataset <- function(dataset) {
-  partition <- dataset %>%
-    mutate(type = NULL) %>%
-    preprocess_dataset(1) %>%
-    partition_dataset()
-
-  write.csv(partition$train, "./dataset/winequality-train.csv", row.names = FALSE)
-  write.csv(partition$test, "./dataset/winequality-test.csv", row.names = FALSE)
-}
-
 subsampling <- function(trainset, method) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
@@ -225,22 +139,4 @@ subsampling <- function(trainset, method) {
   }
 
   res
-}
-
-parallelTrain <- function (trainset, train_control, pre_proc, train_func) {
-  # Install packages
-  if (!require("pacman")) install.packages("pacman")
-  pacman::p_load(doParallel)
-
-  # Register parallel processing
-  cluster <- makeCluster(detectCores())
-  registerDoParallel(cluster)
-
-  # Train the model
-  model <- train_func(trainset, train_control, pre_proc)
-
-  # Stop using parallel computing
-  stopCluster(cluster)
-
-  model
 }
