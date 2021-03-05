@@ -82,7 +82,7 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret)
 
 # Local functions
-source("utils.R")
+source("./utils.R")
 
 # Read trainset
 trainset <- read.csv('../data/winequality-train.csv')
@@ -103,5 +103,7 @@ grid_radial <- expand.grid(
 grid_tree <- expand.grid(maxdepth = 2:10)
 
 # Train the models
-model.tree <- .train_model(trainset, "rpart2", "pca", grid_tree)
-model.svm <- .train_model(trainset, "svmRadial", "pca", grid_radial)
+for (method in c("pca", "z-score")) {
+  model.tree <- .train_model(trainset, "rpart2", method, grid_tree)
+  model.svm <- .train_model(trainset, "svmRadial", method, grid_radial)
+}
