@@ -10,7 +10,7 @@ pacman::p_load(ggplot2, naniar, patchwork, kableExtra, psych, dplyr)
 # Import local functions
 source("../utils.R")
 
-dataset <- read.csv("../dataset/winequality-train.csv") %>%
+dataset <- read.csv("../../data/winequality-train.csv") %>%
   mutate(quality = factor(quality))
 
 .plot_boxplot <- function(data, attribute, title, limits) {
@@ -42,7 +42,7 @@ dataset <- read.csv("../dataset/winequality-train.csv") %>%
 
 .print_or_save <- function(plot, name, save = FALSE, wide = FALSE) {
   if (save) {
-    filename <- file.path("../results/plots/outliers", name)
+    filename <- file.path("../../plots/outliers", name)
     save_plot_png(filename, plot = plot, wide = wide)
   } else {
     print(plot)
@@ -107,8 +107,8 @@ for (i in names(dataset)) {
 s1 <- .print_stats(dataset)
 s2 <- .print_stats(d_iqr)
 
-write(s1, file.path("../results/plots/outliers/with_outliers.tex"))
-write(s2, file.path("../results/plots/outliers/without_outliers.tex"))
+write(s1, file.path("../../plots/outliers/with_outliers.tex"))
+write(s2, file.path("../../plots/outliers/without_outliers.tex"))
 
 # gg_miss_var(dataset, quality)
 # gg_miss_fct(dataset, quality)

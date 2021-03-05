@@ -39,4 +39,5 @@ vignettes/*.pdf
 .Renviron
 
 # Results
-results/
+output/
+plots/

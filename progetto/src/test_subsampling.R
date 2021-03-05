@@ -1,8 +1,8 @@
 library(caret)
 
-source("./utils.R")
+source("utils.R")
 
-dataset <- read.csv('./dataset/winequality-combined.csv')
+dataset <- read.csv('../data/winequality-combined.csv')
 
 # Setup quality
 dataset$quality <- ifelse(dataset$quality > 6, 'good', 'bad')

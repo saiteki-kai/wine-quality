@@ -49,7 +49,7 @@
 
   # Save the model
   obj <- list(model = model, train_time = time, pre_proc = pre_proc)
-  saveRDS(obj, file = paste0("./results/models/", method, "_", pre_proc_method, ".RDS"))
+  saveRDS(obj, file = paste0("../output/", method, "_", pre_proc_method, ".RDS"))
 
   # Return
   obj
@@ -82,10 +82,10 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret)
 
 # Local functions
-source("./utils.R")
+source("utils.R")
 
 # Read trainset
-trainset <- read.csv('./dataset/winequality-train.csv')
+trainset <- read.csv('../data/winequality-train.csv')
 trainset$quality <- factor(trainset$quality)
 
 #Subsampling

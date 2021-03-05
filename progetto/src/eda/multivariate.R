@@ -71,7 +71,7 @@
 
 .plot_pieplot <- function(dataset) {
   mytable <- table(dataset$type)
-  lbls <- paste(names(mytable), "\n", mytable, sep="")
+  lbls <- paste0(names(mytable), "\n", mytable)
   pie(mytable, labels = lbls,
       main="Wine Type Distribution",
       col=c('#FF6666', '#FFFFFF'))
@@ -117,7 +117,7 @@ source('../utils.R')
 ########################################################################################################################
 
 # Import dataset Red & White
-dataset <- read.csv("../dataset/winequality-combined.csv") %>%
+dataset <- read.csv("../../data/winequality-combined.csv") %>%
   preprocess_dataset(2) %>%
   mutate(quality = factor(quality)) %>%
   mutate(type = factor(type)) %>%

@@ -42,8 +42,8 @@ partition_dataset <- function(dataset) {
 #'
 #' @return the combined dataset
 combine_redwhite <- function() {
-  redwine <- read.csv("./dataset/winequality-red.csv")
-  whitewine <- read.csv("./dataset/winequality-white.csv")
+  redwine <- read.csv("../data/winequality-red.csv")
+  whitewine <- read.csv("../data/winequality-white.csv")
 
   redwine$type <- "red"
   whitewine$type <- "white"
@@ -51,7 +51,7 @@ combine_redwhite <- function() {
   wines <- rbind(redwine, whitewine)
 
   # Save the combined dataset
-  write.csv(wines, "./dataset/winequality-combined.csv", row.names = FALSE)
+  write.csv(wines, "../data/winequality-combined.csv", row.names = FALSE)
 
   wines
 }

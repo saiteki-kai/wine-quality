@@ -1,10 +1,13 @@
 library(caret)
 
-dataset <- read.csv("./dataset/winequality-white.csv")
+dataset <- read.csv("../data/winequality-white.csv")
 
 # Setup quality
 dataset$quality <- ifelse(dataset$quality > 6, "good", "bad")
-dataset$quality <- factor(dataset$quality)
+dataset$quality <- factor(dataset$quality, levels = c("bad", "good"))
+
+# dataset$quality <- ifelse(dataset$quality <= 5, "bad", ifelse(dataset$quality > 7, "good", "medium"))
+# dataset$quality <- factor(dataset$quality, levels = c("bad", "medium", "good"))
 
 # Create Partition
 index <- createDataPartition(dataset$quality, p = 0.80, list = FALSE)
@@ -12,8 +15,8 @@ trainset <- dataset[index,]
 testset <- dataset[-index,]
 
 # Downsample
-trainset <- downSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
-names(trainset)[names(trainset) == "Class"] <- "quality"
+# trainset <- downSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
+# names(trainset)[names(trainset) == "Class"] <- "quality"
 
 train_control <- trainControl(
   method = "repeatedcv",
@@ -24,14 +27,14 @@ train_control <- trainControl(
 cols <- ncol(trainset)
 
 # Apply transformations
-pre_proc <- preProcess(trainset[, -cols], method = c("BoxCox", "scale", "center", "pca"), thresh = 0.9, verbose = TRUE)
+pre_proc <- preProcess(trainset[, -cols], method = c("scale", "center", "pca"), verbose = TRUE)
 trainset_pca <- predict(pre_proc, trainset[, -cols])
 trainset_pca$quality <- trainset$quality
 
 model <- train(
   quality ~ .,
   data = trainset_pca,
-  method = "svmRadial",
+  method = "mlp",
   trControl = train_control
 )
 

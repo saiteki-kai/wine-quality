@@ -2,7 +2,7 @@
 #'
 
 .get_model <- function(name) {
-  filename <- file.path("./results/models", paste0(name, "_model.RDS"))
+  filename <- file.path("../output", paste0(name, "_model.RDS"))
   if (file.exists(filename)) {
     readRDS(filename)
   }
@@ -14,7 +14,7 @@
 #' @param pred_time prediction time
 #'
 .write_log <- function(model_name, cm, pred_time) {
-  file <- file.path("./results/models", paste0(model_name, "_.log"))
+  file <- file.path("../output", paste0(model_name, "_.log"))
   write.table(paste("model_name: ", model_name), file, row.names = FALSE, col.names = FALSE)
   write.table(paste("pred_time: ", pred_time), file, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(capture.output(cm), file, row.names = FALSE, col.names = FALSE, append = TRUE)
@@ -66,7 +66,7 @@
 
   # Predict
   start_time <- Sys.time()
-  pred <- predict(model, transformed)
+  pred <- predict(model, newdata = transformed)
   end_time <- Sys.time()
   time <- end_time - start_time
 
@@ -87,10 +87,10 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret, doParallel, ggplot2, grid, precrec, factoextra, checkmate, multiROC, dummies, mlbench, dplyr)
 
 # Local functions
-source("./utils.R")
+source("utils.R")
 
 # Prepare the dataset
-testset <- read.csv('./dataset/winequality-test.csv')
+testset <- read.csv('../data/winequality-test.csv')
 testset$quality <- factor(testset$quality)
 
 # load models
