@@ -25,17 +25,24 @@
 #' @param models a list of models
 #'
 #' @return AUCs for ROC and PRC for all the models
-.plot_roc_and_prc_all <- function(dataset, predictions) {
-  #nb_pred <- as.numeric(predictions$nb_pred)
-  dt_pred <- as.numeric(predictions$dt_pred)
-  svm_pred <- as.numeric(predictions$svm_pred)
-  #nn_pred <- as.numeric(predictions$nn_pred)
+.plot_roc_and_prc_all <- function(dataset, predictions, names) {
 
-  scores <- join_scores(dt_pred, svm_pred)
-  y <- as.numeric(dataset$quality)
-  labels <- join_labels(y, y)
-  mmmdat <- mmdata(scores, labels, modnames = c("nb", "svm"), dsids = c(1, 2))
+  func <- function (x) as.numeric(x) - 1
+  predictions <- map(predictions, func)
+  scores <- join_scores(predictions)
+  y <- as.numeric(dataset$quality) - 1
+
+  myList <- list()
+  for(i in 1:length(names)){
+    myList <- append(myList, list(y))
+  }
+  labels <- join_labels(myList)
+
+  mmmdat <- mmdata(scores, labels, modnames = names, dsids = as.numeric(as.factor(names)))
   res <- evalmod(mmmdat) # mode = 'aucroc'
+
+  # Plot ROC and PRC
+  autoplot(res)
 
   # Calculate CI of AUCs with normal distibution
   auc_ci <- auc_ci(res)
@@ -43,8 +50,7 @@
   # Use knitr::kable to display the result in a table format
   knitr::kable(auc_ci)
 
-  # Plot ROC and PRC
-  autoplot(res)
+  print(res)
 
   return(res)
 }
@@ -109,6 +115,5 @@ for (method in c("pca", "z-score")) {
   .write_log("svmRadial", method, res2$cm, res2$pred_time)
 
   # Plot AUCs ROC & PRC
-  predictions <- list(dt_pred = res1$pred, svm_pred = res2$pred)
-  .plot_roc_and_prc_all(testset, predictions)
+  .plot_roc_and_prc_all(testset, list(pred1=res1$pred, pred2=res2$pred), c("dt", "svm"))
 }
