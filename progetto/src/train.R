@@ -77,6 +77,37 @@
   pre_proc
 }
 
+#' Compute subsampling
+#'
+#' @param trainset the training set
+#' @param method the subsampling method's name
+#'
+#' @return the subsampled trainset
+subsampling <- function(trainset, method) {
+  # Install packages
+  if (!require("pacman")) install.packages("pacman")
+  pacman::p_load(DMwR, ROSE)
+
+  set.seed(9560)
+
+  if (method == "down") {
+    res <- downSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
+    names(res)[names(res) == "Class"] <- "quality"
+  }
+  else if (method == "up") {
+    res <- upSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
+    names(res)[names(res) == "Class"] <- "quality"
+  }
+  else if (method == "SMOTE") {
+    res <- SMOTE(quality ~ ., trainset, perc.over = 100, perc.under = 200)
+  } else {
+    res <- ROSE(quality ~ ., data = trainset)$data
+  }
+
+  res
+}
+
+
 # Install packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret)
