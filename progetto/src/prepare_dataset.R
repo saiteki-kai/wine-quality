@@ -6,17 +6,17 @@ pacman::p_load(caret)
 source("utils.R")
 
 # Load the dataset
-dataset <- read.csv('../data/winequality-combined.csv')
+dataset <- read.csv("../data/winequality-combined.csv")
 
 # Setup quality
-dataset <- target_transformation(dataset, 1)
+dataset <- relabelling(dataset, 1)
 dataset$type <- NULL
 
 # Create Partition
-set.seed(4442)
+set.seed(444)
 index <- createDataPartition(dataset$quality, p = 0.75, list = FALSE)
-trainset <- dataset[index,]
-testset <- dataset[-index,]
+trainset <- dataset[index, ]
+testset <- dataset[-index, ]
 
 write.csv(trainset, "../data/winequality-train.csv", row.names = FALSE)
 write.csv(testset, "../data/winequality-test.csv", row.names = FALSE)

@@ -49,7 +49,9 @@
 
   # Save the model
   model$preProcess <- pre_proc
-  saveRDS(model, file = paste0("../output/", method, "_", pre_proc_method, ".RDS"))
+  saveRDS(model,
+    file = paste0("../output/", method, "_", pre_proc_method, ".RDS")
+  )
 
   # Return
   model
@@ -65,7 +67,9 @@
   data <- trainset[, -ncol(trainset)]
 
   if (name == "pca") {
-    pre_proc <- preProcess(data, method = c("center", "scale", "pca"), thresh = 0.9)
+    pre_proc <- preProcess(data,
+                           method = c("center", "scale", "pca"), thresh = 0.9
+    )
   } else if (name == "z-score") {
     pre_proc <- preProcess(data, method = c("center", "scale"))
   } else if (name == "min-max") {
@@ -116,7 +120,7 @@ pacman::p_load(caret)
 source("./utils.R")
 
 # Read trainset
-trainset <- read.csv('../data/winequality-train.csv')
+trainset <- read.csv("../data/winequality-train.csv")
 trainset$quality <- factor(trainset$quality)
 
 # Subsampling

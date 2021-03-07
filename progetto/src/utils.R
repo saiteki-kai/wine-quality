@@ -11,14 +11,18 @@ pacman::p_load(caret, precrec, factoextra, multiROC, ggplot2, dplyr)
 #' config = 2  -> 3 classes (0: low-quality, 1: medium-quality, 2: high-quality)
 #' otherwise -> 10 classes (0: low-quality, ..., 10: high-quality)
 #' @return the processed dataset
-target_transformation <- function(dataset, config = 1) {
+relabelling <- function(dataset, config = 1) {
   dataset$type <- factor(dataset$type)
 
   if (config == 1) {
-    dataset$quality <- ifelse(dataset$quality > 6, 'good', 'bad')
+    dataset$quality <- ifelse(dataset$quality > 6, "good", "bad")
     dataset$quality <- factor(dataset$quality)
   } else if (config == 2) {
-    dataset$quality <- ifelse(dataset$quality <= 5, 'low', ifelse(dataset$quality < 7, "medium", "high"))
+    dataset$quality <- ifelse(
+      dataset$quality <= 5,
+      "low",
+      ifelse(dataset$quality < 7, "medium", "high")
+    )
     dataset$quality <- factor(dataset$quality)
   } else {
     dataset$quality <- factor(dataset$quality)
@@ -46,8 +50,10 @@ combine_redwhite <- function() {
   wines
 }
 
-#' Detect outliers using the Interquartile Range (IQR) approach or Winsorinzing (Percentile Capping).
-#' All points that lie outside the upper limit or below the lower limit can be considered outliers.
+#' Detect outliers using the Interquartile Range (IQR) approach or
+#' Winsorinzing (Percentile Capping).
+#' All points that lie outside the upper limit or below the lower
+#' limit can be considered outliers.
 #'
 #' @param data numeric array
 #' @param method method of outliers detection
@@ -66,7 +72,9 @@ combine_redwhite <- function() {
 #' Upper Limit = 95th quantile
 #'
 #' @return a list containing the lower and upper limits
-detect_outliers <- function(data, method = "winsorizing", win.quantiles = c(0.05, 0.95)) {
+detect_outliers <- function(data,
+                            method = "winsorizing",
+                            win.quantiles = c(0.05, 0.95)) {
   if (method == "winsorizing") {
     quantiles <- quantile(data, win.quantiles, names = FALSE)
     lower <- quantiles[1]
@@ -89,14 +97,17 @@ detect_outliers <- function(data, method = "winsorizing", win.quantiles = c(0.05
 #' @param win.quantiles quantile limits for the winsorinzing method
 #'
 #' @return the dataset without outliers
-treat_outliers <- function(data, method = "winsorizing", win.quantiles = c(0.05, 0.95), outlier.rm = FALSE) {
+treat_outliers <- function(data, method = "winsorizing",
+                           win.quantiles = c(0.05, 0.95),
+                           outlier.rm = FALSE) {
   if (method == "winsorizing") {
     bounds <- detect_outliers(data, win.quantiles = win.quantiles)
     data[data < bounds[1]] <- bounds$lower
     data[data > bounds[2]] <- bounds$upper
   } else if (method == "IQR") {
     bounds <- detect_outliers(data, method = "IQR")
-    data[data < bounds$lower | data > bounds$upper] <- ifelse(outlier.rm, NA, median(data))
+    data[data < bounds$lower | data > bounds$upper] <-
+      ifelse(outlier.rm, NA, median(data))
   } else {
     stop("`mode` should be either `IQR` or `winsorizing`")
   }
@@ -104,6 +115,10 @@ treat_outliers <- function(data, method = "winsorizing", win.quantiles = c(0.05,
 }
 
 save_plot_png <- function(filename, plot, wide = FALSE) {
-  ggsave(filename, plot = plot, device = "png", height = 6.67, width = ifelse(wide, 13.34, 6.67))
+  ggsave(filename,
+    plot = plot,
+    device = "png",
+    height = 6.67,
+    width = ifelse(wide, 13.34, 6.67)
+  )
 }
-
