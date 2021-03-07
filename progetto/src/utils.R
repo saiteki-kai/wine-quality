@@ -11,7 +11,7 @@ pacman::p_load(caret, precrec, factoextra, multiROC, ggplot2, dplyr)
 #' config = 2  -> 3 classes (0: low-quality, 1: medium-quality, 2: high-quality)
 #' otherwise -> 10 classes (0: low-quality, ..., 10: high-quality)
 #' @return the processed dataset
-relabelling <- function(dataset, config = 1) {
+relabeling <- function(dataset, config = 1) {
   dataset$type <- factor(dataset$type)
 
   if (config == 1) {
