@@ -83,7 +83,7 @@
 #' @param method the subsampling method's name
 #'
 #' @return the subsampled trainset
-subsampling <- function(trainset, method) {
+.subsampling <- function(trainset, method) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(DMwR, ROSE)
