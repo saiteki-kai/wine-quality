@@ -59,10 +59,10 @@ miss_var_summary(combined)
 
 #red AND white wine quality by different class
 #combined separate by two class of quality
-config1 <- preprocess_dataset(combined, 1)
+config1 <- target_transformation(combined, 1)
 
 #combined separate by three class of quality
-config2 <- preprocess_dataset(combined, 2)
+config2 <- target_transformation(combined, 2)
 
 
 #red and white wine quality
@@ -74,12 +74,12 @@ print((p1 + p3 + p2) + plot_layout(guides = "collect"))
 
 #red OR white wine quality by different class
 #red and white wine separate by two class
-config1_redwine <- preprocess_dataset(redwine, 1)
-config1_whitewine <- preprocess_dataset(whitewine, 1)
+config1_redwine <- target_transformation(redwine, 1)
+config1_whitewine <- target_transformation(whitewine, 1)
 
 #red and white wine separate by three class
-config2_redwine <- preprocess_dataset(redwine, 2)
-config2_whitewine <- preprocess_dataset(whitewine, 2)
+config2_redwine <- target_transformation(redwine, 2)
+config2_whitewine <- target_transformation(whitewine, 2)
 
 p1 <- .type_barplot(redwine, "#FF6666", "red wine")
 p2 <- .type_barplot(config1_redwine, "#FF6666", "red wine by two class")
