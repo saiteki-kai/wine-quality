@@ -2,21 +2,21 @@ library(caret)
 
 source("utils.R")
 
-dataset <- read.csv('../data/winequality-combined.csv')
+dataset <- read.csv("../data/winequality-combined.csv")
 
 # Setup quality
-dataset$quality <- ifelse(dataset$quality > 6, 'good', 'bad')
+dataset$quality <- ifelse(dataset$quality > 6, "good", "bad")
 dataset$quality <- factor(dataset$quality)
 dataset$type <- NULL
 
 # Create Partition
 set.seed(2969)
 index <- createDataPartition(dataset$quality, p = 0.75, list = FALSE)
-trainset <- dataset[index,]
-testset <- dataset[-index,]
+trainset <- dataset[index, ]
+testset <- dataset[-index, ]
 
 
-#Subsampling
+# Subsampling
 set.seed(9560)
 down_train <- downSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
 names(down_train)[names(down_train) == "Class"] <- "quality"
@@ -27,11 +27,11 @@ names(up_train)[names(up_train) == "Class"] <- "quality"
 
 library(DMwR)
 set.seed(9560)
-smote_train <- SMOTE(quality ~ ., trainset, perc.over = 600,perc.under=100)
+smote_train <- SMOTE(quality ~ ., trainset, perc.over = 600, perc.under = 100)
 
 library(ROSE)
 set.seed(9560)
-rose_train <- ROSE(quality ~ ., data  = trainset)$data
+rose_train <- ROSE(quality ~ ., data = trainset)$data
 
 
 
@@ -42,8 +42,8 @@ train_control <- trainControl(
 )
 
 grid_radial <- expand.grid(
-  sigma = 0.9,#c(0.1,0.8,0.9,1,1.1,1.2,1.3,1.4),
-  C = 1.2#c(0.1,0.8,0.9,1,1.1,1.2,1.3,1.4)
+  sigma = 0.9, # c(0.1,0.8,0.9,1,1.1,1.2,1.3,1.4),
+  C = 1.2 # c(0.1,0.8,0.9,1,1.1,1.2,1.3,1.4)
 )
 
 set.seed(5627)
@@ -91,21 +91,23 @@ rose_outside <- train(
   trControl = train_control
 )
 
-outside_models <- list(original = orig_fit,
-                       down = down_outside,
-                       up = up_outside,
-                       SMOTE = smote_outside,
-                       ROSE = rose_outside)
+outside_models <- list(
+  original = orig_fit,
+  down = down_outside,
+  up = up_outside,
+  SMOTE = smote_outside,
+  ROSE = rose_outside
+)
 
 outside_resampling <- resamples(outside_models)
 
 test_roc <- function(model, data) {
   library(pROC)
   y <- as.numeric(data$quality) - 1
-  x <- as.numeric(predict(model, data[names(data) != "quality"]))-1
+  x <- as.numeric(predict(model, data[names(data) != "quality"])) - 1
   roc_obj <- roc(y, x, levels = c("good", "bad"))
   ci(roc_obj)
-  }
+}
 
 outside_test <- lapply(outside_models, test_roc, data = trainset)
 outside_test <- lapply(outside_test, as.vector)

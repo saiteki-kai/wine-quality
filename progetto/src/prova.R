@@ -11,8 +11,8 @@ dataset$quality <- factor(dataset$quality, levels = c("bad", "good"))
 
 # Create Partition
 index <- createDataPartition(dataset$quality, p = 0.80, list = FALSE)
-trainset <- dataset[index,]
-testset <- dataset[-index,]
+trainset <- dataset[index, ]
+testset <- dataset[-index, ]
 
 # Downsample
 # trainset <- downSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
