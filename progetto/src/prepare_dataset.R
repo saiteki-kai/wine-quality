@@ -2,17 +2,19 @@
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret)
 
+# Local functions
+source("utils.R")
+
 # Load the dataset
 dataset <- read.csv('../data/winequality-combined.csv')
 
 # Setup quality
-dataset$quality <- ifelse(dataset$quality > 6, 'good', 'bad')
-dataset$quality <- factor(dataset$quality)
+dataset <- target_transformation(dataset, 1)
 dataset$type <- NULL
 
 # Create Partition
-set.seed(444)
-index <- createDataPartition(dataset$quality, p = 0.7, list = FALSE)
+set.seed(4442)
+index <- createDataPartition(dataset$quality, p = 0.75, list = FALSE)
 trainset <- dataset[index,]
 testset <- dataset[-index,]
 
