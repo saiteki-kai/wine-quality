@@ -25,30 +25,24 @@
 #' @param models a list of models
 #'
 #' @return AUCs for ROC and PRC for all the models
-.plot_roc_and_prc_all <- function(dataset, predictions, names) {
+.plot_roc_and_prc_all <- function(reference, prediction, names, method) {
 
-  func <- function (x) as.numeric(x) - 1
-  predictions <- map(predictions, func)
-  scores <- join_scores(predictions)
-  y <- as.numeric(dataset$quality) - 1
+  scores <- join_scores(prediction)
 
-  myList <- list()
-  for(i in 1:length(names)){
-    myList <- append(myList, list(y))
-  }
-  labels <- join_labels(myList)
+  labels <- rep(list(reference), length(names))
+  labels <- join_labels(labels)
 
   mmmdat <- mmdata(scores, labels, modnames = names, dsids = as.numeric(as.factor(names)))
-  res <- evalmod(mmmdat) # mode = 'aucroc'
+  res <- evalmod(mmmdat, mode = "rocprc")
 
   # Plot ROC and PRC
-  autoplot(res)
+  autoplot(res) + title(method)
 
   # Calculate CI of AUCs with normal distibution
   auc_ci <- auc_ci(res)
 
   # Use knitr::kable to display the result in a table format
-  knitr::kable(auc_ci)
+  print(knitr::kable(auc_ci))
 
   print(res)
 
@@ -61,33 +55,29 @@
 #' @param dataset a dataset to predict
 #'
 #' @return list containing the confusion matrix, the predictions and the prediction time
-.evaluate_model <- function(model, dataset, pre_proc) {
+.evaluate_model <- function(model, dataset) {
 
   # Apply transformations
-  if (length(pre_proc) != 0) {
+  if (length(model$preProcess) != 0) {
     cols <- ncol(dataset)
-    transformed <- predict(pre_proc, dataset[, -cols])
+    transformed <- predict(model$preProcess, dataset[, -cols])
     transformed$quality <- dataset$quality
+    model$preProcess <- NULL
   } else {
     transformed <- dataset
   }
 
   # Predict
   start_time <- Sys.time()
-  pred <- predict(model, newdata = transformed)
+  probs <- predict(model, newdata = transformed, type = "prob")
+  pred <- factor(ifelse(probs$good >= 0.5, "good", "bad")) # TODO: CHECK
   end_time <- Sys.time()
   time <- end_time - start_time
-
-  # ROC and PRC
-  #sscurves <- evalmod(scores = as.numeric(pred), labels = combined$test$quality)
-  #autoplot(sscurves)
-  #auc_ci <- auc_ci(sscurves)
-  #knitr::kable(auc_ci)
 
   # Print confusion matrix
   cm <- confusionMatrix(data = pred, reference = dataset$quality, mode = 'prec_recall', positive = "good")
 
-  out <- list(cm = cm, pred = pred, pred_time = time)
+  out <- list(cm = cm, pred = probs, pred_time = time)
 }
 
 # Install packages
@@ -101,19 +91,38 @@ source("utils.R")
 testset <- read.csv('../data/winequality-test.csv')
 testset$quality <- factor(testset$quality)
 
-for (method in c("pca", "z-score")) {
+for (method in c("pca", "z-score", "min-max")) {
   # Load models
-  obj1 <- .get_model("rpart2", method)
-  obj2 <- .get_model("svmRadial", method)
+  rpart.model <- .get_model("rpart2", method)
+  svmRadial.model <- .get_model("svmRadial", method)
+  svmLinear.model <- .get_model("svmLinear", method)
 
   # Evaluate the model
-  res1 <- .evaluate_model(obj1$model, testset, obj1$pre_proc)
-  res2 <- .evaluate_model(obj2$model, testset, obj2$pre_proc)
+  res1 <- .evaluate_model(rpart.model, testset)
+  res2 <- .evaluate_model(svmRadial.model, testset)
+  res3 <- .evaluate_model(svmLinear.model, testset)
 
   # Write Logs
   .write_log("rpart2", method, res1$cm, res1$pred_time)
   .write_log("svmRadial", method, res2$cm, res2$pred_time)
+  .write_log("svmLinear", method, res3$cm, res3$pred_time)
+
+  predictions <- list(pred1 = res1$pred$good, pred2 = res2$pred$good, pred3 = res3$pred$good)
+
+  print(paste0("Method: ", method))
 
   # Plot AUCs ROC & PRC
-  .plot_roc_and_prc_all(testset, list(pred1=res1$pred, pred2=res2$pred), c("dt", "svm"))
+  .plot_roc_and_prc_all(testset$quality, predictions, c("rpart2", "svmRadial", "svmLinear"), method)
+
+  # Model Comparison
+  cv.values <- resamples(list(rpart2 = rpart.model, svmRadial = svmRadial.model, svmLinear = svmLinear.model))
+  summary(cv.values)
+  print(dotplot(cv.values, metric = "ROC"))
+  print(bwplot(cv.values, layout = c(3, 1)))
+  print(splom(cv.values, metric = "ROC"))
 }
+
+# TODO: save plots and divide subsampled results from non subsampled
+# TODO: save tuning plot(model)
+# TODO: test statistici
+

@@ -21,7 +21,9 @@
   train_control <- trainControl(
     method = "repeatedcv",
     number = 10,
-    repeats = 3,
+    repeats = 1,
+    classProbs = TRUE,
+    summaryFunction = twoClassSummary,
     allowParallel = TRUE
   )
 
@@ -30,29 +32,27 @@
   registerDoParallel(cluster)
 
   # Train the model
-  start_time <- Sys.time()
   model <- train(
     quality ~ .,
     data = trasformed,
     method = method,
     tuneGrid = tune_grid,
+    metric = "ROC",
     trControl = train_control
   )
-  end_time <- Sys.time()
 
   # Stop using parallel computing
   stopCluster(cluster)
 
   # Print train time
-  time <- end_time - start_time
-  print(paste0("train time: ", time))
+  print(model$times)
 
   # Save the model
-  obj <- list(model = model, train_time = time, pre_proc = pre_proc)
-  saveRDS(obj, file = paste0("../output/", method, "_", pre_proc_method, ".RDS"))
+  model$preProcess <- pre_proc
+  saveRDS(model, file = paste0("../output/", method, "_", pre_proc_method, ".RDS"))
 
   # Return
-  obj
+  model
 }
 
 #' Compute parameters for the preprocessing
@@ -88,13 +88,16 @@ source("./utils.R")
 trainset <- read.csv('../data/winequality-train.csv')
 trainset$quality <- factor(trainset$quality)
 
-#Subsampling
-trainset <- subsampling(trainset, "SMOTE")
+# Subsampling
+# trainset <- subsampling(trainset, "SMOTE")
 
-# Tuning parameters
+# Tuning parameters (Best: sigma=0.9, C=1.2)
 grid_radial <- expand.grid(
-  sigma = 0.9, # c(0.1,0.8,0.9,1,1.1,1.2,1.3,1.4),
-  C = 1.2 # c(0.1,0.8,0.9,1,1.1,1.2,1.3,1.4)
+  sigma = c(0.1, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4),
+  C = c(0.1, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4)
+)
+grid_linear <- expand.grid(
+  C = c(0.1, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4)
 )
 # grid_radial <- expand.grid(
 #   sigma = c(0.01, 0.5, 1), #c(0,0.01,0.1,0.5,0.75,0.9,1),
@@ -103,7 +106,8 @@ grid_radial <- expand.grid(
 grid_tree <- expand.grid(maxdepth = 2:10)
 
 # Train the models
-for (method in c("pca", "z-score")) {
-  model.tree <- .train_model(trainset, "rpart2", method, grid_tree)
-  model.svm <- .train_model(trainset, "svmRadial", method, grid_radial)
+for (method in c("pca", "z-score", "min-max")) {
+  .train_model(trainset, "rpart2", method, grid_tree)
+  .train_model(trainset, "svmLinear", method, grid_linear)
+  .train_model(trainset, "svmRadial", method, grid_radial)
 }
