@@ -133,9 +133,9 @@ subsampling <- function(trainset, method) {
     names(res)[names(res) == "Class"] <- "quality"
   }
   else if (method == "SMOTE") {
-    res <- SMOTE(quality ~ ., trainset, perc.over = 600,perc.under=100)
+    res <- SMOTE(quality ~ ., trainset, perc.over = 100, perc.under = 200)
   } else {
-    res <- ROSE(quality ~ ., data  = trainset)$data
+    res <- ROSE(quality ~ ., data = trainset)$data
   }
 
   res
