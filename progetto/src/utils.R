@@ -9,32 +9,22 @@ pacman::p_load(caret, precrec, factoextra, multiROC, ggplot2, dplyr)
 #' @details
 #' config = 1  -> 2 classes (0: bad-quality, 1: good-quality)
 #' config = 2  -> 3 classes (0: low-quality, 1: medium-quality, 2: high-quality)
-#' config = 3 (default) -> 10 classes (0: low-quality, ..., 10: high-quality)
+#' otherwise -> 10 classes (0: low-quality, ..., 10: high-quality)
 #' @return the processed dataset
-preprocess_dataset <- function(dataset, config = 1) {
-  #dataset$type <- factor(dataset$type)
+target_transformation <- function(dataset, config = 1) {
+  dataset$type <- factor(dataset$type)
 
   if (config == 1) {
-    dataset$quality <- ifelse(dataset$quality > 6, 1, 0)
-    dataset$quality <- factor(dataset$quality, levels = c(0, 1)) # labels = c("bad", "good")
+    dataset$quality <- ifelse(dataset$quality > 6, 'good', 'bad')
+    dataset$quality <- factor(dataset$quality)
   } else if (config == 2) {
-    dataset$quality <- ifelse(dataset$quality <= 5, 0, ifelse(dataset$quality < 7, 1, 2))
-    dataset$quality <- factor(dataset$quality, levels = c(0, 1, 2)) # labels = c("low", "medium", "high")
+    dataset$quality <- ifelse(dataset$quality <= 5, 'low', ifelse(dataset$quality < 7, "medium", "high"))
+    dataset$quality <- factor(dataset$quality)
+  } else {
+    dataset$quality <- factor(dataset$quality)
   }
 
   dataset
-}
-
-#' Partion the dataset based on the class attribute
-#'
-#' @param dataset a dataset
-#' @return the partition composed of train and test
-partition_dataset <- function(dataset) {
-  index <- createDataPartition(dataset$quality, p = 0.75, list = FALSE)
-  train <- dataset[index,]
-  test <- dataset[-index,]
-
-  list(train = train, test = test)
 }
 
 #' Combine the red and the white datasets and add type attribute.
@@ -117,26 +107,3 @@ save_plot_png <- function(filename, plot, wide = FALSE) {
   ggsave(filename, plot = plot, device = "png", height = 6.67, width = ifelse(wide, 13.34, 6.67))
 }
 
-subsampling <- function(trainset, method) {
-  # Install packages
-  if (!require("pacman")) install.packages("pacman")
-  pacman::p_load(DMwR, ROSE)
-
-  set.seed(9560)
-
-  if (method == "down") {
-    res <- downSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
-    names(res)[names(res) == "Class"] <- "quality"
-  }
-  else if (method == "up") {
-    res <- upSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
-    names(res)[names(res) == "Class"] <- "quality"
-  }
-  else if (method == "SMOTE") {
-    res <- SMOTE(quality ~ ., trainset, perc.over = 100, perc.under = 200)
-  } else {
-    res <- ROSE(quality ~ ., data = trainset)$data
-  }
-
-  res
-}
