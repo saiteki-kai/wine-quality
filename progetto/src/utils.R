@@ -115,10 +115,29 @@ treat_outliers <- function(data, method = "winsorizing",
 }
 
 save_plot_png <- function(filename, plot, wide = FALSE) {
-  ggsave(filename,
-    plot = plot,
-    device = "png",
-    height = 6.67,
-    width = ifelse(wide, 13.34, 6.67)
-  )
+  if ("gg" %in% class(plot)) {
+    ggsave(filename,
+      plot = plot,
+      device = "png",
+      height = 6.67,
+      width = ifelse(wide, 13.34, 6.67)
+    )
+  } else {
+    png(filename,
+      units = "in",
+      res = 300,
+      height = 6.67,
+      width = ifelse(wide, 13.34, 6.67)
+    )
+    plot
+    dev.off()
+  }
+}
+
+print_or_save <- function(plot, filename, save = FALSE, wide = FALSE) {
+  if (save) {
+    save_plot_png(filename, plot = plot, wide = wide)
+  } else {
+    print(plot)
+  }
 }
