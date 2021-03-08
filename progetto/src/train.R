@@ -68,7 +68,7 @@
 
   if (name == "pca") {
     pre_proc <- preProcess(data,
-                           method = c("center", "scale", "pca"), thresh = 0.9
+      method = c("center", "scale", "pca"), thresh = 0.9
     )
   } else if (name == "z-score") {
     pre_proc <- preProcess(data, method = c("center", "scale"))
@@ -140,9 +140,31 @@ grid_linear <- expand.grid(
 # )
 grid_tree <- expand.grid(maxdepth = 2:10)
 
+tuning_path <- "../plots/tuning"
+
+models <- list(
+  list(name = "rpart2", tune_grid = grid_tree),
+  list(name = "svmLinear", tune_grid = grid_linear),
+  list(name = "svmRadial", tune_grid = grid_radial)
+)
+
 # Train the models
 for (method in c("pca", "z-score", "min-max")) {
-  .train_model(trainset, "rpart2", method, grid_tree)
-  .train_model(trainset, "svmLinear", method, grid_linear)
-  .train_model(trainset, "svmRadial", method, grid_radial)
+  for (model in models) {
+    m <- .train_model(trainset, model$name, method, model$tune_grid)
+    # m <- .get_model(model$name, method)
+
+    best <- sprintf("%s: %s", names(m$bestTune), m$bestTune)
+    best <- paste(best, collapse = ", ")
+
+    plot <- ggplot(m) +
+      ggtitle(paste(model$name, method, best, sep = " - ")) +
+      theme(plot.title = element_text(hjust = 0.5))
+
+    print_or_save(plot,
+      filename = file.path(tuning_path, paste0(model$name, "_", method, ".png")),
+      save = TRUE,
+      wide = TRUE
+    )
+  }
 }
