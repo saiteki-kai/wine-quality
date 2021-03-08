@@ -10,5 +10,7 @@
 .create_if_not_exists(file.path("../output"))
 .create_if_not_exists(file.path("../plots"))
 .create_if_not_exists(file.path("../plots/outliers"))
+.create_if_not_exists(file.path("../plots/roc"))
+.create_if_not_exists(file.path("../plots/tuning"))
 
 # TODO: Create folders in the correct file where needed
