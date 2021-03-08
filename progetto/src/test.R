@@ -47,28 +47,22 @@
 #' @param models a list of models
 #'
 #' @return AUCs for ROC and PRC for all the models
-.plot_roc_and_prc_all <- function(reference, prediction, names, method) {
-  scores <- join_scores(prediction)
+.plot_roc_and_prc_all <- function(labels, probs, method) {
+  library(pROC)
 
-  labels <- rep(list(reference), length(names))
-  labels <- join_labels(labels)
+  # Create dataframe for roc
+  df <- as.data.frame(probs)
+  df$target <- labels
 
-  mmmdat <- mmdata(scores, labels,
-    modnames = names,
-    dsids = as.numeric(as.factor(names))
-  )
-  res <- evalmod(mmmdat, mode = "rocprc")
+  roc.list <- roc(target ~ ., data = df, levels = levels(labels), ci = TRUE)
+  auc_res <- lapply(roc.list, function(roc) list(ci = roc$ci, auc = roc$auc))
 
-  # Plot ROC and PRC
-  autoplot(res) + title(method)
+  p <- ggroc(roc.list, legacy.axes = T) +
+    geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "#aaaaaa") +
+    ggtitle(method) +
+    theme(plot.title = element_text(hjust = 0.5))
 
-  # Calculate CI of AUCs with normal distibution
-  auc_ci <- auc_ci(res)
-
-  # Use knitr::kable to display the result in a table format
-  print(knitr::kable(auc_ci))
-
-  res
+  list(plot = p, auc = auc_res)
 }
 
 #' Print all the measures for the model evaluation
@@ -93,7 +87,7 @@
   # Predict
   start_time <- Sys.time()
   probs <- predict(model, newdata = transformed, type = "prob")
-  pred <- factor(ifelse(probs$good >= 0.5, "good", "bad")) # TODO: CHECK
+  pred <- predict(model, newdata = transformed)
   end_time <- Sys.time()
   time <- end_time - start_time
 
@@ -105,15 +99,12 @@
     positive = "good"
   )
 
-  list(cm = cm, pred = probs, pred_time = time)
+  list(cm = cm, probs = probs, pred_time = time)
 }
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(
-  caret, doParallel, ggplot2, grid, precrec,
-  factoextra, checkmate, multiROC, dummies, mlbench, dplyr
-)
+pacman::p_load(caret, ggplot2, grid, pROC, dplyr)
 
 # Local functions
 source("utils.R")
@@ -139,19 +130,21 @@ for (method in c("pca", "z-score", "min-max")) {
   .write_log("svmLinear", method, res3$cm, res3$pred_time)
 
   predictions <- list(
-    pred1 = res1$pred$good,
-    pred2 = res2$pred$good,
-    pred3 = res3$pred$good
+    rpart2 = res1$probs$good,
+    svmRadial = res2$probs$good,
+    svmLinear = res3$probs$good
   )
-
-  print(paste0("Method: ", method))
 
   # Plot AUCs ROC & PRC
-  .plot_roc_and_prc_all(
-    testset$quality, predictions,
-    c("rpart2", "svmRadial", "svmLinear"),
-    method
+  roc_prc <- .plot_roc_and_prc_all(testset$quality, predictions, method)
+
+  print_or_save(roc_prc$plot,
+    file.path("../plots/roc", paste0(method, ".png")),
+    save = TRUE,
+    wide = TRUE
   )
+
+  print(roc_prc$auc)
 
   # Model Comparison
   cv.values <- resamples(
@@ -161,12 +154,24 @@ for (method in c("pca", "z-score", "min-max")) {
       svmLinear = svmLinear.model
     )
   )
+
   summary(cv.values)
-  print(dotplot(cv.values, metric = "ROC"))
-  print(bwplot(cv.values, layout = c(3, 1)))
-  print(splom(cv.values, metric = "ROC"))
+  print_or_save(dotplot(cv.values, metric = "ROC"),
+    "../plots/comparison/dotplot.png",
+    save = TRUE,
+    wide = TRUE
+  )
+  print_or_save(bwplot(cv.values, layout = c(3, 1)),
+    "../plots/comparison/bwplot.png",
+    save = TRUE,
+    wide = TRUE
+  )
+  print_or_save(splom(cv.values, metric = "ROC"),
+    "../plots/comparison/splom.png",
+    save = TRUE,
+    wide = TRUE
+  )
 }
 
 # TODO: save plots and divide subsampled results from non subsampled
-# TODO: save tuning plot(model)
 # TODO: test statistici
