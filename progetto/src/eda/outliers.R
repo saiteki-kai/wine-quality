@@ -10,9 +10,6 @@ pacman::p_load(ggplot2, naniar, patchwork, kableExtra, psych, dplyr)
 # Import local functions
 source("../utils.R")
 
-dataset <- read.csv("../../data/winequality-train.csv") %>%
-  mutate(quality = factor(quality))
-
 .plot_boxplot <- function(data, attribute, title, limits) {
   data %>% ggplot(aes_string(x = attribute)) +
     stat_boxplot(aes(y = ""), geom = "errorbar", width = 0.5) +
@@ -40,14 +37,10 @@ dataset <- read.csv("../../data/winequality-train.csv") %>%
     theme(plot.title = element_text(hjust = 0.5))
 }
 
-.print_or_save <- function(plot, name, save = FALSE, wide = FALSE) {
-  if (save) {
-    filename <- file.path("../../plots/outliers", name)
-    save_plot_png(filename, plot = plot, wide = wide)
-  } else {
-    print(plot)
-  }
-}
+outliers_path <- "../../plots/outliers"
+
+dataset <- read.csv("../../data/winequality-train.csv") %>%
+  mutate(quality = factor(quality))
 
 d_iqr <- dataset
 d_iqr_NA <- dataset
@@ -70,7 +63,11 @@ for (i in names(dataset)) {
       plot_layout(guides = "collect") +
       labs(x = i)
 
-    .print_or_save(plot, paste0(i, "_boxplot.png"), save = FALSE, wide = TRUE)
+    print_or_save(plot,
+      filename = file.path(outliers_path, paste0(i, "_boxplot.png")),
+      save = FALSE,
+      wide = TRUE
+    )
 
     d0 <- .plot_distribution(dataset, i, "Original", x_lims)
     d1 <- .plot_distribution(d_iqr, i, "IQR Method", x_lims)
@@ -81,7 +78,11 @@ for (i in names(dataset)) {
       plot_layout(guides = "collect") +
       labs(x = i)
 
-    .print_or_save(plot, paste0(i, "_distribution.png"), save = FALSE, wide = TRUE)
+    print_or_save(plot,
+      filename = file.path(outliers_path, paste0(i, "_distribution.png")),
+      save = FALSE,
+      wide = TRUE
+    )
 
     q0 <- .plot_qqplot(dataset, i, "Original")
     q1 <- .plot_qqplot(d_iqr, i, "IQR Method")
@@ -90,7 +91,10 @@ for (i in names(dataset)) {
 
     plot <- (q0 + q1 + q2 + q3) + plot_layout(guides = "collect")
 
-    .print_or_save(plot, name = paste0(i, "_qqplot.png"), save = FALSE)
+    print_or_save(plot,
+      filename = file.path(outliers_path, paste0(i, "_qqplot.png")),
+      save = FALSE
+    )
   }
 }
 
