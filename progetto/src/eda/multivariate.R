@@ -1,7 +1,7 @@
-.plot_pca <- function(dataset) {
-  dataset$quality <- NULL
+.plot_pca <- function(trainset) {
+  trainset$quality <- NULL
 
-  pca <- prcomp(dataset, center = TRUE, scale = TRUE)
+  pca <- prcomp(trainset, center = TRUE, scale = TRUE)
   eig <- get_eigenvalue(pca)
   var <- get_pca_var(pca)
 
@@ -28,22 +28,22 @@
   )
 }
 
-.plot_scatter <- function(dataset, attr1, attr2, color, title) {
-  ggplot(dataset, aes_string(x = attr1, y = attr2)) +
+.plot_scatter <- function(trainset, attr1, attr2, color, title) {
+  ggplot(trainset, aes_string(x = attr1, y = attr2)) +
     geom_jitter(aes_string(color = color), size = 2, alpha = 0.7) +
     geom_smooth(method = "lm", formula = y ~ x) +
     ggtitle(title)
 }
 
-.plot_median_barplot <- function(dataset, attr1) {
-  x <- aggregate(dataset[[attr1]], by = list(dataset$quality), FUN = median)
+.plot_median_barplot <- function(trainset, attr1) {
+  x <- aggregate(trainset[[attr1]], by = list(trainset$quality), FUN = median)
   ggplot(data = x, aes_string(x = "Group.1", y = "x")) +
     geom_bar(stat = "identity", aes_string(fill = "Group.1")) +
     ggtitle(attr1)
 }
 
-.plot_boxplot <- function(dataset, attr1, class, title) {
-  p <- ggplot(dataset, aes_string(x = attr1, fill = class)) +
+.plot_boxplot <- function(trainset, attr1, class, title) {
+  p <- ggplot(trainset, aes_string(x = attr1, fill = class)) +
     geom_boxplot() +
     ggtitle(title)
   p
@@ -65,8 +65,8 @@
   p
 }
 
-.plot_pieplot <- function(dataset) {
-  mytable <- table(dataset$type)
+.plot_pieplot <- function(trainset) {
+  mytable <- table(trainset$type)
   lbls <- paste0(names(mytable), "\n", mytable)
   pie(mytable,
     labels = lbls,
@@ -75,8 +75,8 @@
   )
 }
 
-.plot_corrmatrix <- function(dataset, title) {
-  corr <- round(cor(dataset), 2)
+.plot_corrmatrix <- function(trainset, title) {
+  corr <- round(cor(trainset), 2)
   corr <- corr
   p.mat <- cor_pmat(corr)
   ggcorrplot(corr, hc.order = TRUE, lab = TRUE, p.mat = p.mat, insig = "blank") +
@@ -116,31 +116,37 @@ source("../utils.R")
 
 ########################################################################################################################
 
-# Import dataset Red & White
-dataset <- read.csv("../../data/winequality-combined.csv") %>%
-  preprocess_dataset(2) %>%
-  mutate(quality = factor(quality)) %>%
-  mutate(type = factor(type)) %>%
-  as.data.frame()
+# Load the dataset
+dataset <- read.csv("../../data/winequality-combined.csv")
+
+# Setup quality
+dataset <- relabeling(dataset)
+
+# Create Partition
+set.seed(444)
+index <- createDataPartition(dataset$quality, p = 0.70, list = FALSE)
+trainset <- dataset[index, ]
+testset <- dataset[-index, ]
+
 
 # Type Distribution
-.plot_pieplot(dataset)
+.plot_pieplot(trainset)
 
 # Quality Distribution
-.combined_barplot(dataset, "3 class config")
+.combined_barplot(trainset, "3 class config")
 
-# dataset$type <- ifelse(dataset$type == "red", 1, 0)
-# dataset$type <- as.numeric(dataset$type) - 1
-# dataset$quality <- as.numeric(dataset$quality) - 1
+# trainset$type <- ifelse(trainset$type == "red", 1, 0)
+# trainset$type <- as.numeric(trainset$type) - 1
+# trainset$quality <- as.numeric(trainset$quality) - 1
 
 # Split Data Red & White Only
-red <- dataset[dataset$type == "red", ]
+red <- trainset[trainset$type == "red", ]
 red$type <- NULL
 red$quality <- as.numeric(red$quality) - 1
 
 .print_stats(red)
 
-white <- dataset[dataset$type == "white", ]
+white <- trainset[trainset$type == "white", ]
 white$type <- NULL
 white$quality <- as.numeric(white$quality) - 1
 
@@ -155,134 +161,134 @@ white$quality <- as.numeric(white$quality) - 1
 
 
 # Plot correlation matrix Red & White
-dataset$quality <- as.numeric(dataset$quality) - 1
-dataset$type <- NULL
-.plot_corrmatrix(dataset, "Red & White Correlations")
+trainset$quality <- as.numeric(trainset$quality) - 1
+trainset$type <- NULL
+.plot_corrmatrix(trainset, "Red & White Correlations")
 
 
 # Log 10 Transformation (just for visualization purpose)
-dataset$alcohol <- log10(dataset$alcohol)
-dataset$density <- log10(dataset$density)
-dataset$residual.sugar <- log10(dataset$residual.sugar)
+trainset$alcohol <- log10(trainset$alcohol)
+trainset$density <- log10(trainset$density)
+trainset$residual.sugar <- log10(trainset$residual.sugar)
 
-dataset$volatile.acidity <- log10(dataset$volatile.acidity)
-dataset$citric.acid <- log10(dataset$citric.acid)
-dataset$pH <- log10(dataset$pH)
-dataset$fixed.acidity <- log10(dataset$fixed.acidity)
+trainset$volatile.acidity <- log10(trainset$volatile.acidity)
+trainset$citric.acid <- log10(trainset$citric.acid)
+trainset$pH <- log10(trainset$pH)
+trainset$fixed.acidity <- log10(trainset$fixed.acidity)
 
-dataset$free.sulfur.dioxide <- log10(dataset$free.sulfur.dioxide)
-dataset$total.sulfur.dioxide <- log10(dataset$total.sulfur.dioxide)
-dataset$sulphates <- log10(dataset$sulphates)
+trainset$free.sulfur.dioxide <- log10(trainset$free.sulfur.dioxide)
+trainset$total.sulfur.dioxide <- log10(trainset$total.sulfur.dioxide)
+trainset$sulphates <- log10(trainset$sulphates)
 
-dataset$chlorides <- log10(dataset$chlorides)
+trainset$chlorides <- log10(trainset$chlorides)
 
 
 # Correlation with quality
-.plot_scatter(dataset, "quality", "alcohol", "quality", "") #+
-.plot_scatter(dataset, "quality", "density", "quality", "") #+
-.plot_scatter(dataset, "quality", "chlorides", "quality", "") #+
-.plot_scatter(dataset, "quality", "volatile.acidity", "quality", "") #+
-.plot_scatter(dataset, "quality", "residual.sugar", "quality", "") #+
-.plot_scatter(dataset, "quality", "sulphates", "quality", "") #+
-.plot_scatter(dataset, "quality", "citric.acid", "quality", "") #+
-.plot_scatter(dataset, "quality", "fixed.acidity", "quality", "") #+
-.plot_scatter(dataset, "quality", "pH", "quality", "") #+
-.plot_scatter(dataset, "quality", "free.sulfur.dioxide", "quality", "") #+
-.plot_scatter(dataset, "quality", "total.sulfur.dioxide", "quality", "") #+
+.plot_scatter(trainset, "quality", "alcohol", "quality", "") #+
+.plot_scatter(trainset, "quality", "density", "quality", "") #+
+.plot_scatter(trainset, "quality", "chlorides", "quality", "") #+
+.plot_scatter(trainset, "quality", "volatile.acidity", "quality", "") #+
+.plot_scatter(trainset, "quality", "residual.sugar", "quality", "") #+
+.plot_scatter(trainset, "quality", "sulphates", "quality", "") #+
+.plot_scatter(trainset, "quality", "citric.acid", "quality", "") #+
+.plot_scatter(trainset, "quality", "fixed.acidity", "quality", "") #+
+.plot_scatter(trainset, "quality", "pH", "quality", "") #+
+.plot_scatter(trainset, "quality", "free.sulfur.dioxide", "quality", "") #+
+.plot_scatter(trainset, "quality", "total.sulfur.dioxide", "quality", "") #+
 plot_layout(guides = "collect")
 
 # Other Relevants cases
 .plot_scatter(
-  dataset, "free.sulfur.dioxide", "total.sulfur.dioxide", "quality",
+  trainset, "free.sulfur.dioxide", "total.sulfur.dioxide", "quality",
   "caso di alta correlazione tra total.sulfur.dioxide e free.sulfur.dioxide"
 )
 .plot_scatter(
-  dataset, "total.sulfur.dioxide", "residual.sugar", "quality",
+  trainset, "total.sulfur.dioxide", "residual.sugar", "quality",
   "caso di media correlazione tra total.sulfur.dioxide e residual.sugar"
 )
 
 
 .plot_scatter(
-  dataset, "alcohol", "density", "quality",
+  trainset, "alcohol", "density", "quality",
   "caso di alta correlazione tra density e alcohol"
 )
 .plot_scatter(
-  dataset, "alcohol", "residual.sugar", "quality",
+  trainset, "alcohol", "residual.sugar", "quality",
   "caso di correlazione tra alcohol e residual.sugar"
 )
 
 
 .plot_scatter(
-  dataset, "density", "chlorides", "quality",
+  trainset, "density", "chlorides", "quality",
   "caso di media correlazione tra density e chlorides"
 )
 
 .plot_scatter(
-  dataset, "chlorides", "volatile.acidity", "quality",
+  trainset, "chlorides", "volatile.acidity", "quality",
   "caso di media correlazione tra chlorides e volatile.acidity"
 )
 .plot_scatter(
-  dataset, "chlorides", "sulphates", "quality",
+  trainset, "chlorides", "sulphates", "quality",
   "caso di media correlazione tra chlorides e sulphates"
 )
 
 
 .plot_scatter(
-  dataset, "volatile.acidity", "free.sulfur.dioxide", "quality",
+  trainset, "volatile.acidity", "free.sulfur.dioxide", "quality",
   "caso di media correlazione tra volatile.acidity e free.sulfur.dioxide"
 )
 .plot_scatter(
-  dataset, "volatile.acidity", "total.sulfur.dioxide", "quality",
+  trainset, "volatile.acidity", "total.sulfur.dioxide", "quality",
   "caso di media correlazione tra volatile.acidity e total.sulfur.dioxide"
 )
 .plot_scatter(
-  dataset, "volatile.acidity", "citric.acid", "quality",
+  trainset, "volatile.acidity", "citric.acid", "quality",
   "caso di media correlazione tra volatile.acidity e citric.acid"
 )
 
 
 # pair plot for (alcohol, density, volatile acidity, chlorides)
 df <- data.frame(
-  alcohol = dataset$alcohol,
-  density = dataset$density,
-  volatile.acidity = dataset$volatile.acidity,
-  chlorides = dataset$chlorides
+  alcohol = trainset$alcohol,
+  density = trainset$density,
+  volatile.acidity = trainset$volatile.acidity,
+  chlorides = trainset$chlorides
 )
-.plot_pairplot(df, dataset$quality, "4 most important features (alcohol, density, volatile acidity, chlorides)")
+.plot_pairplot(df, trainset$quality, "4 most important features (alcohol, density, volatile acidity, chlorides)")
 
 
 # pair plot for (alcohol, density, residual.sugar)
 df <- data.frame(
-  alcohol = dataset$alcohol,
-  density = dataset$density,
-  residual.sugar = dataset$residual.sugar
+  alcohol = trainset$alcohol,
+  density = trainset$density,
+  residual.sugar = trainset$residual.sugar
 )
-.plot_pairplot(df, dataset$quality, "(alcohol, density, residual.sugar)")
+.plot_pairplot(df, trainset$quality, "(alcohol, density, residual.sugar)")
 
 # pair plot for (volatile.acidity, citric.acid, pH, fixed.acidity)
 df <- data.frame(
-  volatile.acidity = dataset$volatile.acidity,
-  citric.acid = dataset$citric.acid,
-  pH = dataset$pH,
-  fixed.acidity = dataset$fixed.acidity
+  volatile.acidity = trainset$volatile.acidity,
+  citric.acid = trainset$citric.acid,
+  pH = trainset$pH,
+  fixed.acidity = trainset$fixed.acidity
 )
-.plot_pairplot(df, dataset$quality, "(volatile.acidity, citric.acid, pH, fixed.acidity)")
+.plot_pairplot(df, trainset$quality, "(volatile.acidity, citric.acid, pH, fixed.acidity)")
 
 # pair plot for (free.sulfur.dioxide, total.sulfur.dioxide, sulphates)
 df <- data.frame(
-  free.sulfur.dioxide = dataset$free.sulfur.dioxide,
-  total.sulfur.dioxide = dataset$total.sulfur.dioxide,
-  sulphates = dataset$sulphates
+  free.sulfur.dioxide = trainset$free.sulfur.dioxide,
+  total.sulfur.dioxide = trainset$total.sulfur.dioxide,
+  sulphates = trainset$sulphates
 )
-.plot_pairplot(df, dataset$quality, "(free.sulfur.dioxide, total.sulfur.dioxide, sulphates)")
+.plot_pairplot(df, trainset$quality, "(free.sulfur.dioxide, total.sulfur.dioxide, sulphates)")
 
 
 
 # T-test for feature selection
-# t.test(dataset$quality, dataset$sulphates)
+# t.test(trainset$quality, trainset$sulphates)
 
-# x <- dataset[dataset$quality == "bad", ]
-# y <- dataset[dataset$quality == "good", ]
+# x <- trainset[trainset$quality == "bad", ]
+# y <- trainset[trainset$quality == "good", ]
 # t.test(x$alcohol,y$alcohol)
 # bartlett.test(alcohol ~ quality, trainset_pca)
 # t.test(alcohol ~ quality, trainset_pca, var.equal=FALSE, conf.level=0.95)
