@@ -13,7 +13,7 @@
   q <- data2 %>% ggplot(aes_string(x = attribute, title = attribute)) +
     geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
     geom_freqpoly(color = "blue", bins = 40)
-  (p + q) / ( .plot_qqplot(data1, attribute, "") + .plot_qqplot(data2, attribute, ""))
+  (p + q) / (.plot_qqplot(data1, attribute, "") + .plot_qqplot(data2, attribute, ""))
 }
 
 .pre_proc <- function(trainset, name) {
@@ -40,42 +40,44 @@
   trainset <- trainset[names(trainset) != target]
   skewness <- psych::skew(as.data.frame(trainset))
   kurtosis <- psych::kurtosi(as.data.frame(trainset))
-  cbind(skew=skewness, kurtosi=kurtosis)
+  cbind(skew = skewness, kurtosi = kurtosis)
 }
 
 # Install packages
-if (!require('pacman')) install.packages('pacman')
-pacman::p_load(corrplot, ggplot2, dplyr, naniar,
-               patchwork, factoextra, reshape2, ggcorrplot, scales, GGally, MASS, bestNormalize)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  corrplot, ggplot2, dplyr, naniar,
+  patchwork, factoextra, reshape2, ggcorrplot, scales, GGally, MASS, bestNormalize
+)
 
 # boxcox funziona solo su features strettamente positive!!!
 
 # Local functions
-source('../utils.R')
+source("../utils.R")
 
 # Read trainset
-trainset <- read.csv('../../data/winequality-train.csv')
+trainset <- read.csv("../../data/winequality-train.csv")
 trainset$quality <- factor(trainset$quality)
 
 # Apply transformedations
 data <- trainset
 
 data$quality <- NULL
-#data$alcohol <- NULL
-#data$density <- NULL
-#data$pH <- NULL
-#data$citric.acid <- NULL
-#data$total.sulfur.dioxide <- NULL
+# data$alcohol <- NULL
+# data$density <- NULL
+# data$pH <- NULL
+# data$citric.acid <- NULL
+# data$total.sulfur.dioxide <- NULL
 
 pre_proc <- preProcess(data, method = c("scale", "center", "BoxCox"), verbose = TRUE)
 transformed <- predict(pre_proc, data)
 
 transformed$quality <- trainset$quality
-#transformed$alcohol <- trainset$alcohol
-#transformed$density <- trainset$density
-#transformed$pH <- trainset$pH
-#transformed$citric.acid <- trainset$citric.acid
-#transformed$total.sulfur.dioxide <- trainset$total.sulfur.dioxide
+# transformed$alcohol <- trainset$alcohol
+# transformed$density <- trainset$density
+# transformed$pH <- trainset$pH
+# transformed$citric.acid <- trainset$citric.acid
+# transformed$total.sulfur.dioxide <- trainset$total.sulfur.dioxide
 
 .global_distribution(trainset, transformed, "alcohol")
 .global_distribution(trainset, transformed, "density")

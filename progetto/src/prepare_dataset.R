@@ -15,8 +15,8 @@ dataset$type <- NULL
 # Create Partition
 set.seed(444)
 index <- createDataPartition(dataset$quality, p = 0.70, list = FALSE)
-trainset <- dataset[index,]
-testset <- dataset[-index,]
+trainset <- dataset[index, ]
+testset <- dataset[-index, ]
 
 write.csv(trainset, "../data/winequality-train.csv", row.names = FALSE)
 write.csv(testset, "../data/winequality-test.csv", row.names = FALSE)
