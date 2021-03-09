@@ -3,39 +3,41 @@
 #'
 #'
 
-.train_model <- function(trainset, method, pre_proc_method, tune_grid = NULL) {
+.train_model <- function(trainset, model_type, tune_grid = NULL) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(caret, doParallel)
 
-  # Set seed for repeatability
-  set.seed(6314)
+  folds <- 10
+  repeats <- 3
+  grid_size <- prod(dim(tune_grid))
 
-  # Apply transformations
-  cols <- ncol(trainset)
-  pre_proc <- .pre_proc(trainset, pre_proc_method)
-  trasformed <- predict(pre_proc, trainset[, -cols])
-  trasformed$quality <- trainset$quality
+  # Set seed for repeatability
+  set.seed(444)
+  seeds <- vector(mode = "list", length = (folds * repeats) + 1)
+  for (i in 1:(length(seeds) - 1)) seeds[[i]] <- sample.int(n = 1000, grid_size)
+  seeds[[length(seeds)]] <- sample.int(1000, 1)
 
   # 10-Fold cross validation
   train_control <- trainControl(
     method = "repeatedcv",
-    number = 10,
-    repeats = 1,
+    repeats = repeats,
     classProbs = TRUE,
     summaryFunction = twoClassSummary,
+    seeds = seeds,
+    index = createMultiFolds(trainset$quality, folds, repeats),
     allowParallel = TRUE
   )
 
   # Register parallel processing
-  cluster <- makeCluster(detectCores())
+  cluster <- makeCluster(detectCores() - 1)
   registerDoParallel(cluster)
 
   # Train the model
   model <- train(
     quality ~ .,
-    data = trasformed,
-    method = method,
+    data = trainset,
+    method = model_type,
     tuneGrid = tune_grid,
     metric = "ROC",
     trControl = train_control
@@ -46,12 +48,6 @@
 
   # Print train time
   print(model$times)
-
-  # Save the model
-  model$preProcess <- pre_proc
-  saveRDS(model,
-    file = paste0("../output/", method, "_", pre_proc_method, ".RDS")
-  )
 
   # Return
   model
@@ -92,7 +88,7 @@
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(DMwR, ROSE)
 
-  set.seed(9560)
+  set.seed(444)
 
   if (method == "down") {
     res <- downSample(x = trainset[, -ncol(trainset)], y = trainset$quality)
@@ -111,7 +107,6 @@
   res
 }
 
-
 # Install packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret)
@@ -127,7 +122,6 @@ trainset$quality <- factor(trainset$quality)
 # trainset <- subsampling(trainset, "SMOTE")
 
 # Tuning parameters
-
 # degree: The degree of the polynomial kernel function. This has to be an positive integer.
 # scale: The scaling parameter of the polynomial kernel is a convenient way of normalizing patterns without the need to modify the data itself
 # C: The offset used in a polynomial kernel
@@ -151,20 +145,32 @@ grid_tree <- expand.grid(maxdepth = 2:10)
 tuning_path <- "../plots/tuning"
 
 models <- list(
-  # list(name = "rpart2", tune_grid = grid_tree),
-  # list(name = "svmLinear", tune_grid = grid_linear),
+  list(name = "rpart2", tune_grid = grid_tree),
+  list(name = "svmLinear", tune_grid = grid_linear)
   # list(name = "svmRadial", tune_grid = grid_radial),
-  list(name = "svmPoly", tune_grid = grid_poly)
+  # list(name = "svmPoly", tune_grid = grid_poly)
 )
 
-# Train the models
 for (method in c("pca", "z-score", "min-max")) {
-  print(paste("Method:", method))
+  print(paste("Method: ", method))
+
+  # Apply pre-processing
+  pre_proc <- .pre_proc(trainset, method)
+  trasformed <- predict(pre_proc, trainset[, -ncol(trainset)])
+  trasformed$quality <- trainset$quality
 
   for (model in models) {
-    print(paste0("training ", model$name), "...")
+    print(paste0("training ", model$name, "..."))
 
-    m <- .train_model(trainset, model$name, method, model$tune_grid)
+    # Train model
+    m <- .train_model(trasformed, model$name, model$tune_grid)
+    m$preProcess <- pre_proc
+
+    # Save model
+    saveRDS(m,
+      file = paste0("../output/", model$name, "_", method, ".RDS")
+    )
+
     # m <- .get_model(model$name, method)
 
     # Get the best tune
@@ -178,7 +184,7 @@ for (method in c("pca", "z-score", "min-max")) {
 
     print_or_save(plot,
       filename = file.path(tuning_path, paste0(model$name, "_", method, ".png")),
-      save = TRUE,
+      save = F,
       wide = TRUE
     )
   }
