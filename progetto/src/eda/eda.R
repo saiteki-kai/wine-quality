@@ -47,26 +47,37 @@ pacman::p_load(corrplot, ggplot2, dplyr, naniar, patchwork, factoextra)
 source("../utils.R")
 
 # Import datasets
-combined <- read.csv("../../data/winequality-combined.csv")
-redwine <- read.csv("../../data/winequality-red.csv")
-whitewine <- read.csv("../../data/winequality-white.csv")
+dataset <- read.csv("../../data/winequality-combined.csv")
+
+# setup quality
+#dataset <- relabeling(dataset, 3)
+
+# create partition
+set.seed(444)
+index <- createDataPartition(dataset$quality, p=0.70, list=FALSE)
+trainset <- dataset[index, ]
 
 # Summary report
-summary(combined)
+summary(trainset)
 
 # Check Missing Values
-miss_var_summary(combined)
+miss_var_summary(trainset)
 
 # red AND white wine quality by different class
 # combined separate by two class of quality
-config1 <- relabelling(combined, 1)
+config1 <- relabeling(trainset, 1)
 
 # combined separate by three class of quality
-config2 <- relabelling(combined, 2)
+config2 <- relabeling(trainset, 2)
 
+# only red wine
+redwine <- filter(trainset, type=="red")
+
+# only white wine
+whitewine <- filter(trainset, type=="white")
 
 # red and white wine quality
-p1 <- .combined_barplot(combined, "red and white quality")
+p1 <- .combined_barplot(trainset, "red and white quality")
 p2 <- .combined_barplot(config1, "quality by two class")
 p3 <- .combined_barplot(config2, "quality by three class")
 
@@ -74,12 +85,12 @@ print((p1 + p3 + p2) + plot_layout(guides = "collect"))
 
 # red OR white wine quality by different class
 # red and white wine separate by two class
-config1_redwine <- relabelling(redwine, 1)
-config1_whitewine <- relabelling(whitewine, 1)
+config1_redwine <- relabeling(redwine, 1)
+config1_whitewine <- relabeling(whitewine, 1)
 
 # red and white wine separate by three class
-config2_redwine <- relabelling(redwine, 2)
-config2_whitewine <- relabelling(whitewine, 2)
+config2_redwine <- relabeling(redwine, 2)
+config2_whitewine <- relabeling(whitewine, 2)
 
 p1 <- .type_barplot(redwine, "#FF6666", "red wine")
 p2 <- .type_barplot(config1_redwine, "#FF6666", "red wine by two class")
@@ -91,12 +102,12 @@ p6 <- .type_barplot(config2_whitewine, "#FFFFFF", "white wine by three class")
 
 print((p1 + p3 + p2) / (p4 + p6 + p5))
 
-for (i in select(combined, -c("type", "quality")) %>% names()) {
-  if (is.numeric(combined[[i]])) {
-    .global_distribution(combined, i)
+for (i in select(trainset, -c("type", "quality")) %>% names()) {
+  if (is.numeric(trainset[[i]])) {
+    .global_distribution(trainset, i)
     .class_distribution(config1, i)
     .class_distribution(config2, i)
-    .class_distribution(combined, i)
+    .class_distribution(trainset, i)
   }
 }
 #
