@@ -152,7 +152,7 @@ for (method in c("pca", "z-score", "min-max")) {
     wide = FALSE
   )
 
-  print(roc_prc$auc)
+  #print(roc_prc$auc)
 
   # Model Comparison
   cv.values <- resamples(
@@ -164,7 +164,7 @@ for (method in c("pca", "z-score", "min-max")) {
     )
   )
 
-  summary(cv.values)
+  #summary(cv.values)
   print_or_save(dotplot(cv.values, metric = "ROC"),
     "../plots/comparison/dotplot.png",
     save = TRUE,

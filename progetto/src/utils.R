@@ -129,7 +129,7 @@ save_plot_png <- function(filename, plot, wide = FALSE) {
       height = 6.67,
       width = ifelse(wide, 13.34, 6.67)
     )
-    plot
+    print(plot)
     dev.off()
   }
 }
