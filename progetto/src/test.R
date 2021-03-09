@@ -60,7 +60,11 @@
   p <- ggroc(roc.list, legacy.axes = T) +
     geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "#aaaaaa") +
     ggtitle(method) +
-    theme(plot.title = element_text(hjust = 0.5))
+    theme(
+      plot.title = element_text(hjust = 0.5),
+      legend.title = element_blank(),
+      legend.position = "bottom"
+    )
 
   list(plot = p, auc = auc_res)
 }
@@ -118,21 +122,25 @@ for (method in c("pca", "z-score", "min-max")) {
   rpart.model <- .get_model("rpart2", method)
   svmRadial.model <- .get_model("svmRadial", method)
   svmLinear.model <- .get_model("svmLinear", method)
+  svmPoly.model <- .get_model("svmPoly", method)
 
   # Evaluate the model
   res1 <- .evaluate_model(rpart.model, testset)
   res2 <- .evaluate_model(svmRadial.model, testset)
   res3 <- .evaluate_model(svmLinear.model, testset)
+  res4 <- .evaluate_model(svmPoly.model, testset)
 
   # Write Logs
   .write_log("rpart2", method, res1$cm, res1$pred_time)
   .write_log("svmRadial", method, res2$cm, res2$pred_time)
   .write_log("svmLinear", method, res3$cm, res3$pred_time)
+  .write_log("svmPoly", method, res4$cm, res4$pred_time)
 
   predictions <- list(
     rpart2 = res1$probs$good,
     svmRadial = res2$probs$good,
-    svmLinear = res3$probs$good
+    svmLinear = res3$probs$good,
+    svmPoly = res4$probs$good
   )
 
   # Plot AUCs ROC & PRC
@@ -141,7 +149,7 @@ for (method in c("pca", "z-score", "min-max")) {
   print_or_save(roc_prc$plot,
     file.path("../plots/roc", paste0(method, ".png")),
     save = TRUE,
-    wide = TRUE
+    wide = FALSE
   )
 
   print(roc_prc$auc)
@@ -151,7 +159,8 @@ for (method in c("pca", "z-score", "min-max")) {
     list(
       rpart2 = rpart.model,
       svmRadial = svmRadial.model,
-      svmLinear = svmLinear.model
+      svmLinear = svmLinear.model,
+      svmPoly = svmPoly.model
     )
   )
 
