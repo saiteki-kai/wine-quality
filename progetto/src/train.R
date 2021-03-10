@@ -47,7 +47,7 @@
   stopCluster(cluster)
 
   # Print train time
-  print(model$times)
+  print(paste0(round(model$times$everything["elapsed"], 4), "s"))
 
   # Return
   model
@@ -127,28 +127,22 @@ trainset$quality <- factor(trainset$quality)
 # C: The offset used in a polynomial kernel
 # sigma: The inverse kernel width used by the Gaussian kernal
 # maxdepth: The max depth of the tree
+# https://www.rdocumentation.org/packages/kernlab/versions/0.9-27/topics/dots
 
-grid_radial <- expand.grid(
-  sigma = c(0.1, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4),
-  C = c(0.1, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4)
-)
-grid_linear <- expand.grid(
-  C = c(0.1, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4)
-)
-grid_poly <- expand.grid(
-  degree = 1:4,
-  scale = 1,
-  C = c(0.1, 1, 5) # 100, 1000)
-)
+C <- c(0.1, 0.5, 1, 1.5, 2) # seq(0.25, 2, 0.25)
+
+grid_linear <- expand.grid(C = C)
+grid_radial <- expand.grid(sigma = c(0.1, 0.5, 1), C = C)
+grid_poly <- expand.grid(degree = 1:6, scale = 1, C = C)
 grid_tree <- expand.grid(maxdepth = 2:10)
 
 tuning_path <- "../plots/tuning"
 
 models <- list(
   list(name = "rpart2", tune_grid = grid_tree),
-  list(name = "svmLinear", tune_grid = grid_linear)
-  # list(name = "svmRadial", tune_grid = grid_radial),
-  # list(name = "svmPoly", tune_grid = grid_poly)
+  list(name = "svmLinear", tune_grid = grid_linear),
+  list(name = "svmRadial", tune_grid = grid_radial),
+  list(name = "svmPoly", tune_grid = grid_poly)
 )
 
 for (method in c("pca", "z-score", "min-max")) {
@@ -184,7 +178,7 @@ for (method in c("pca", "z-score", "min-max")) {
 
     print_or_save(plot,
       filename = file.path(tuning_path, paste0(model$name, "_", method, ".png")),
-      save = F,
+      save = TRUE,
       wide = TRUE
     )
   }
