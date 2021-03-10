@@ -50,11 +50,11 @@ source("../utils.R")
 dataset <- read.csv("../../data/winequality-combined.csv")
 
 # setup quality
-#dataset <- relabeling(dataset, 3)
+# dataset <- relabeling(dataset, 3)
 
 # create partition
 set.seed(444)
-index <- createDataPartition(dataset$quality, p=0.70, list=FALSE)
+index <- createDataPartition(dataset$quality, p = 0.70, list = FALSE)
 trainset <- dataset[index, ]
 
 # Summary report
@@ -71,10 +71,10 @@ config1 <- relabeling(trainset, 1)
 config2 <- relabeling(trainset, 2)
 
 # only red wine
-redwine <- filter(trainset, type=="red")
+redwine <- filter(trainset, type == "red")
 
 # only white wine
-whitewine <- filter(trainset, type=="white")
+whitewine <- filter(trainset, type == "white")
 
 # red and white wine quality
 p1 <- .combined_barplot(trainset, "red and white quality")
@@ -102,7 +102,7 @@ p6 <- .type_barplot(config2_whitewine, "#FFFFFF", "white wine by three class")
 
 print((p1 + p3 + p2) / (p4 + p6 + p5))
 
-for (i in select(trainset, -c("type", "quality")) %>% names()) {
+for (i in dplyr::select(trainset, -c("type", "quality")) %>% names()) {
   if (is.numeric(trainset[[i]])) {
     .global_distribution(trainset, i)
     .class_distribution(config1, i)
