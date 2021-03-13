@@ -59,14 +59,13 @@ source("./utils.R")
   res
 }
 
-
-.apply_scaling <- function(data, scale_type='z-score', pre_proc=list()) {
+.apply_scaling <- function(data, scale_method='z-score', pre_proc=list()) {
   trasformed <- list()
   if (length(pre_proc) > 0) {
     trasformed <- predict(pre_proc, data[, -ncol(data)])
     trasformed$quality <- data$quality
   } else {
-    pre_proc <- .pre_proc(data, scale_type)
+    pre_proc <- .pre_proc(data, scale_method)
     trasformed <- predict(pre_proc, data[, -ncol(data)])
     trasformed$quality <- data$quality
   }
@@ -74,8 +73,7 @@ source("./utils.R")
   obj <- list(data=trasformed, pre_proc=pre_proc)
 }
 
-
-.apply_pre_proc <- function(trainset, testset, scale_func, keep_outliers, balanced) {
+apply_pre_proc <- function(trainset, testset, scale_method, keep_outliers, balanced, save=FALSE) {
 
   # remove outliers if needed
   if (keep_outliers == FALSE) {
@@ -88,38 +86,49 @@ source("./utils.R")
   }
 
   # apply scaling if needed
-  empty_str <- is.na(scale_func) || scale_func == ''
+  empty_str <- is.na(scale_method) || scale_method == ''
   res1 <- list()
   res2 <- list()
   if (empty_str) {
     res1$data <- trainset
     res2$data <- testset
   } else {
-    res1 <- .apply_scaling(trainset, scale_func, list())
-    res2 <- .apply_scaling(testset, scale_func, res1$pre_proc)
+    res1 <- .apply_scaling(trainset, scale_method, list())
+    res2 <- .apply_scaling(testset, scale_method, res1$pre_proc)
   }
 
-  list(
+  out <- list(
     trainset = res1$data,
     testset = res2$data,
-    pre_proc = res1$pre_proc
+    pre_proc = res1$pre_proc,
+    keep_outliers = keep_outliers,
+    scale_method = scale_method,
+    balanced = balanced
   )
+
+  if (save) {
+    # Save dataset
+    saveRDS(out, file = "../data/preprocessed.RDS")
+  }
+
+  out
 }
 
+
 #' Dataset PreProcess Config:
-#' dataset_path: the path where the dataset is stored
-#' label_cfg: a number of relabaling configuration (1,2 or 3)
-#' keep_outliers: a boolean value wheter or not to keep in trainset outliers.
-#' balanced: a boolean value iff TRUE SMOTE is applied to balance the trainset
-#' scale_func: a string rapresenting the name of the scaling function ('z-score', 'min-max', 'pca')
-#' split_perc: the percentage of split for trainset and testset
-#' seed: the number to set for the dataset split
+#' @param dataset_path the path where the dataset is stored
+#' @param label_cfg a number of relabaling configuration (1,2 or 3)
+#' @param keep_outliers a boolean value wheter or not to keep in trainset outliers.
+#' @param balanced a boolean value iff TRUE SMOTE is applied to balance the trainset
+#' @param scale_method a string rapresenting the name of the scaling function ('z-score', 'min-max', 'pca')
+#' @param split_perc the percentage of split for trainset and testset
+#' @param seed the number to set for the dataset split
 
 dataset_path <- "../data/winequality-combined.csv"
 label_cfg <- 1
 keep_outliers <- FALSE #TRUE
 balanced <- FALSE
-scale_func <- 'z-score'
+scale_method <- 'z-score'
 split_perc <- 0.7
 seed <- 444
 
@@ -136,11 +145,6 @@ index <- createDataPartition(dataset$quality, p = split_perc, list = FALSE)
 trainset <- dataset[index, ]
 testset <- dataset[-index, ]
 
-#write.csv(trainset, "../data/winequality-train.csv", row.names = FALSE)
-#write.csv(testset, "../data/winequality-test.csv", row.names = FALSE)
+write.csv(trainset, "../data/winequality-train.csv", row.names = FALSE)
+write.csv(testset, "../data/winequality-test.csv", row.names = FALSE)
 
-# Apply PreProcess
-out <- .apply_pre_proc(trainset, testset, scale_func, keep_outliers, balanced)
-
-# Save dataset
-saveRDS(out, file = "../data/preprocessed.RDS")
