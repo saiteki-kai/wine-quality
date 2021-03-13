@@ -2,7 +2,7 @@
 #'
 
 .get_model <- function(model_name, pre_proc_method) {
-  filename <- file.path(model_path, paste0(model_name, "_", pre_proc_method, ".RDS"))
+  filename <- file.path(outputs_path, paste0(model_name, "_", pre_proc_method, ".RDS"))
 
   if (file.exists(filename)) {
     return(readRDS(filename))
@@ -18,7 +18,7 @@
 #'
 .write_log <- function(model_name, pre_proc_name, cm, pred_time) {
   filename <- file.path(
-    log_path,
+    outputs_path,
     paste0(model_name, "_", pre_proc_name, ".log")
   )
 
@@ -57,21 +57,19 @@
 
   scores <- join_scores(probs)
 
-  mdat <- mmdata(
-    scores = scores,
-    labels = labels,
+  mdat <- mmdata(scores, labels,
     modnames = models,
     dsids = as.numeric(as.factor(models))
   )
 
-  sscurves <- evalmod(mdat,    mode = "rocprc")
+  sscurves <- evalmod(mdat, mode = "rocprc")
 
-  png(file.path("../plots/roc", paste0(method, ".png")),
-    units = "in",
-    res = 300,
-    height = 6.67,
-    width = ifelse(TRUE, 13.34, 6.67)
-  )
+  # png(file.path(roc_path, paste0(method, ".png")),
+  #   units = "in",
+  #   res = 300,
+  #   height = 6.67,
+  #   width = ifelse(TRUE, 13.34, 6.67)
+  # )
   # Plot ROC and PRC
   autoplot(sscurves)
   dev.off()
@@ -98,16 +96,17 @@
 #' @return list containing the confusion matrix, the predictions
 #'      and the prediction time
 .evaluate_model <- function(model, dataset) {
-
-  # Apply transformations
-  if (length(model$preProcess) != 0) {
-    cols <- ncol(dataset)
-    transformed <- predict(model$preProcess, dataset[, -cols])
+  # Apply pre-processing
+  if (!is.null(model$preProcess)) {
+    transformed <- predict(model$preProcess, dataset[, -ncol(dataset)])
     transformed$quality <- dataset$quality
+    # Remove (caret) preProcess object to avoid applying transformations
     model$preProcess <- NULL
   } else {
     transformed <- dataset
   }
+
+  print(model)
 
   # Predict
   start_time <- Sys.time()
@@ -147,11 +146,10 @@ for (method in pre_proc_methods) {
 
     # Load the model
     mod <- .get_model(model$name, method)
+    models[[model$name]]$model <- mod
 
     # Evaluate the model
     res <- .evaluate_model(mod, testset)
-
-    models[[model$name]]$model <- mod
     models[[model$name]]$results <- res
 
     # Save results
@@ -162,8 +160,8 @@ for (method in pre_proc_methods) {
   predictions <- lapply(models, function(x) x$results$probs$good)
 
   # Plot AUCs ROC & PRC
-  roc_prc <- .plot_roc_prc(testset$quality, predictions, method)
-  print(roc_prc)
+  aucs <- .plot_roc_prc(testset$quality, predictions, method)
+  print(aucs)
 
   # Resample results
   cv.values <- resamples(lapply(models, function(x) x$model))

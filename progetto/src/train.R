@@ -120,7 +120,7 @@ trainset <- read.csv("../data/winequality-train.csv") %>%
   mutate(quality = factor(quality))
 
 # Remove Outliers
-if (remove_outliers) {
+if (keep_outliers) {
   trainset <- trainset %>%
     lapply(function(x) {
       if (is.numeric(x)) {
@@ -155,7 +155,7 @@ for (method in pre_proc_methods) {
 
     # Save model
     saveRDS(m,
-      file = file.path(results_path, paste0(model$name, "_", method, ".RDS"))
+      file = file.path(outputs_path, paste0(model$name, "_", method, ".RDS"))
     )
 
     # m <- .get_model(model$name, method)

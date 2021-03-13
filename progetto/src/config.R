@@ -1,21 +1,22 @@
+keep_outliers <- TRUE
+subsample <- FALSE
 
-# Train Paths ------------------------------------------------------------------
+#  Paths -----------------------------------------------------------------------
 
 tuning_path <- file.path(
   "../plots/tuning",
-  ifelse(remove_outliers, "outliers", "no-outliers")
+  ifelse(keep_outliers, "outliers", "no-outliers")
 )
 
-results_path <- file.path(
+outputs_path <- file.path(
   "../output",
-  ifelse(remove_outliers, "outliers", "no-outliers")
+  ifelse(keep_outliers, "outliers", "no-outliers")
 )
 
-# Test Paths -------------------------------------------------------------------
-
-log_path <- "../output"
-roc_path <- "../plots/roc"
-model_path <- "../output"
+roc_path <- file.path(
+  "../plots/roc",
+  ifelse(keep_outliers, "outliers", "no-outliers")
+)
 
 # Tuning parameters ------------------------------------------------------------
 
@@ -33,16 +34,13 @@ grid_radial <- expand.grid(sigma = c(0.1, 0.5, 1), C = C)
 grid_poly <- expand.grid(degree = 1:6, scale = 1, C = C)
 grid_tree <- expand.grid(maxdepth = 2:10)
 
-# Global parameters ------------------------------------------------------------
-
-remove_outliers <- FALSE
-subsample <- FALSE
+# ------------------------------
 
 models <- list(
   rpart2 = list(name = "rpart2", tune_grid = grid_tree),
-  svmLinear = list(name = "svmLinear", tune_grid = grid_linear),
-  svmRadial = list(name = "svmRadial", tune_grid = grid_radial)
+  svmLinear = list(name = "svmLinear", tune_grid = grid_linear)
+  # svmRadial = list(name = "svmRadial", tune_grid = grid_radial)
   # list(name = "svmPoly", tune_grid = grid_poly)
 )
 
-pre_proc_methods <- list("pca", "z-score")
+pre_proc_methods <- list("z-score")
