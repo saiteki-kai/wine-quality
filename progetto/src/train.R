@@ -3,7 +3,7 @@
 #'
 #'
 
-.train_model <- function(trainset, model_type, tune_grid = NULL) {
+.train_model <- function(trainset, model_name, tune_grid = NULL) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(caret, doParallel)
@@ -23,7 +23,7 @@
     method = "repeatedcv",
     repeats = repeats,
     classProbs = TRUE,
-    summaryFunction = twoClassSummary,
+    summaryFunction = prSummary, #twoClassSummary,
     seeds = seeds,
     index = createMultiFolds(trainset$quality, folds, repeats),
     allowParallel = TRUE
@@ -37,9 +37,9 @@
   model <- train(
     quality ~ .,
     data = trainset,
-    method = model_type,
+    method = model_name,
     tuneGrid = tune_grid,
-    metric = "ROC",
+    metric = "Precision", #ROC
     trControl = train_control
   )
 

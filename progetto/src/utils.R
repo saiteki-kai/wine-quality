@@ -92,7 +92,7 @@ detect_outliers <- function(data,
 
 #' Treat the outliers using different methods
 #'
-#' @param dataset a dataset
+#' @param dataset a dataseta
 #' @param method method of outliers detection
 #' @param win.quantiles quantile limits for the winsorinzing method
 #'
@@ -112,6 +112,18 @@ treat_outliers <- function(data, method = "winsorizing",
     stop("`mode` should be either `IQR` or `winsorizing`")
   }
   data
+}
+
+remove_outliers <- function(trainset, method) {
+  func <- function (x) {
+    if (is.numeric(x)) {
+      treat_outliers(x, method)
+    } else { x }
+  }
+
+  trainset %>%
+    lapply(func) %>%
+    as.data.frame()
 }
 
 save_plot_png <- function(filename, plot, wide = FALSE) {
