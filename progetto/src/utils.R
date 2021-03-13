@@ -115,10 +115,12 @@ treat_outliers <- function(data, method = "winsorizing",
 }
 
 remove_outliers <- function(trainset, method) {
-  func <- function (x) {
+  func <- function(x) {
     if (is.numeric(x)) {
       treat_outliers(x, method)
-    } else { x }
+    } else {
+      x
+    }
   }
 
   trainset %>%

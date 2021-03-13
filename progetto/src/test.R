@@ -64,13 +64,13 @@
 
   sscurves <- evalmod(mdat, mode = "rocprc")
 
-  # png(file.path(roc_path, paste0(method, ".png")),
-  #   units = "in",
-  #   res = 300,
-  #   height = 6.67,
-  #   width = ifelse(TRUE, 13.34, 6.67)
-  # )
   # Plot ROC and PRC
+  png(file.path(roc_path, paste0(method, ".png")),
+    units = "in",
+    res = 300,
+    height = 6.67,
+    width = ifelse(TRUE, 13.34, 6.67)
+  )
   autoplot(sscurves)
   dev.off()
 

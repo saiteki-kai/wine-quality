@@ -23,7 +23,7 @@
     method = "repeatedcv",
     repeats = repeats,
     classProbs = TRUE,
-    summaryFunction = prSummary, #twoClassSummary,
+    summaryFunction = prSummary,
     seeds = seeds,
     index = createMultiFolds(trainset$quality, folds, repeats),
     allowParallel = TRUE
@@ -39,7 +39,7 @@
     data = trainset,
     method = model_name,
     tuneGrid = tune_grid,
-    metric = "Precision", #ROC
+    metric = "Precision",
     trControl = train_control
   )
 
