@@ -113,39 +113,31 @@ pacman::p_load(caret)
 
 # Local functions
 source("./utils.R")
+source("./config.R")
 
-# Read trainset
-trainset <- read.csv("../data/winequality-train.csv")
-trainset$quality <- factor(trainset$quality)
+# Load Dataset
+trainset <- read.csv("../data/winequality-train.csv") %>%
+  mutate(quality = factor(quality))
+
+# Remove Outliers
+if (remove_outliers) {
+  trainset <- trainset %>%
+    lapply(function(x) {
+      if (is.numeric(x)) {
+        treat_outliers(x, method = "IQR")
+      } else {
+        x
+      }
+    }) %>%
+    as.data.frame()
+}
 
 # Subsampling
-# trainset <- subsampling(trainset, "SMOTE")
+if (subsample) {
+  trainset <- .subsampling(trainset, "SMOTE")
+}
 
-# Tuning parameters
-# degree: The degree of the polynomial kernel function. This has to be an positive integer.
-# scale: The scaling parameter of the polynomial kernel is a convenient way of normalizing patterns without the need to modify the data itself
-# C: The offset used in a polynomial kernel
-# sigma: The inverse kernel width used by the Gaussian kernal
-# maxdepth: The max depth of the tree
-# https://www.rdocumentation.org/packages/kernlab/versions/0.9-27/topics/dots
-
-C <- c(0.1, 0.5, 1, 1.5, 2) # seq(0.25, 2, 0.25)
-
-grid_linear <- expand.grid(C = C)
-grid_radial <- expand.grid(sigma = c(0.1, 0.5, 1), C = C)
-grid_poly <- expand.grid(degree = 1:6, scale = 1, C = C)
-grid_tree <- expand.grid(maxdepth = 2:10)
-
-tuning_path <- "../plots/tuning"
-
-models <- list(
-  list(name = "rpart2", tune_grid = grid_tree),
-  list(name = "svmLinear", tune_grid = grid_linear),
-  list(name = "svmRadial", tune_grid = grid_radial),
-  list(name = "svmPoly", tune_grid = grid_poly)
-)
-
-for (method in c("pca", "z-score", "min-max")) {
+for (method in pre_proc_methods) {
   print(paste("Method: ", method))
 
   # Apply pre-processing
@@ -158,11 +150,12 @@ for (method in c("pca", "z-score", "min-max")) {
 
     # Train model
     m <- .train_model(trasformed, model$name, model$tune_grid)
+    # Add the (caret) preProcess object in the model
     m$preProcess <- pre_proc
 
     # Save model
     saveRDS(m,
-      file = paste0("../output/", model$name, "_", method, ".RDS")
+      file = file.path(results_path, paste0(model$name, "_", method, ".RDS"))
     )
 
     # m <- .get_model(model$name, method)

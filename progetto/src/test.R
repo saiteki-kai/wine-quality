@@ -45,29 +45,32 @@
 }
 
 #' Plot ROC and precision_recall_curve for all the models specified
-#' @param dataset a dataset
-#' @param models a list of models
+#' @param
+#' @param
 #'
-#' @return AUCs for ROC and PRC for all the models
-.plot_roc_prc <- function(labels, probs, names, method) {
-  labels <- rep(list(labels), length(names))
+#' @return AUCs for ROC and PRC
+.plot_roc_prc <- function(labels, probs, method) {
+  models <- names(probs)
+
+  labels <- rep(list(labels), length(probs))
   labels <- join_labels(labels)
 
   scores <- join_scores(probs)
 
-  sscurves <- evalmod(
-    mode = "rocprc",
+  mdat <- mmdata(
     scores = scores,
     labels = labels,
-    modnames = names,
-    dsids = as.numeric(as.factor(names))
+    modnames = models,
+    dsids = as.numeric(as.factor(models))
   )
 
+  sscurves <- evalmod(mdat,    mode = "rocprc")
+
   png(file.path("../plots/roc", paste0(method, ".png")),
-      units = "in",
-      res = 300,
-      height = 6.67,
-      width = ifelse(TRUE, 13.34, 6.67)
+    units = "in",
+    res = 300,
+    height = 6.67,
+    width = ifelse(TRUE, 13.34, 6.67)
   )
   # Plot ROC and PRC
   autoplot(sscurves)
@@ -76,7 +79,8 @@
   # Format AUC
   aucs <- auc(sscurves) %>% dplyr::select("modnames", "curvetypes", "aucs")
   aucs$curvetypes <- factor(aucs$curvetypes, levels = unique(aucs$curvetypes))
-  aucs <- aucs %>% split(aucs$curvetypes) %>%
+  aucs <- aucs %>%
+    split(aucs$curvetypes) %>%
     lapply(function(x) {
       x <- dplyr::select(x, "modnames", "aucs")
       names(x) <- c("model", "AUC")
@@ -128,63 +132,43 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret, ggplot2, grid, pROC, dplyr)
 
 # Local functions
-source("utils.R")
-
-log_path <- "../output"
-roc_path <- "../plots/roc"
-model_path <- "../output"
+source("./utils.R")
+source("./config.R")
 
 # Prepare the dataset
 testset <- read.csv("../data/winequality-test.csv")
 testset$quality <- factor(testset$quality)
 
-for (method in c("pca", "z-score", "min-max")) {
-  # Load models
-  rpart.model <- .get_model("rpart2", method)
-  svmRadial.model <- .get_model("svmRadial", method)
-  svmLinear.model <- .get_model("svmLinear", method)
-  # svmPoly.model <- .get_model("svmPoly", method)
+for (method in pre_proc_methods) {
+  print(paste("Method: ", method))
 
-  # Evaluate the model
-  res1 <- .evaluate_model(rpart.model, testset)
-  res2 <- .evaluate_model(svmRadial.model, testset)
-  res3 <- .evaluate_model(svmLinear.model, testset)
-  # res4 <- .evaluate_model(svmPoly.model, testset)
+  for (model in models) {
+    print(paste0("evaluate ", model$name, "..."))
 
-  # Write Logs
-  .write_log("rpart2", method, res1$cm, res1$pred_time)
-  .write_log("svmRadial", method, res2$cm, res2$pred_time)
-  .write_log("svmLinear", method, res3$cm, res3$pred_time)
-  # .write_log("svmPoly", method, res4$cm, res4$pred_time)
+    # Load the model
+    mod <- .get_model(model$name, method)
 
-  predictions <- list(
-    rpart2 = res1$probs$good,
-    svmRadial = res2$probs$good,
-    svmLinear = res3$probs$good # ,
-    # svmPoly = res4$probs$good
-  )
+    # Evaluate the model
+    res <- .evaluate_model(mod, testset)
 
-  names <- c(
-    "rpart2",
-    "svmRadial",
-    "svmLinear" # ,
-    # "svmPoly"
-  )
+    models[[model$name]]$model <- mod
+    models[[model$name]]$results <- res
+
+    # Save results
+    .write_log(model$name, method, res$cm, res$pred_time)
+  }
+
+  # Get predictions
+  predictions <- lapply(models, function(x) x$results$probs$good)
 
   # Plot AUCs ROC & PRC
-  roc_prc <- .plot_roc_prc(testset$quality, predictions, names, method)
-
+  roc_prc <- .plot_roc_prc(testset$quality, predictions, method)
   print(roc_prc)
 
-  # Model Comparison
-  cv.values <- resamples(
-    list(
-      rpart2 = rpart.model,
-      svmRadial = svmRadial.model,
-      svmLinear = svmLinear.model # ,
-      # svmPoly = svmPoly.model
-    )
-  )
+  # Resample results
+  cv.values <- resamples(lapply(models, function(x) x$model))
+
+  # Model comparison
 
   # summary(cv.values)
   # print_or_save(dotplot(cv.values, metric = "ROC"),
@@ -208,3 +192,4 @@ for (method in c("pca", "z-score", "min-max")) {
 
 # TODO: save plots and divide subsampled results from non subsampled
 # TODO: test statistici
+# TODO: rename variables (designation clashs)
