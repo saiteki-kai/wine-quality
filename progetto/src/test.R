@@ -128,7 +128,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, ggplot2, grid, pROC, dplyr)
+pacman::p_load(caret, ggplot2, grid, precrec, dplyr)
 
 # Local functions
 source("./utils.R")
