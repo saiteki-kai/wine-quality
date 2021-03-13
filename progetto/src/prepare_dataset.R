@@ -1,6 +1,6 @@
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret)
+pacman::p_load(caret, dplyr)
 
 # Local functions
 source("./utils.R")
@@ -60,8 +60,9 @@ source("./utils.R")
 }
 
 
-.apply_scaling <- function(data, scale_type='z-score', pre_proc=NULL) {
-  if (pre_proc != NULL) {
+.apply_scaling <- function(data, scale_type='z-score', pre_proc=list()) {
+  trasformed <- list()
+  if (length(pre_proc) > 0) {
     trasformed <- predict(pre_proc, data[, -ncol(data)])
     trasformed$quality <- data$quality
   } else {
@@ -69,30 +70,40 @@ source("./utils.R")
     trasformed <- predict(pre_proc, data[, -ncol(data)])
     trasformed$quality <- data$quality
   }
-  list(data=trasformed, pre_proc=pre_proc)
+
+  obj <- list(data=trasformed, pre_proc=pre_proc)
 }
 
 
-.apply_pre_proc <- function(trainset, testset, pre_proc, scale_func, keep_outliers, balanced) {
+.apply_pre_proc <- function(trainset, testset, scale_func, keep_outliers, balanced) {
 
   # remove outliers if needed
-  trainset <- ifelse(keep_outliers, trainset, remove_outliers(trainset, 'IQR'))
+  if (keep_outliers == FALSE) {
+    trainset <- remove_outliers(trainset, 'IQR') # not working!
+  }
 
   # apply SMOTE if needed
-  trainset <- ifelse(balanced, .subsampling(trainset, 'SMOTE'), trainset)
+  if (balanced) {
+    trainset <- .subsampling(trainset, 'SMOTE')
+  }
 
   # apply scaling if needed
-  res1 <- ifelse(is_empty(scale_func), trainset, .apply_scaling(trainset, scale_func, NULL))
-  res2 <- ifelse(is_empty(scale_func), testset, .apply_scaling(testset, scale_func, res1$pre_proc))
+  empty_str <- is.na(scale_func) || scale_func == ''
+  res1 <- list()
+  res2 <- list()
+  if (empty_str) {
+    res1$data <- trainset
+    res2$data <- testset
+  } else {
+    res1 <- .apply_scaling(trainset, scale_func, list())
+    res2 <- .apply_scaling(testset, scale_func, res1$pre_proc)
+  }
 
-  out <- list(
+  list(
     trainset = res1$data,
     testset = res2$data,
     pre_proc = res1$pre_proc
   )
-
-  # Save dataset
-  saveRDS(out, file = "../data/preprocessed.RDS")
 }
 
 #' Dataset PreProcess Config:
@@ -106,7 +117,7 @@ source("./utils.R")
 
 dataset_path <- "../data/winequality-combined.csv"
 label_cfg <- 1
-keep_outliers <- FALSE
+keep_outliers <- FALSE #TRUE
 balanced <- FALSE
 scale_func <- 'z-score'
 split_perc <- 0.7
@@ -130,4 +141,6 @@ testset <- dataset[-index, ]
 
 # Apply PreProcess
 out <- .apply_pre_proc(trainset, testset, scale_func, keep_outliers, balanced)
-# out <- train_transformed, test_transformed, pre_proc
+
+# Save dataset
+saveRDS(out, file = "../data/preprocessed.RDS")
