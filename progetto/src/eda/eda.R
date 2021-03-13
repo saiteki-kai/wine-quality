@@ -39,6 +39,8 @@
     ggtitle(title)
 }
 
+# TODO: distribution grouped by type => if there's a good overlapping is ok to use red and white together
+
 # Install packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(corrplot, ggplot2, dplyr, naniar, patchwork, factoextra)
@@ -110,6 +112,6 @@ for (i in dplyr::select(trainset, -c("type", "quality")) %>% names()) {
     .class_distribution(trainset, i)
   }
 }
-#
+
 # source("./outliers.R")
 # source("./multivariate.R")
