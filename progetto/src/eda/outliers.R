@@ -37,7 +37,8 @@ source("../utils.R")
     theme(plot.title = element_text(hjust = 0.5))
 }
 
-outliers_path <- "../../plots/eda/outliers"
+outliers_path <- file.path("..", "..", "plots", "eda", "outliers")
+create_dir_if_not_exists(outliers_path)
 
 dataset <- read.csv("../../data/winequality-train.csv") %>%
   mutate(quality = factor(quality))
@@ -103,7 +104,7 @@ for (i in names(dataset)) {
 
   stats <- psych::describe(df) %>% round(2)
   stats %>%
-    select(-c("mad", "trimmed", "range", "se", "n")) %>%
+    dplyr::select(-c("mad", "trimmed", "range", "se", "n")) %>%
     kbl("latex", booktabs = T) %>%
     kable_styling(latex_options = c("striped", "scale_down"))
 }
@@ -111,8 +112,8 @@ for (i in names(dataset)) {
 s1 <- .print_stats(dataset)
 s2 <- .print_stats(d_iqr)
 
-write(s1, file.path("../../plots/outliers/with_outliers.tex"))
-write(s2, file.path("../../plots/outliers/without_outliers.tex"))
+write(s1, file.path(outliers_path, "with_outliers.tex"))
+write(s2, file.path(outliers_path, "without_outliers.tex"))
 
 # gg_miss_var(dataset, quality)
 # gg_miss_fct(dataset, quality)

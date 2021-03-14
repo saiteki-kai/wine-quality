@@ -10,28 +10,20 @@ subsample <- FALSE
 
 #  Paths -----------------------------------------------------------------------
 
-tuning_path <- file.path(
-  "../plots/tuning",
-  ifelse(keep_outliers, "outliers", "no-outliers")
-)
+subfolder <- ifelse(keep_outliers, "outliers", "no-outliers")
 
-outputs_path <- file.path(
-  "../output",
-  ifelse(keep_outliers, "outliers", "no-outliers")
-)
-
-roc_path <- file.path(
-  "../plots/roc",
-  ifelse(keep_outliers, "outliers", "no-outliers")
-)
+outputs_path <- file.path("..", "output", subfolder)
+tuning_path <- file.path("..", "plots", "tuning", subfolder)
+roc_path <- file.path("..", "plots", "roc", subfolder)
+comparison_path <- file.path("..", "plots", "comparison", subfolder)
 
 # Tuning parameters ------------------------------------------------------------
 
 # degree:   The degree of the polynomial kernel function.
 #           This has to be an positive integer.
 #
-# scale:    The scaling parameter of the polynomial kernel is a convenient way of
-#           normalizing patterns without the need to modify the data itself
+# scale:    The scaling parameter of the polynomial kernel is a convenient way
+#           of normalizing patterns without the need to modify the data itself
 #
 # C:        The offset used in a polynomial kernel
 #
