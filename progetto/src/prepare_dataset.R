@@ -6,11 +6,10 @@ pacman::p_load(caret)
 source("./utils.R")
 
 # Load the dataset
-dataset <- read.csv("../data/winequality-combined.csv")
+dataset <- read.csv("../data/winequality-white.csv")
 
 # Setup quality
 dataset <- relabeling(dataset)
-dataset$type <- NULL
 
 # Create Partition
 set.seed(444)
