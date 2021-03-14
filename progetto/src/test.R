@@ -2,7 +2,10 @@
 #'
 
 .get_model <- function(model_name, preproc_type) {
-  filename <- file.path(outputs_path, paste0(model_name, "_", preproc_type, ".RDS"))
+  filename <- file.path(
+    outputs_path,
+    paste0(model_name, "_", preproc_type, ".RDS")
+  )
 
   if (file.exists(filename)) {
     return(readRDS(filename))
@@ -18,6 +21,8 @@
 #' @param pred_time prediction time
 #'
 .write_log <- function(model_name, preproc_type, cm, pred_time) {
+  create_dir_if_not_exists(outputs_path)
+
   filename <- file.path(
     outputs_path,
     paste0(model_name, "_", preproc_type, ".log")
@@ -61,6 +66,7 @@
 #'   model3 = c(0.4, 0.7, 0.8, 0.5)
 #' )
 #' .plot_roc_prc(labels, probs, "z-score")
+#'
 #' @return AUCs of ROC and PRC for each model
 .plot_roc_prc <- function(labels, probs, preproc_type) {
   models <- names(probs)
@@ -77,7 +83,8 @@
 
   sscurves <- evalmod(mdat, mode = "rocprc")
 
-  # Plot ROC and PRC
+  # Save ROC and PRC
+  create_dir_if_not_exists(roc_path)
   png(file.path(roc_path, paste0(preproc_type, ".png")),
     units = "in",
     res = 300,
@@ -106,8 +113,8 @@
 #' @param dataset a dataset to predict
 #' @param model classification model
 #'
-#' @return list containing the confusion matrix, the predictions
-#'      and the prediction time
+#' @return list containing the confusion matrix, the predictions and the
+#' prediction time
 .evaluate_model <- function(dataset, model) {
   # Apply pre-processing
   if (!is.null(model$preProcess)) {
@@ -178,27 +185,26 @@ for (preproc_type in preproc_types) {
   cv.values <- resamples(lapply(models, function(x) x$model))
 
   # Model comparison
-
-  # summary(cv.values)
-  # print_or_save(dotplot(cv.values, metric = "ROC"),
-  #   "../plots/comparison/dotplot.png",
-  #   save = TRUE,
-  #   wide = TRUE
-  # )
-  # print_or_save(bwplot(cv.values, layout = c(3, 1)),
-  #   "../plots/comparison/bwplot.png",
-  #   save = TRUE,
-  #   wide = TRUE
-  # )
-  # print_or_save(splom(cv.values, metric = "ROC"),
-  #   "../plots/comparison/splom.png",
-  #   save = TRUE,
-  #   wide = TRUE
-  # )
+  summary(cv.values)
+  create_dir_if_not_exists(comparison_path)
+  print_or_save(dotplot(cv.values, metric = c("Precision", "Recall"), layout = c(1,2)),
+    file.path(comparison_path, paste0(preproc_type, "_dotplot.png")),
+    save = TRUE,
+    wide = TRUE
+  )
+  print_or_save(bwplot(cv.values, layout = c(1, 4)),
+    file.path(comparison_path,  paste0(preproc_type, "_bwplot.png")),
+    save = TRUE,
+    wide = TRUE
+  )
+  print_or_save(splom(cv.values, metric = "Precision"),
+    file.path(comparison_path,  paste0(preproc_type, "_splom.png")),
+    save = TRUE,
+    wide = TRUE
+  )
 }
 
 # print(t_test(pred1-pred2, paired = TRUE))
 
-# TODO: save plots and divide subsampled results from non subsampled
 # TODO: test statistici
 # TODO: rename variables (designation clashs)

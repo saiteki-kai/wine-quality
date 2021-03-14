@@ -155,13 +155,17 @@ for (preproc_type in preproc_types) {
     m$preProcess <- pre_proc
 
     # Save model
+    create_dir_if_not_exists(outputs_path)
     saveRDS(m,
-      file = file.path(outputs_path, paste0(model$name, "_", preproc_type, ".RDS"))
+      file = file.path(
+        outputs_path,
+        paste0(model$name, "_", preproc_type, ".RDS")
+      )
     )
 
     # m <- .get_model(model$name, preproc_type)
 
-    if (length(attr(m$finalModel, "param")) > 1) {
+    if (!is.null(model$tune_grid)) {
       # Get the best tune
       best <- sprintf("%s: %s", names(m$bestTune), m$bestTune)
       best <- paste(best, collapse = ", ")
@@ -171,6 +175,7 @@ for (preproc_type in preproc_types) {
         ggtitle(paste(model$name, preproc_type, best, sep = " - ")) +
         theme(plot.title = element_text(hjust = 0.5))
 
+      create_dir_if_not_exists(tuning_path)
       print_or_save(plot,
         filename = file.path(tuning_path, paste0(model$name, "_", preproc_type, ".png")),
         save = TRUE,

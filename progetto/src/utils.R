@@ -3,6 +3,7 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret, precrec, factoextra, multiROC, ggplot2, dplyr)
 
 #' Convert the quality attribute based on the configuration
+#'
 #' @param dataset a dataset
 #' @param config indicates the class configuration to be used
 #'
@@ -10,9 +11,14 @@ pacman::p_load(caret, precrec, factoextra, multiROC, ggplot2, dplyr)
 #' config = 1  -> 2 classes (0: bad-quality, 1: good-quality)
 #' config = 2  -> 3 classes (0: low-quality, 1: medium-quality, 2: high-quality)
 #' otherwise -> 10 classes (0: low-quality, ..., 10: high-quality)
+#'
 #' @return the processed dataset
-relabeling <- function(dataset, config = 1) {
-  dataset$type <- factor(dataset$type)
+relabeling <- function(dataset, config = 1, type = FALSE) {
+  if (type) {
+    dataset$type <- factor(dataset$type)
+  } else {
+    dataset$type <- NULL
+  }
 
   if (config == 1) {
     dataset$quality <- ifelse(dataset$quality > 6, "good", "bad")
@@ -154,4 +160,18 @@ print_or_save <- function(plot, filename, save = FALSE, wide = FALSE) {
   } else {
     print(plot)
   }
+}
+
+#' Create the directory of the specified path
+#'
+#' @param path folder path name
+#'
+#' @return returns TRUE if the directory was created successfully or
+#' already exists, FALSE otherwise.
+create_dir_if_not_exists <- function(path) {
+  if (!dir.exists(path)) {
+    out <- dir.create(path, recursive = TRUE)
+    return(out)
+  }
+  TRUE
 }
