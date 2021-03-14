@@ -51,9 +51,9 @@ grid_tree <- expand.grid(maxdepth = 2:10)
 # ------------------------------------------------------------------------------
 
 models <- list(
-  rpart2 = list(name = "rpart2", tune_grid = NULL),
-  svmLinear = list(name = "svmLinear", tune_grid = NULL),
-  svmRadial = list(name = "svmRadial", tune_grid = NULL)
+  rpart2 = list(name = "rpart2", tune_grid = grid_tree),
+  svmLinear = list(name = "svmLinear", tune_grid = grid_linear),
+  svmRadial = list(name = "svmRadial", tune_grid = grid_radial)
   # list(name = "svmPoly", tune_grid = grid_poly)
 )
 

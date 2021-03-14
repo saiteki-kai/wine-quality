@@ -10,9 +10,9 @@
   print(p)
 }
 
-.class_distribution <- function(data, attribute) {
+.class_distribution <- function(data, attribute, target) {
   p <- data %>%
-    ggplot(aes_string(x = attribute, group = "quality", fill = "quality", color = "quality")) +
+    ggplot(aes_string(x = attribute, group = target, fill = target, color = target)) +
     geom_density(alpha = 0.2, bins = 40) +
     ggtitle(attribute)
   print(p)
@@ -38,8 +38,6 @@
     #   color = "black") +
     ggtitle(title)
 }
-
-# TODO: distribution grouped by type => if there's a good overlapping is ok to use red and white together
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
@@ -107,9 +105,10 @@ print((p1 + p3 + p2) / (p4 + p6 + p5))
 for (i in dplyr::select(trainset, -c("type", "quality")) %>% names()) {
   if (is.numeric(trainset[[i]])) {
     .global_distribution(trainset, i)
-    .class_distribution(config1, i)
-    .class_distribution(config2, i)
-    .class_distribution(trainset, i)
+    .class_distribution(config1, i, "quality")
+    .class_distribution(config2, i, "quality")
+    .class_distribution(trainset, i, "quality")
+    .class_distribution(trainset, i, "type")
   }
 }
 
