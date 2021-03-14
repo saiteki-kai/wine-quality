@@ -1,8 +1,8 @@
 #' Test
 #'
 
-.get_model <- function(model_name, pre_proc_method) {
-  filename <- file.path(outputs_path, paste0(model_name, "_", pre_proc_method, ".RDS"))
+.get_model <- function(model_name, preproc_type) {
+  filename <- file.path(outputs_path, paste0(model_name, "_", preproc_type, ".RDS"))
 
   if (file.exists(filename)) {
     return(readRDS(filename))
@@ -13,13 +13,14 @@
 
 #' Write a log file
 #' @param model_name model's name
+#' @param preproc_type type of preprocessing
 #' @param cm a confusion matrix
 #' @param pred_time prediction time
 #'
-.write_log <- function(model_name, pre_proc_name, cm, pred_time) {
+.write_log <- function(model_name, preproc_type, cm, pred_time) {
   filename <- file.path(
     outputs_path,
-    paste0(model_name, "_", pre_proc_name, ".log")
+    paste0(model_name, "_", preproc_type, ".log")
   )
 
   write.table(
@@ -44,12 +45,24 @@
   )
 }
 
-#' Plot ROC and precision_recall_curve for all the models specified
-#' @param
-#' @param
+#' Plot ROC and PRC for all the models specified
 #'
-#' @return AUCs for ROC and PRC
-.plot_roc_prc <- function(labels, probs, method) {
+#' @param labels target labels
+#' @param probs list with probabilities of positive class of each model
+#' @param preproc_type type of pre-processing
+#'
+#' @examples
+#'
+#' ## example of three models and a binary class
+#' labels <- c(1, 1, 0, 0)
+#' probs <- list(
+#'   model1 = c(0.5, 0.6, 0.2, 0.4),
+#'   model2 = c(0.1, 0.4, 0.3, 0.2),
+#'   model3 = c(0.4, 0.7, 0.8, 0.5)
+#' )
+#' .plot_roc_prc(labels, probs, "z-score")
+#' @return AUCs of ROC and PRC for each model
+.plot_roc_prc <- function(labels, probs, preproc_type) {
   models <- names(probs)
 
   labels <- rep(list(labels), length(probs))
@@ -65,7 +78,7 @@
   sscurves <- evalmod(mdat, mode = "rocprc")
 
   # Plot ROC and PRC
-  png(file.path(roc_path, paste0(method, ".png")),
+  png(file.path(roc_path, paste0(preproc_type, ".png")),
     units = "in",
     res = 300,
     height = 6.67,
@@ -90,12 +103,12 @@
 
 #' Print all the measures for the model evaluation
 #'
-#' @param model classification model
 #' @param dataset a dataset to predict
+#' @param model classification model
 #'
 #' @return list containing the confusion matrix, the predictions
 #'      and the prediction time
-.evaluate_model <- function(model, dataset) {
+.evaluate_model <- function(dataset, model) {
   # Apply pre-processing
   if (!is.null(model$preProcess)) {
     transformed <- predict(model$preProcess, dataset[, -ncol(dataset)])
@@ -105,8 +118,6 @@
   } else {
     transformed <- dataset
   }
-
-  print(model)
 
   # Predict
   start_time <- Sys.time()
@@ -128,7 +139,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, ggplot2, grid, precrec, dplyr)
+pacman::p_load(caret, ggplot2, precrec, dplyr)
 
 # Local functions
 source("./utils.R")
@@ -138,29 +149,29 @@ source("./config.R")
 testset <- read.csv("../data/winequality-test.csv")
 testset$quality <- factor(testset$quality)
 
-for (method in pre_proc_methods) {
-  print(paste("Method: ", method))
+for (preproc_type in preproc_types) {
+  print(paste("Pre-Processing: ", preproc_type))
 
   for (model in models) {
     print(paste0("evaluate ", model$name, "..."))
 
     # Load the model
-    mod <- .get_model(model$name, method)
+    mod <- .get_model(model$name, preproc_type)
     models[[model$name]]$model <- mod
 
     # Evaluate the model
-    res <- .evaluate_model(mod, testset)
+    res <- .evaluate_model(testset, mod)
     models[[model$name]]$results <- res
 
     # Save results
-    .write_log(model$name, method, res$cm, res$pred_time)
+    .write_log(model$name, preproc_type, res$cm, res$pred_time)
   }
 
   # Get predictions
   predictions <- lapply(models, function(x) x$results$probs$good)
 
   # Plot AUCs ROC & PRC
-  aucs <- .plot_roc_prc(testset$quality, predictions, method)
+  aucs <- .plot_roc_prc(testset$quality, predictions, preproc_type)
   print(aucs)
 
   # Resample results

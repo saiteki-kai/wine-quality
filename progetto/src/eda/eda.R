@@ -43,7 +43,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(corrplot, ggplot2, dplyr, naniar, patchwork, factoextra)
+pacman::p_load(ggplot2, corrplot, naniar, patchwork, dplyr)
 
 # Local functions
 source("../utils.R")

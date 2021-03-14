@@ -37,7 +37,7 @@ source("../utils.R")
     theme(plot.title = element_text(hjust = 0.5))
 }
 
-outliers_path <- "../../plots/outliers"
+outliers_path <- "../../plots/eda/outliers"
 
 dataset <- read.csv("../../data/winequality-train.csv") %>%
   mutate(quality = factor(quality))
@@ -101,7 +101,7 @@ for (i in names(dataset)) {
 .print_stats <- function(df) {
   df$quality <- NULL
 
-  stats <- describe(df) %>% round(2)
+  stats <- psych::describe(df) %>% round(2)
   stats %>%
     select(-c("mad", "trimmed", "range", "se", "n")) %>%
     kbl("latex", booktabs = T) %>%

@@ -10,7 +10,8 @@
 
   folds <- 10
   repeats <- 3
-  grid_size <- prod(dim(tune_grid))
+  tune_length <- 3 # caret default
+  grid_size <- ifelse(is.null(tune_grid), tune_length, prod(dim(tune_grid)))
 
   # Set seed for repeatability
   set.seed(444)
@@ -56,22 +57,22 @@
 #' Compute parameters for the preprocessing
 #'
 #' @param trainset the training set
-#' @param name the preprocessing method's name
+#' @param type the preprocessing type
 #'
 #' @return the preProcess object
-.pre_proc <- function(trainset, name) {
+.pre_proc <- function(trainset, type) {
   data <- trainset[, -ncol(trainset)]
 
-  if (name == "pca") {
+  if (type == "pca") {
     pre_proc <- preProcess(data,
       method = c("center", "scale", "pca"), thresh = 0.9
     )
-  } else if (name == "z-score") {
+  } else if (type == "z-score") {
     pre_proc <- preProcess(data, method = c("center", "scale"))
-  } else if (name == "min-max") {
+  } else if (type == "min-max") {
     pre_proc <- preProcess(data, method = "range")
   } else {
-    stop("`method` should be either `pca`, `z-score` or `min-max`")
+    stop("`type` should be either `pca`, `z-score` or `min-max`")
   }
 
   pre_proc
@@ -137,11 +138,11 @@ if (subsample) {
   trainset <- .subsampling(trainset, "SMOTE")
 }
 
-for (method in pre_proc_methods) {
-  print(paste("Method: ", method))
+for (preproc_type in preproc_types) {
+  print(paste("Pre-Processing: ", preproc_type))
 
   # Apply pre-processing
-  pre_proc <- .pre_proc(trainset, method)
+  pre_proc <- .pre_proc(trainset, preproc_type)
   trasformed <- predict(pre_proc, trainset[, -ncol(trainset)])
   trasformed$quality <- trainset$quality
 
@@ -155,24 +156,26 @@ for (method in pre_proc_methods) {
 
     # Save model
     saveRDS(m,
-      file = file.path(outputs_path, paste0(model$name, "_", method, ".RDS"))
+      file = file.path(outputs_path, paste0(model$name, "_", preproc_type, ".RDS"))
     )
 
-    # m <- .get_model(model$name, method)
+    # m <- .get_model(model$name, preproc_type)
 
-    # Get the best tune
-    best <- sprintf("%s: %s", names(m$bestTune), m$bestTune)
-    best <- paste(best, collapse = ", ")
+    if (length(attr(m$finalModel, "param")) > 1) {
+      # Get the best tune
+      best <- sprintf("%s: %s", names(m$bestTune), m$bestTune)
+      best <- paste(best, collapse = ", ")
 
-    # Plot tuning parameters
-    plot <- ggplot(m) +
-      ggtitle(paste(model$name, method, best, sep = " - ")) +
-      theme(plot.title = element_text(hjust = 0.5))
+      # Plot tuning parameters
+      plot <- ggplot(m) +
+        ggtitle(paste(model$name, preproc_type, best, sep = " - ")) +
+        theme(plot.title = element_text(hjust = 0.5))
 
-    print_or_save(plot,
-      filename = file.path(tuning_path, paste0(model$name, "_", method, ".png")),
-      save = TRUE,
-      wide = TRUE
-    )
+      print_or_save(plot,
+        filename = file.path(tuning_path, paste0(model$name, "_", preproc_type, ".png")),
+        save = TRUE,
+        wide = TRUE
+      )
+    }
   }
 }
