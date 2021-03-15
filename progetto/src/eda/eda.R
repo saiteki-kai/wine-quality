@@ -65,10 +65,10 @@ miss_var_summary(trainset)
 
 # red AND white wine quality by different class
 # combined separate by two class of quality
-config1 <- relabeling(trainset, 1)
+config1 <- relabeling(trainset, 1, type = TRUE)
 
 # combined separate by three class of quality
-config2 <- relabeling(trainset, 2)
+config2 <- relabeling(trainset, 2, type = TRUE)
 
 # only red wine
 redwine <- filter(trainset, type == "red")
@@ -105,10 +105,13 @@ print((p1 + p3 + p2) / (p4 + p6 + p5))
 for (i in dplyr::select(trainset, -c("type", "quality")) %>% names()) {
   if (is.numeric(trainset[[i]])) {
     .global_distribution(trainset, i)
+
+    .class_distribution(dataset, i, "type")
+
     .class_distribution(config1, i, "quality")
     .class_distribution(config2, i, "quality")
-    .class_distribution(trainset, i, "quality")
-    .class_distribution(trainset, i, "type")
+
+    # .class_distribution(trainset, i, "quality")
   }
 }
 
