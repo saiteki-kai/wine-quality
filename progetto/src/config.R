@@ -1,15 +1,14 @@
-#' Config
-#'
-#' This file contains the configuration for train and test.
-#'
+#' This script contains the configuration used for train and test scripts.
+#' You can specify whether keep outliers or subsample the training set,
+#' the models to be trained and their tuning parameters, the pre-processing
+#' method to apply on both training and test sets, and the folders for saving
+#' results and plots.
 
-# Global Parameters ------------------------------------------------------------
-
+# Global Parameters
 keep_outliers <- TRUE
 subsample <- FALSE
 
-#  Paths -----------------------------------------------------------------------
-
+# Folders
 subfolder <- ifelse(keep_outliers, "outliers", "no-outliers")
 
 outputs_path <- file.path("..", "output", subfolder)
@@ -17,7 +16,7 @@ tuning_path <- file.path("..", "plots", "tuning", subfolder)
 roc_path <- file.path("..", "plots", "roc", subfolder)
 comparison_path <- file.path("..", "plots", "comparison", subfolder)
 
-# Tuning parameters ------------------------------------------------------------
+# Tuning parameters
 
 # degree:   The degree of the polynomial kernel function.
 #           This has to be an positive integer.
@@ -40,8 +39,7 @@ grid_radial <- expand.grid(sigma = c(0.01, 0.1, 0.5, 1), C = C)
 grid_poly <- expand.grid(degree = 1:3, scale = 1, C = C)
 grid_tree <- expand.grid(cp = c(0.001, 0.005, 0.01, 0.05, 0.1))
 
-# ------------------------------------------------------------------------------
-
+# Models
 models <- list(
   rpart2 = list(name = "rpart2", tune_grid = NULL, tune_length = 10),
   svmLinear = list(name = "svmLinear", tune_grid = grid_linear),
@@ -51,6 +49,7 @@ models <- list(
   # knn = list(name = "knn", tune_grid = NULL, tune_length = 10)
 )
 
+# Pre-processing Types
 preproc_types <- list("z-score", "pca")
 
 # ------------------------------------------------------------------------------
