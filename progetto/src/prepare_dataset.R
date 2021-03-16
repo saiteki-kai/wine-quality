@@ -1,3 +1,6 @@
+#' This script transform the quality label in a binary label and create the
+#' partition between training and test sets.
+
 # Install packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret)
