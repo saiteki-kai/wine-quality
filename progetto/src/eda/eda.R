@@ -5,8 +5,9 @@
 
 .global_distribution <- function(data, attribute) {
   p <- data %>% ggplot(aes_string(x = attribute, title = attribute)) +
-    geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
-    geom_freqpoly(color = "blue", bins = 40)
+    geom_density(alpha = 0.2, color = "red", fill = "#FF6666", bins = 40)
+    #geom_histogram(alpha = 0.7, color = "red", fill = "#FF6666", bins = 40) +
+    #geom_freqpoly(color = "blue", bins = 40)
   print(p)
 }
 
@@ -109,7 +110,7 @@ for (i in dplyr::select(trainset, -c("type", "quality")) %>% names()) {
     .class_distribution(dataset, i, "type")
 
     .class_distribution(config1, i, "quality")
-    .class_distribution(config2, i, "quality")
+    #.class_distribution(config2, i, "quality")
 
     # .class_distribution(trainset, i, "quality")
   }
