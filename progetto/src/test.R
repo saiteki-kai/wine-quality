@@ -66,7 +66,6 @@
 #'   model3 = c(0.4, 0.7, 0.8, 0.5)
 #' )
 #' .plot_roc_prc(labels, probs, "z-score")
-#'
 #' @return AUCs of ROC and PRC for each model
 .plot_roc_prc <- function(labels, probs, preproc_type) {
   models <- names(probs)
@@ -182,26 +181,28 @@ for (preproc_type in preproc_types) {
   print(aucs)
 
   # Resample results
-  cv.values <- resamples(lapply(models, function(x) x$model))
+  if (length(models) > 1) {
+    cv.values <- resamples(lapply(models, function(x) x$model))
 
-  # Model comparison
-  summary(cv.values)
-  create_dir_if_not_exists(comparison_path)
-  print_or_save(dotplot(cv.values, metric = c("Precision", "Recall"), layout = c(1,2)),
-    file.path(comparison_path, paste0(preproc_type, "_dotplot.png")),
-    save = TRUE,
-    wide = TRUE
-  )
-  print_or_save(bwplot(cv.values, layout = c(1, 4)),
-    file.path(comparison_path,  paste0(preproc_type, "_bwplot.png")),
-    save = TRUE,
-    wide = TRUE
-  )
-  print_or_save(splom(cv.values, metric = "Precision"),
-    file.path(comparison_path,  paste0(preproc_type, "_splom.png")),
-    save = TRUE,
-    wide = TRUE
-  )
+    # Model comparison
+    summary(cv.values)
+    create_dir_if_not_exists(comparison_path)
+    print_or_save(dotplot(cv.values, metric = c("Precision", "Recall"), layout = c(1, 2)),
+      file.path(comparison_path, paste0(preproc_type, "_dotplot.png")),
+      save = TRUE,
+      wide = TRUE
+    )
+    print_or_save(bwplot(cv.values, layout = c(1, 4)),
+      file.path(comparison_path, paste0(preproc_type, "_bwplot.png")),
+      save = TRUE,
+      wide = TRUE
+    )
+    print_or_save(splom(cv.values, metric = "Precision"),
+      file.path(comparison_path, paste0(preproc_type, "_splom.png")),
+      save = TRUE,
+      wide = TRUE
+    )
+  }
 }
 
 # print(t_test(pred1-pred2, paired = TRUE))
