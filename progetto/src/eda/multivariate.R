@@ -1,3 +1,18 @@
+#' Multivariate Analysis
+
+# Install packages
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  corrplot, ggplot2, dplyr, naniar,
+  patchwork, factoextra, reshape2,
+  ggcorrplot, scales, GGally, MASS, bestNormalize, psych
+)
+
+# Source scripts
+source("../utils.R")
+
+# Local functions
+
 .plot_pca <- function(trainset) {
   trainset$quality <- NULL
 
@@ -99,22 +114,6 @@
   res <- stats %>% dplyr::select(-c("mad", "trimmed", "range", "se", "n"))
   res
 }
-
-
-# Install packages
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(
-  corrplot, ggplot2, dplyr, naniar,
-  patchwork, factoextra, reshape2,
-  ggcorrplot, scales, GGally, MASS, bestNormalize, psych
-)
-
-# Local functions
-source("../utils.R")
-
-
-
-########################################################################################################################
 
 # Load the dataset
 dataset <- read.csv("../../data/winequality-combined.csv")
