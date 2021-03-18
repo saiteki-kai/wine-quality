@@ -84,8 +84,8 @@ print(p4 + p6 + p5)
 for (i in dplyr::select(whitewine, -"quality") %>% names()) {
   if (is.numeric(whitewine[[i]])) {
     p <- .global_distribution(whitewine, i) +
-    .class_distribution(config1_whitewine, i, "quality")
-    #.class_distribution(config2_whitewine, i, "quality")
+      .class_distribution(config1_whitewine, i, "quality")
+    # .class_distribution(config2_whitewine, i, "quality")
     print(p)
   }
 }
