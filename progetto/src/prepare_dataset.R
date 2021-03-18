@@ -5,7 +5,7 @@
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret)
 
-# Local functions
+# Source scripts
 source("./utils.R")
 
 # Load the dataset

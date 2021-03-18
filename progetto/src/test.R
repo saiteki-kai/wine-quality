@@ -1,6 +1,15 @@
 #' Test
 #'
 
+# Install packages
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(caret, ggplot2, precrec, dplyr)
+
+# Source scripts
+source("./utils.R")
+source("./config.R")
+
+# Local functions
 .get_model <- function(model_name, preproc_type) {
   filename <- file.path(
     outputs_path,
@@ -142,14 +151,6 @@
 
   list(cm = cm, probs = probs, pred_time = time)
 }
-
-# Install packages
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, ggplot2, precrec, dplyr)
-
-# Local functions
-source("./utils.R")
-source("./config.R")
 
 # Prepare the dataset
 testset <- read.csv("../data/winequality-test.csv")
