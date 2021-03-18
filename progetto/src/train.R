@@ -44,7 +44,7 @@ source("./config.R")
     method = model_name,
     tuneGrid = tune_grid,
     tuneLength = tune_length,
-    metric = "Precision",
+    metric = "AUC",
     trControl = train_control
   )
 
@@ -69,7 +69,7 @@ source("./config.R")
 
   if (type == "pca") {
     pre_proc <- preProcess(data,
-      method = c("center", "scale", "pca"), thresh = 0.9
+      method = c("center", "scale", "pca"), thresh = 0.95
     )
   } else if (type == "z-score") {
     pre_proc <- preProcess(data, method = c("center", "scale"))
