@@ -1,4 +1,4 @@
-# Red Wine Quality
+# White Wine Quality
 
 Machine learning course project about wine quality
 
@@ -15,44 +15,16 @@ https://www.overleaf.com/2658978263bgkqnbbbfhfq
 
 ## To Do
 
----
-
-- [ ] Use training set in EDA
-- [ ] Multivariate Analysis after Outlier Treatment
-- [ ] Outlier detection also in the test??
+- [ ] Use **training set** in EDA
+- [ ] Barplot for each variable by quality
+- [ ] Fix Multivariate Analysis
+  - [ ] PCA Plots
+  - [ ] Comparison after Outlier Treatment
+- [ ] Fix model comparison plots   
 - [ ] Statistical Tests for model comparison
-- [ ] Decide which models will be used
+
+## Refinement 
+
+- [ ] Separate preliminary analysis from EDA
+- [ ] Rename variables (designation clash, ect..)  
 - [ ] Documentation
-
----
-
-### EDA
-
-- [x] Variable Summary #Giuseppe
-- [x] Check Null, Missing Data #Giuseppe
-- [x] Distribution Analysis (Red, White, Both) & Class Options (10 classes, 2 classes, 3 classes) #Mirco
-- [x] Attribute Distribution By Class #Mirco
-- [x] Box Plot #Giuseppe
-- [x] Correlation Map #Gaetano
-- [x] PCA #Gaetano
-
-### Preprocessing
-
-- [x] Class Attribute #Giuseppe
-- [x] Normalization / Standardization #Giuseppe
-- [x] Feature Selection (if needed) #Gaetano
-
-### Classification
-
-- [x] Naive Bayes #Giuseppe
-- [ ] Other Model (to be decided) #Geatano
-- [x] Train, Test #Gaetano, Giuseppe
-
-### Model Evaluation
-
-- [x] Confusion Matrix #Gaetano
-- [x] F1, Accuracy, Recall, ... #Gaetano
-- [x] AUCs ROC & PRC #Gaetano
-- [ ] Model Comparison
-- [ ] Statistic Tests #Giuseppe
-- [x] Computational Time #Gaetano

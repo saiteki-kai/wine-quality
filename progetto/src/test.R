@@ -207,6 +207,3 @@ for (preproc_type in preproc_types) {
 }
 
 # print(t_test(pred1-pred2, paired = TRUE))
-
-# TODO: test statistici
-# TODO: rename variables (designation clashs)
