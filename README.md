@@ -13,6 +13,10 @@ repository [https://archive.ics.uci.edu/ml/datasets/wine+quality](https://archiv
 
 https://www.overleaf.com/2658978263bgkqnbbbfhfq
 
+### Presentation
+
+https://docs.google.com/presentation/d/15Vv52jSk2hnaXR3ZWF4y3bjLNW_DlrJSGzQyvJsIjxM/edit?usp=sharing
+
 ## To Do
 
 - [ ] Use **training set** in EDA
