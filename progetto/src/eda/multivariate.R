@@ -67,8 +67,7 @@ source("../utils.R")
 
 .combined_barplot <- function(data, title) {
   p <- ggplot(data, aes(x = quality)) +
-    scale_fill_manual(values = c("red" = "#FF6666", "white" = "white")) +
-    geom_bar(aes(fill = type), position = "dodge2", alpha = 0.7, color = "black") +
+    geom_bar(aes(fill=quality), position = "dodge2", alpha = 0.7, color = "black") +
     # stat_count(
     #   aes(y = ..count..),
     #   label = y ,
@@ -299,3 +298,30 @@ df <- data.frame(
 
 # res.aov <- aov(weight ~ group, data = my_data)
 # summary(res.aov)
+
+
+
+#codice mirco----------------------------------
+
+# Import datasets
+whitewine <- read.csv("../../data/winequality-combined.csv")
+
+# create a only white numeric data
+trainset_numeric <- filter(whitewine, type == "white")
+trainset_numeric <- trainset_numeric[,-13]
+
+# create partition
+set.seed(444)
+index <- createDataPartition(dataset$quality, p = 0.70, list = FALSE)
+trainset <- dataset[index, ]
+
+# Quality Distribution
+.combined_barplot(trainset, "class config")
+
+# Plot correlation matrix
+.plot_corrmatrix(trainset_numeric, "White data Correlations")
+
+
+
+
+#fine codice mirco-----------------------------
