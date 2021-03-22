@@ -44,9 +44,10 @@ source("../utils.R")
 }
 
 .plot_scatter <- function(trainset, attr1, attr2, color, title) {
-  ggplot(trainset, aes_string(x = attr1, y = attr2)) +
+    ggplot(trainset, aes_string(x = attr1, y = attr2)) +
     geom_jitter(aes_string(color = color), size = 2, alpha = 0.7) +
     geom_smooth(method = "lm", formula = y ~ x) +
+    geom_line(aes(x = 5.5), color = "red") +
     ggtitle(title)
 }
 
@@ -306,9 +307,11 @@ df <- data.frame(
 # Import datasets
 whitewine <- read.csv("../../data/winequality-combined.csv")
 
-# create a only white numeric data
-trainset_numeric <- filter(whitewine, type == "white")
-trainset_numeric <- trainset_numeric[,-13]
+# trainset all class
+trainset_all <- whitewine[whitewine$type == "white", ]
+trainset_all$type <- NULL
+trainset_all$quality <- as.numeric(trainset_all$quality)
+
 
 # create partition
 set.seed(444)
@@ -318,8 +321,79 @@ trainset <- dataset[index, ]
 # Quality Distribution
 .combined_barplot(trainset, "class config")
 
-# Plot correlation matrix
-.plot_corrmatrix(trainset_numeric, "White data Correlations")
+#trainset numeric quality
+trainset_num <- trainset
+trainset_num$quality <- as.numeric(trainset$quality) - 1
+
+# Plot correlation matrix--------------da verificare----------
+.plot_corrmatrix(trainset_num, "White data Correlations")
+
+# Log 10 Transformation (just for visualization purpose)
+trainset$alcohol <- log10(trainset$alcohol)
+trainset$density <- log10(trainset$density)
+trainset$residual.sugar <- log10(trainset$residual.sugar)
+
+trainset$volatile.acidity <- log10(trainset$volatile.acidity)
+trainset$citric.acid <- log10(trainset$citric.acid)
+trainset$pH <- log10(trainset$pH)
+trainset$fixed.acidity <- log10(trainset$fixed.acidity)
+
+trainset$free.sulfur.dioxide <- log10(trainset$free.sulfur.dioxide)
+trainset$total.sulfur.dioxide <- log10(trainset$total.sulfur.dioxide)
+trainset$sulphates <- log10(trainset$sulphates)
+
+trainset$chlorides <- log10(trainset$chlorides)
+
+# Correlation with quality
+.plot_scatter(trainset_all, "quality", "alcohol", "quality", "")
+.plot_scatter(trainset_all, "quality", "density", "quality", "")
+.plot_scatter(trainset_all, "quality", "chlorides", "quality", "")
+.plot_scatter(trainset_all, "quality", "volatile.acidity", "quality", "")
+.plot_scatter(trainset_all, "quality", "residual.sugar", "quality", "")
+.plot_scatter(trainset_all, "quality", "sulphates", "quality", "")
+.plot_scatter(trainset_all, "quality", "citric.acid", "quality", "")
+.plot_scatter(trainset_all, "quality", "fixed.acidity", "quality", "")
+.plot_scatter(trainset_all, "quality", "pH", "quality", "")
+.plot_scatter(trainset_all, "quality", "free.sulfur.dioxide", "quality", "")
+.plot_scatter(trainset_all, "quality", "total.sulfur.dioxide", "quality", "")
+
+# Other Relevants cases
+# free.sulfur.dioxide and total.sulfur.dioxide
+.plot_scatter(
+  trainset_num, "free.sulfur.dioxide", "total.sulfur.dioxide", "quality",
+  "caso di alta correlazione tra total.sulfur.dioxide e free.sulfur.dioxide"
+)
+
+# alcohol and density
+.plot_scatter(
+  trainset_num, "alcohol", "density", "quality",
+  "caso di alta correlazione tra density e alcohol"
+)
+
+# total.sulfur.dioxide and residual.sugar
+.plot_scatter(
+  trainset_num, "total.sulfur.dioxide", "residual.sugar", "quality",
+  "caso di media correlazione tra total.sulfur.dioxide e residual.sugar"
+)
+
+# volatile.acidity and total.sulfur.dioxide
+.plot_scatter(
+  trainset_num, "volatile.acidity", "total.sulfur.dioxide", "quality",
+  "caso di media correlazione tra volatile.acidity e total.sulfur.dioxide"
+)
+
+# chlorides and sulphates
+.plot_scatter(
+  trainset_num, "chlorides", "sulphates", "quality",
+  "caso di media correlazione tra chlorides e sulphates"
+)
+
+# residual.sugar and free.sulfur.dioxide
+.plot_scatter(
+  trainset_num, "residual.sugar", "free.sulfur.dioxide", "quality",
+  "caso di media correlazione tra chlorides e sulphates"
+)
+
 
 
 
