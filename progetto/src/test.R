@@ -145,7 +145,7 @@ source("./config.R")
   cm <- confusionMatrix(
     data = pred,
     reference = dataset$quality,
-    mode = "prec_recall",
+    mode = "everything",
     positive = "good"
   )
 
@@ -180,6 +180,31 @@ for (preproc_type in preproc_types) {
   # Plot AUCs ROC & PRC
   aucs <- .plot_roc_prc(testset$quality, predictions, preproc_type)
   print(aucs)
+
+  # Plot performace measures
+  measures <- lapply(models, function(x) {
+    res <- x$results$cm$byClass[c("F1", "Precision", "Recall")]
+    res["Accuracy"] <- x$results$cm$overall["Accuracy"]
+    res["AUC PRC"] <- aucs$PRC$AUC[aucs$PRC$model == x$name]
+    res
+  })
+
+  measures <- sort(unlist(measures), decreasing = TRUE)
+  measures <- data.frame(measures, stringsAsFactors = TRUE)
+  i <- strsplit(row.names(measures), ".", fixed = TRUE)
+  measures$measure <- factor(unlist(lapply(i, function(o) o[[2]])))
+  measures$model <- factor(unlist(lapply(i, function(o) o[[1]])))
+  colnames(measures) <- c("Value", "Measure", "Model")
+
+  p <- ggplot(measures, aes(fill = Measure, x = Measure, y = Value)) +
+    geom_bar(position = "dodge", stat = "identity") +
+    facet_wrap(vars(Model), nrow = 1)
+
+  print_or_save(p,
+    file.path(comparison_path, paste0(preproc_type, "_measures.png")),
+    save = TRUE,
+    wide = TRUE
+  )
 
   # Resample results
   if (length(models) > 1) {
