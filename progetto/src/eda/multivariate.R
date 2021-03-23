@@ -44,7 +44,7 @@ source("../utils.R")
 }
 
 .plot_scatter <- function(trainset, attr1, attr2, color, title) {
-    ggplot(trainset, aes_string(x = attr1, y = attr2)) +
+  ggplot(trainset, aes_string(x = attr1, y = attr2)) +
     geom_jitter(aes_string(color = color), size = 2, alpha = 0.7) +
     geom_smooth(method = "lm", formula = y ~ x) +
     geom_line(aes(x = 5.5), color = "red") +
@@ -68,7 +68,7 @@ source("../utils.R")
 
 .combined_barplot <- function(data, title) {
   p <- ggplot(data, aes(x = quality)) +
-    geom_bar(aes(fill=quality), position = "dodge2", alpha = 0.7, color = "black") +
+    geom_bar(aes(fill = quality), position = "dodge2", alpha = 0.7, color = "black") +
     # stat_count(
     #   aes(y = ..count..),
     #   label = y ,
@@ -302,7 +302,7 @@ df <- data.frame(
 
 
 
-#codice mirco----------------------------------
+# codice mirco----------------------------------
 
 # Import datasets
 whitewine <- read.csv("../../data/winequality-combined.csv")
@@ -321,7 +321,7 @@ trainset <- dataset[index, ]
 # Quality Distribution
 .combined_barplot(trainset, "class config")
 
-#trainset numeric quality
+# trainset numeric quality
 trainset_num <- trainset
 trainset_num$quality <- as.numeric(trainset$quality) - 1
 
@@ -398,4 +398,4 @@ trainset$chlorides <- log10(trainset$chlorides)
 
 
 
-#fine codice mirco-----------------------------
+# fine codice mirco-----------------------------
