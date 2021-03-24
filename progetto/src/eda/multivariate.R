@@ -114,11 +114,39 @@ trainset$chlorides <- log10(trainset$chlorides)"
 .plot_boxplot(trainset, "total.sulfur.dioxide", "quality", "")
 
 # Other Relevants cases
+# free.sulfur.dioxide and total.sulfur.dioxide
 .plot_scatter(
   trainset, "free.sulfur.dioxide", "total.sulfur.dioxide", "quality",
   "caso di alta correlazione tra total.sulfur.dioxide e free.sulfur.dioxide"
 )
+
+# alcohol and density
 .plot_scatter(
   trainset, "alcohol", "density", "quality",
   "caso di alta correlazione tra density e alcohol"
 )
+
+# total.sulfur.dioxide and residual.sugar
+.plot_scatter(
+  trainset, "total.sulfur.dioxide", "residual.sugar", "quality",
+  "caso di media correlazione tra total.sulfur.dioxide e residual.sugar"
+)
+
+# volatile.acidity and total.sulfur.dioxide
+.plot_scatter(
+  trainset, "volatile.acidity", "total.sulfur.dioxide", "quality",
+  "caso di media correlazione tra volatile.acidity e total.sulfur.dioxide"
+)
+
+# chlorides and sulphates
+.plot_scatter(
+  trainset, "chlorides", "sulphates", "quality",
+  "caso di media correlazione tra chlorides e sulphates"
+)
+
+# residual.sugar and free.sulfur.dioxide
+.plot_scatter(
+  trainset, "residual.sugar", "free.sulfur.dioxide", "quality",
+  "caso di media correlazione tra chlorides e sulphates"
+)
+
