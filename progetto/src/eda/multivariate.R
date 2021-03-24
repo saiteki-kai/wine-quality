@@ -88,7 +88,7 @@ trainset_num$quality <- as.numeric(trainset$quality) - 1
 .plot_corrmatrix(trainset_num, "White data Correlations")
 
 # Log 10 Transformation (just for visualization purpose)
-"trainset$alcohol <- log10(trainset$alcohol)
+trainset$alcohol <- log10(trainset$alcohol)
 trainset$density <- log10(trainset$density)
 trainset$residual.sugar <- log10(trainset$residual.sugar)
 trainset$volatile.acidity <- log10(trainset$volatile.acidity)
@@ -98,7 +98,7 @@ trainset$fixed.acidity <- log10(trainset$fixed.acidity)
 trainset$free.sulfur.dioxide <- log10(trainset$free.sulfur.dioxide)
 trainset$total.sulfur.dioxide <- log10(trainset$total.sulfur.dioxide)
 trainset$sulphates <- log10(trainset$sulphates)
-trainset$chlorides <- log10(trainset$chlorides)"
+trainset$chlorides <- log10(trainset$chlorides)
 
 # Correlation with quality
 .plot_boxplot(trainset, "alcohol", "quality", "") +
@@ -113,40 +113,49 @@ trainset$chlorides <- log10(trainset$chlorides)"
 .plot_boxplot(trainset, "free.sulfur.dioxide", "quality", "") +
 .plot_boxplot(trainset, "total.sulfur.dioxide", "quality", "")
 
-# Other Relevants cases
-# free.sulfur.dioxide and total.sulfur.dioxide
-.plot_scatter(
-  trainset, "free.sulfur.dioxide", "total.sulfur.dioxide", "quality",
-  "caso di alta correlazione tra total.sulfur.dioxide e free.sulfur.dioxide"
-)
+# Other Relevants cases:
+# - residual.sugar and density +0.84
+# - alcohol and density -0.77
+# - free.sulfur.dioxide and total.sulfur.dioxide +0.62
+# - total.sulfur.dioxide and density +0.52
+# - residual.sugar e alcohol -0.45
+# - total.sulfur.dioxide e alcohol -0.45
 
-# alcohol and density
+# (penso di toglierle queste due)
+# - fixed.acidity e pH -0.43
+# - free.sulfur.dioxide e alcohol -0.25
+
+
+.plot_scatter(
+  trainset, " residual.sugar", "density", "quality",
+  "caso di correlazione tra residual.sugar e density +0.84"
+)
 .plot_scatter(
   trainset, "alcohol", "density", "quality",
-  "caso di alta correlazione tra density e alcohol"
+  "caso di correlazione tra density e alcohol -0.77"
 )
-
-# total.sulfur.dioxide and residual.sugar
 .plot_scatter(
-  trainset, "total.sulfur.dioxide", "residual.sugar", "quality",
-  "caso di media correlazione tra total.sulfur.dioxide e residual.sugar"
+  trainset, "free.sulfur.dioxide", "total.sulfur.dioxide", "quality",
+  "caso di correlazione tra total.sulfur.dioxide e free.sulfur.dioxide +0.62"
 )
-
-# volatile.acidity and total.sulfur.dioxide
 .plot_scatter(
-  trainset, "volatile.acidity", "total.sulfur.dioxide", "quality",
-  "caso di media correlazione tra volatile.acidity e total.sulfur.dioxide"
+  trainset, "total.sulfur.dioxide", "density", "quality",
+  "caso di correlazione tra density e alcohol +0.52"
 )
-
-# chlorides and sulphates
 .plot_scatter(
-  trainset, "chlorides", "sulphates", "quality",
-  "caso di media correlazione tra chlorides e sulphates"
+  trainset, "alcohol", "residual.sugar", "quality",
+  "caso di correlazione tra residual.sugar e alcohol -0.45"
 )
-
-# residual.sugar and free.sulfur.dioxide
 .plot_scatter(
-  trainset, "residual.sugar", "free.sulfur.dioxide", "quality",
-  "caso di media correlazione tra chlorides e sulphates"
+  trainset, "alcohol", "total.sulfur.dioxide", "quality",
+  "caso di correlazione tra total.sulfur.dioxide e alcohol -0.45"
 )
 
+.plot_scatter(
+  trainset, "fixed.acidity", "pH", "quality",
+  "caso di correlazione tra fixed.acidity e pH -0.43"
+)
+.plot_scatter(
+  trainset, "free.sulfur.dioxide", "alcohol", "quality",
+  "caso di correlazione tra free.sulfur.dioxide e alcohol -0.25"
+)
