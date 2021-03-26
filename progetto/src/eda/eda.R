@@ -2,25 +2,35 @@
 #'
 #' add description.
 #'
-.type_barplot <- function(data, color, title) {
+
+# Install packages
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(patchwork)
+
+# Source scripts
+source("../utils.R")
+
+# Local Functions
+
+.type_barplot <- function(data, title, y_lim = 4000) {
   data %>% ggplot(aes(x = quality, fill = quality)) +
     geom_bar(alpha = 0.7, color = "black") +
-    ylim(0, 5000) +
+    ylim(0, y_lim) +
     ggtitle(title)
 }
 
-# Import dataset
-whitewine <- read.csv("../../data/winequality-combined.csv")
-whitewine <- filter(whitewine, type == "white") # only white wine
+# Load dataset
+whitewine <- read.csv("../../data/winequality-white.csv")
 
-config0_whitewine <- relabeling(whitewine, 3) # white wine quality by different class
-config1_whitewine <- relabeling(whitewine, 1) # white wine separate by two class
-config2_whitewine <- relabeling(whitewine, 2) # white wine separate by three class
+config1 <- relabeling(whitewine, 1) # white wine separate by two class
+config2 <- relabeling(whitewine, 2) # white wine separate by three class
+config3 <- relabeling(whitewine, 3) # white wine quality by different class
 
-p4 <- .type_barplot(config0_whitewine, "#FFFFFF", "by 10 class")
-p5 <- .type_barplot(config1_whitewine, "#FFFFFF", "by two class(x>6)")
-p6 <- .type_barplot(config2_whitewine, "#FFFFFF", "by three class(x<=5, 5<x<7, x>=7)")
-print(p4 + p6 + p5)
+p1 <- .type_barplot(config1, "2 levels")
+p2 <- .type_barplot(config2, "3 levels")
+p3 <- .type_barplot(config3, "10 levels")
+
+print(p3 + p2 + p1)
 
 #source("./univariate.R")
 #source("./outliers.R")
