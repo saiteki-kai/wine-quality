@@ -37,7 +37,7 @@ source("../utils.R")
     .plot_distribution(data, "pH", target) +
     .plot_distribution(data, "free.sulfur.dioxide", target) +
     .plot_distribution(data, "total.sulfur.dioxide", target) +
-    plot_layout(guides = 'collect')
+    plot_layout(guides = "collect")
 
   print(p)
 }
