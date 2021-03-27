@@ -51,6 +51,8 @@ source("../utils.R")
 outliers_path <- file.path("..", "..", "plots", "eda", "outliers")
 create_dir_if_not_exists(outliers_path)
 
+save <- TRUE
+
 dataset <- read.csv("../../data/winequality-train.csv") %>%
   mutate(quality = factor(quality))
 
@@ -77,7 +79,7 @@ for (i in names(dataset)) {
 
     print_or_save(plot,
       filename = file.path(outliers_path, paste0(i, "_boxplot.png")),
-      save = FALSE,
+      save = save,
       wide = TRUE
     )
 
@@ -92,7 +94,7 @@ for (i in names(dataset)) {
 
     print_or_save(plot,
       filename = file.path(outliers_path, paste0(i, "_distribution.png")),
-      save = FALSE,
+      save = save,
       wide = TRUE
     )
 
@@ -105,7 +107,7 @@ for (i in names(dataset)) {
 
     print_or_save(plot,
       filename = file.path(outliers_path, paste0(i, "_qqplot.png")),
-      save = FALSE
+      save = save
     )
   }
 }
