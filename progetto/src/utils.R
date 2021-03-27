@@ -120,18 +120,17 @@ treat_outliers <- function(data, method = "winsorizing",
   data
 }
 
-remove_outliers <- function(trainset, method) {
-  func <- function(x) {
-    if (is.numeric(x)) {
-      treat_outliers(x, method)
-    } else {
-      x
-    }
-  }
-
+remove_outliers <- function(trainset) {
   trainset %>%
-    lapply(func) %>%
-    as.data.frame()
+    lapply(function(x) {
+      if (is.numeric(x)) {
+        treat_outliers(x, method = "IQR", outlier.rm = TRUE)
+      } else {
+        x
+      }
+    }) %>%
+    as.data.frame() %>%
+    na.omit()
 }
 
 save_plot_png <- function(filename, plot, wide = FALSE) {

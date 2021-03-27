@@ -118,16 +118,7 @@ trainset <- read.csv("../data/winequality-train.csv") %>%
 
 # Remove Outliers
 if (!keep_outliers) {
-  trainset <- trainset %>%
-    lapply(function(x) {
-      if (is.numeric(x)) {
-        treat_outliers(x, method = "IQR", outlier.rm = TRUE)
-      } else {
-        x
-      }
-    }) %>%
-    as.data.frame() %>%
-    na.omit()
+  trainset <- remove_outliers(trainset)
 }
 
 # Subsampling
