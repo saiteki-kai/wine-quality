@@ -30,9 +30,8 @@
 \usepackage{listings}
 \usepackage[pass]{geometry}
 \usepackage[figuresright]{rotating}
-\usepackage{algorithm}
-\usepackage{algorithmic}
 \usepackage{hyperref}
+\usepackage{csquotes}
 \usepackage[backend=biber,bibencoding=ascii]{biblatex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -91,7 +90,6 @@
 % LISTA DEI CAPITOLI DA INCLUDERE
 \includeonly{
     chapters/introduzione,
-    chapters/dominio,
     chapters/assunzioni,
     chapters/analisi,
     chapters/modelli,
@@ -107,42 +105,42 @@
 
 \begin{document}
 
-    % FRONTESPIZIO
-    \include{frontespizio}
+% FRONTESPIZIO
+\include{frontespizio}
 
-    \frontmatter
+\frontmatter
 
-    % INDICE GENERALE
-    \tableofcontents
+% INDICE GENERALE
+\tableofcontents
 
-    % INDICE DELLE FIGURE
-    %\listoffigures
+% INDICE DELLE FIGURE
+%\listoffigures
 
-    % INDICE DELLE TABELLE
-    %\listoftables
+% INDICE DELLE TABELLE
+%\listoftables
 
-    % INDICE DEI CODICI
-    %\listofcodes
+% INDICE DEI CODICI
+%\listofcodes
 
-    \mainmatter
+\mainmatter
 
-    % INCLUSIONE CAPITOLI
-    \include{chapters/introduzione}
-    \include{chapters/dominio}
-    \include{chapters/assunzioni}
-    \include{chapters/analisi}
-    \include{chapters/modelli}
-    \include{chapters/esperimenti}
-    \include{chapters/risultati}
-    \include{chapters/conclusioni}
+% INCLUSIONE CAPITOLI
+\include{chapters/introduzione}
+\include{chapters/dominio}
+\include{chapters/assunzioni}
+\include{chapters/analisi}
+\include{chapters/modelli}
+\include{chapters/esperimenti}
+\include{chapters/risultati}
+\include{chapters/conclusioni}
 
-    % INCLUSIONE APPENDICE
-    % \appendix
-    % \include{chapters/app_a}
+% INCLUSIONE APPENDICE
+% \appendix
+% \include{chapters/app_a}
 
-    % BIBLIOGRAFIA
-    \phantomsection
-    \addcontentsline{toc}{chapter}{\refname}\nocite{*}
-    \printbibliography
+% BIBLIOGRAFIA
+\phantomsection
+\addcontentsline{toc}{chapter}{\refname}\nocite{*}
+\printbibliography
 
 \end{document}

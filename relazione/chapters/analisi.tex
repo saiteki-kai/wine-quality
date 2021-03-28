@@ -1,2 +1,47 @@
 \chapter{Analisi Esplorativa}
 \label{ch:analisi}
+
+L‘Exploratory Data Analysis, spesso abbreviato in EDA, è una tecnica usata nel campo della Data Science per approfondire la conoscenza del dataset su cui si intende lavorare, operazione cruciale per svolgere su di esso qualsiasi tipo di attività.\\
+Queste tecniche permettono di approfondire e conoscere il dataset attraverso diverse tecniche che tendono a variare per ogni dataset.\\
+Come verrà presentato in questo capitolo i principali strumenti attraverso i quali si studia il dataset sono i grafici e calcoli numerici di particolari valori indicativi di andamenti e correlazioni tra i dati.\\
+I grafici sono di diverse tipologie in base a ciò che si vuole andare a catturare, a carpire dal dataset.\\
+Questo studio sui dati permette di verificare alcune supposizioni, ipotesi fatte a priori, permette di trovare informazioni difficili da poter notare in modo intuitivo o tramite semplici osservazioni.\\
+Queste analisi non sono banali e semplici, possono richiedere molto tempo e studio, ma se compiuta in modo adeguato può portare ad una conoscenza approfondita del dataset trovando tutte le principali correlazioni, tutte le principali relazioni che intercorrono tra i dati.
+
+\section{Tipi di dati}
+In questo capitolo vengono semplicemente elencati i tipi di dati per ogni singolo attributo presente nel dataset.\\
+Convertiamo il tipo di $quality$ da $integer$ a $factor$ per permetterci di lavorare con una classificazione a due classi come precedentemente specificato.\\
+Nello specifico $quality$ può assuemre solo il valore $"0"$ o il valore $"1"$ relative alla bassa qualità ($"0"$) e all'alta qualità ($"1"$).\\
+
+\noindent
+\textbf{Elenco variabili}
+\begin{enumerate}
+    \item \textbf{Fixed acidity:} $numeric$
+    \item \textbf{Volatile acidity:} $numeric$
+    \item \textbf{Citric acid:} $numeric$
+    \item \textbf{Residual sugar:} $numeric$
+    \item \textbf{Chlorides:} $numeric$
+    \item \textbf{Free sulfur dioxide:} $numeric$
+    \item \textbf{Total sulfur dioxide:} $numeric$
+    \item \textbf{Density:} $numeric$
+    \item \textbf{pH:} $numeric$
+    \item \textbf{Sulphates:} $numeric$
+    \item \textbf{Alcohol:} $numeric$
+    \item \textbf{Type:} $character$
+    \item \textbf{Quality:} $factor$
+\end{enumerate}
+
+\noindent
+Inoltre nel dataset non sono presenti dati mancanti per nessuna delle variabili presenti.
+
+\input{chapters/analisi/outliers}
+
+\input{chapters/analisi/Distribuzioni_delle_variabil}
+
+\input{chapters/analisi/Distribuzione_delle_classi}
+
+\section{Confronto tra Classi}
+
+\section{Correlazione}
+
+\section{Analisi delle componenti principali}

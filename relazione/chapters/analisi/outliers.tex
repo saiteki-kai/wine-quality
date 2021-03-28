@@ -1,0 +1,255 @@
+\section{Analisi Outlier}
+Gli outlier sono dei valori anomali o estremi, lontani dai valori centrali di un insieme di dati. Questi valori influenzano negativamente la media e la deviazione standard del dataset e quindi possono portare a risultati sbagliati. Molti algoritmi di machine learning non funzionano in modo ottimale in presenza di outlier e quindi c'è bisogno di rilevarli e rimuoverli.
+
+\vspace{4mm}
+\noindent
+\`{E} stata effettuata una ricerca degli outlier su ogni attributo numerico attraverso i seguenti metodi statistici:
+
+\subsubsection{IQR}
+Gli outlier sono stati individuati usando l'approccio basato sul Interquartile Range (IQR). Lo scarto interquartile è un indice di dispersione, ovvero una misura di quanto i valori si allontanino da un valore centrale. Viene calcolato dalla differenza tra il terzo quartile (Q3) e il primo quartile (Q1). In questo approccio tutti i punti che si trovano al di sopra del valore Q3 + 1.5 * IQR o al di sotto del valore Q1 - 1.5 * IQR sono considerati outlier.
+
+\begin{align*}
+    IQR         & = Q3 - Q1        \\
+    Lower Bound & = Q1 - 1.5 * IQR \\
+    Upper Bound & = Q3 + 1.5 * IQR
+\end{align*}
+
+\noindent
+Gli outlier possono essere rimossi o sostituiti con un valore fissato come ad esempio media, moda, mediana.
+Dal momento che il dataset è sbilanciato, l'opzione di rimuovere completamente gli outlier è stata scartata perché molti di questi appartengono alla classe minoritaria.
+In questo lavoro si è scelto quindi di sostituire i valori con la mediana, poiché alcune variabili hanno distribuzioni con una distorsione unilaterale e quindi corrisponde a un valore più vicino al centro rispetto alla media.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.8\textwidth]{images/IQR.png}
+    \caption{Esempio di scarto interquartile in una distribuzione normale \cite{wikipedia:iqr}}
+    \label{fig:iqr}
+\end{figure}
+
+\subsubsection{Winsorizing (Percentile Capping)}
+E' un metodo simile al metodo IQR, in questo caso si utilizzano due percentili. Tutti i valori sotto al minimo valore dell'intervallo vengono sostituiti con il minimo, e tutti i valori sopra il massimo valore dell'intervallo vengono sostituiti con il massimo. In questo lavoro sono stati usati due intervalli ($5^{\circ}$ percentile, $95^{\circ}$ percentile) e ($1^{\circ}$ percentile, $99^{\circ}$ percentile).
+
+\noindent
+I due intervalli sono stati denominati Winsorizing 90\% e Winsorizing 98\%:
+\begin{itemize}
+    \item Winsorizing 90\% indica che il 5\% inferiore dei dati viene sostituito con il $5^{\circ}$ percentile e il 5\% superiore dei dati viene sostituito con il $95^{\circ}$ percentile.
+    \item Winsorizing 98\% indica che l' 1\% inferiore dei dati viene sostituito con il $1^{\circ}$ percentile e l' 1\% superiore dei dati viene sostituito con il $99^{\circ}$ percentile.
+\end{itemize}
+
+\subsubsection{Metodo Scelto}
+Un grafico abbastanza semplice e veloce per visualizzare gli outlier è il boxplot. \'{E} stato confrontato ogni variabile del dataset con i valori assunti dopo l'applicazione dei metodi di rimozione degli outlier (IQR, Winsorizing 90\% e Winsorizing 98\%), attraverso dei boxplot. Sopra a ogni boxplot sono stati riportati i valori divisi per qualità.
+
+\noindent
+Il metodo Winsorizing rileva un intervallo di outlier più piccolo e variabile rispetto all'IQR. Inoltre nei casi di distribuzione con distorsione laterale accumula troppi valori agli estremi, alterando così la distribuzione. Con il metodo Winsorizing 98\% si risulta avere una distribuzione più smussata agli estremi. Il metodo IQR, sostituendo con la mediana non altera molto la distribuzione.
+Per decidere il metodo più efficace da usare sono stati confrontati dati dopo l'applicazione di ogni metodo attraverso dei Q-Q plot.
+
+\noindent
+I Q-Q (quantile-quantile) plot sono dei grafici utili per capire se due insiemi di dati hanno la stessa distribuzione. Vengono rappresentati i punti in un piano cartesiano attraverso una coppia di quantili. Inoltre viene tracciata una retta a 45° in modo da evidenziare i punti più vicini alla retta. Due insiemi di dati hanno una distribuzione simile se i punti cadono approssimatamene sulla linea di riferimento.
+Analizzando i grafici si è visto che il metodo IQR ha valori più vicini alla retta, quindi si è scelto di utilizzare questo.
+
+\noindent
+Nelle seguenti tabelle sono stati riportati le varie statistiche descrittive delle variabili prima e dopo la rimozione degli outlier con il metodo scelto.
+
+\input{tables/with_outliers}
+
+\input{tables/without_outliers}
+
+\subsection{Grafici}
+
+\begin{figure}[H]
+    \centering
+
+    \subfloat[]{%
+        \includegraphics[width=0.99\textwidth]{images/outliers/alcohol_boxplot.png}
+    }
+
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/alcohol_distribution.png}
+    }\qquad
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/alcohol_qqplot.png}
+    }
+
+    \label{fig:alcohol}
+    \caption{Commento}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+
+    \subfloat[]{%
+        \includegraphics[width=0.99\textwidth]{images/outliers/chlorides_boxplot.png}
+    }
+
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/chlorides_distribution.png}
+    }\qquad
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/chlorides_qqplot.png}
+    }
+
+    \label{fig:chlorides}
+    \caption{Commento}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+
+    \subfloat[]{%
+        \includegraphics[width=0.99\textwidth]{images/outliers/citric.acid_boxplot.png}
+    }
+
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/citric.acid_distribution.png}
+    }\qquad
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/citric.acid_qqplot.png}
+    }
+
+    \label{fig:citric.acid}
+    \caption{Commento}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+
+    \subfloat[]{%
+        \includegraphics[width=0.99\textwidth]{images/outliers/density_boxplot.png}
+    }
+
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/density_distribution.png}
+    }\qquad
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/density_qqplot.png}
+    }
+
+    \label{fig:density}
+    \caption{Commento}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+
+    \subfloat[]{%
+        \includegraphics[width=0.99\textwidth]{images/outliers/fixed.acidity_boxplot.png}
+    }
+
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/fixed.acidity_distribution.png}
+    }\qquad
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/fixed.acidity_qqplot.png}
+    }
+
+    \label{fig:fixed.acidity}
+    \caption{Commento}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+
+    \subfloat[]{%
+        \includegraphics[width=0.99\textwidth]{images/outliers/free.sulfur.dioxide_boxplot.png}
+    }
+
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/free.sulfur.dioxide_distribution.png}
+    }\qquad
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/free.sulfur.dioxide_qqplot.png}
+    }
+
+    \label{fig:free.sulfur.dioxide}
+    \caption{Commento}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+
+    \subfloat[]{%
+        \includegraphics[width=0.99\textwidth]{images/outliers/pH_boxplot.png}
+    }
+
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/pH_distribution.png}
+    }\qquad
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/pH_qqplot.png}
+    }
+
+    \label{fig:pH}
+    \caption{Commento}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+
+    \subfloat[]{%
+        \includegraphics[width=0.99\textwidth]{images/outliers/residual.sugar_boxplot.png}
+    }
+
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/residual.sugar_distribution.png}
+    }\qquad
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/residual.sugar_qqplot.png}
+    }
+
+    \label{fig:residual.sugar}
+    \caption{Commento}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+
+    \subfloat[]{%
+        \includegraphics[width=0.99\textwidth]{images/outliers/sulphates_boxplot.png}
+    }
+
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/sulphates_distribution.png}
+    }\qquad
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/sulphates_qqplot.png}
+    }
+
+    \label{fig:sulphates}
+    \caption{Commento}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+
+    \subfloat[]{%
+        \includegraphics[width=0.99\textwidth]{images/outliers/total.sulfur.dioxide_boxplot.png}
+    }
+
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/total.sulfur.dioxide_distribution.png}
+    }\qquad
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/total.sulfur.dioxide_qqplot.png}
+    }
+
+    \label{fig:total.sulfur.dioxide}
+    \caption{Commento}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+
+    \subfloat[]{%
+        \includegraphics[width=0.99\textwidth]{images/outliers/volatile.acidity_boxplot.png}
+    }
+
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/volatile.acidity_distribution.png}
+    }\qquad
+    \subfloat[]{%
+        \includegraphics[width=0.45\textwidth]{images/outliers/volatile.acidity_qqplot.png}
+    }
+
+    \label{fig:volatile.acidity}
+    \caption{Commento}
+\end{figure}
