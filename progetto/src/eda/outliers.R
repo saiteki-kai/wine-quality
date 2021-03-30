@@ -19,7 +19,7 @@ source("../utils.R")
     xlim(limits) +
     ggtitle(title) +
     labs(y = NULL, x = NULL) +
-    theme(plot.title = element_text(hjust = 0.5))
+    theme(plot.title = element_text(hjust = 0.5), legend.position = "none")
 }
 
 .plot_qqplot <- function(data, attribute, title) {
@@ -54,7 +54,7 @@ create_dir_if_not_exists(outliers_path)
 save <- TRUE
 
 dataset <- read.csv("../../data/winequality-train.csv") %>%
-  mutate(quality = factor(quality))
+  dplyr::mutate(quality = factor(quality))
 
 d_iqr <- dataset
 d_win1 <- dataset
@@ -74,12 +74,11 @@ for (i in names(dataset)) {
     p3 <- .plot_boxplot(d_win2, i, "Winsorizing 98%", x_lims)
 
     plot <- (p0 / p1 / p2 / p3) +
-      plot_layout(guides = "collect") +
       labs(x = i)
 
     print_or_save(plot,
       filename = file.path(outliers_path, paste0(i, "_boxplot.png")),
-      save = save,
+      save = TRUE,
       wide = TRUE
     )
 
@@ -88,14 +87,14 @@ for (i in names(dataset)) {
     d2 <- .plot_distribution(d_win1, i, "Winsorizing 90%", x_lims)
     d3 <- .plot_distribution(d_win2, i, "Winsorizing 98%", x_lims)
 
-    plot <- (d0 + d1 + d2 + d3) +
+    plot <- (d0 / d1 / d2 / d3) +
       plot_layout(guides = "collect") +
       labs(x = i)
 
     print_or_save(plot,
       filename = file.path(outliers_path, paste0(i, "_distribution.png")),
       save = save,
-      wide = TRUE
+      wide = FALSE
     )
 
     q0 <- .plot_qqplot(dataset, i, "Original")
