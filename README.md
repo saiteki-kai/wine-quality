@@ -19,16 +19,16 @@ https://docs.google.com/presentation/d/15Vv52jSk2hnaXR3ZWF4y3bjLNW_DlrJSGzQyvJsI
 
 ## To Do
 
-- [ ] Use **training set** in EDA
-- [ ] Barplot for each variable by quality
-- [ ] Fix Multivariate Analysis
+- [x] Use **training set** in EDA
+- [x] Fix Multivariate Analysis
+  - [ ] Correlation Plots
   - [ ] PCA Plots
-  - [ ] Comparison after Outlier Treatment
+  - [x] Comparison after Outlier Treatment
 - [ ] Fix model comparison plots   
 - [ ] Statistical Tests for model comparison
 
 ## Refinement 
 
-- [ ] Separate preliminary analysis from EDA
+- [x] Separate preliminary analysis from EDA
 - [ ] Rename variables (designation clash, ect..)  
 - [ ] Documentation
