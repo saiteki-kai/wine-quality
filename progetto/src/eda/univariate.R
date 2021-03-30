@@ -1,4 +1,4 @@
-#' Exploratory Data Analysis
+#' Univariate
 #'
 #' add description.
 #'
@@ -47,7 +47,7 @@ trainset <- read.csv("../../data/winequality-train.csv")
 trainset$quality <- factor(trainset$quality)
 
 # Summary report
-describe(trainset)
+psych::describe(trainset)
 
 # Check Missing Values
 miss_var_summary(trainset)
