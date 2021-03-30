@@ -2,11 +2,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(
-  corrplot, ggplot2, dplyr, naniar,
-  patchwork, factoextra, reshape2,
-  ggcorrplot, scales, GGally, MASS, bestNormalize, psych
-)
+pacman::p_load(ggcorrplot, corrplot, GGally, factoextra)
 
 # Source scripts
 source("../utils.R")
@@ -146,8 +142,8 @@ trainset$quality <- factor(trainset$quality)
 trainset_noo <- remove_outliers(trainset)
 
 # Plot PCA
-# pca_o <- .plot_pca(trainset)
-# pca_noo <- .plot_pca(trainset_noo, no.outliers = TRUE)
+pca_o <- .plot_pca(trainset)
+pca_noo <- .plot_pca(trainset_noo, no.outliers = TRUE)
 
 # trainset numeric quality
 trainset_num <- trainset
