@@ -1,6 +1,6 @@
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, precrec, factoextra, multiROC, ggplot2, dplyr)
+pacman::p_load(caret, ggplot2, kableExtra, psych, dplyr)
 
 #' Convert the quality attribute based on the configuration
 #'
@@ -25,11 +25,13 @@ relabeling <- function(dataset, config = 1, type = FALSE) {
     dataset$quality <- factor(dataset$quality)
   } else if (config == 2) {
     dataset$quality <- ifelse(
-      dataset$quality <= 5,
+      dataset$quality < 5,
       "low",
       ifelse(dataset$quality < 7, "medium", "high")
     )
-    dataset$quality <- factor(dataset$quality)
+    dataset$quality <- factor(dataset$quality,
+      levels = c("low", "medium", "high")
+    )
   } else {
     dataset$quality <- factor(dataset$quality)
   }
@@ -173,4 +175,22 @@ create_dir_if_not_exists <- function(path) {
     return(out)
   }
   TRUE
+}
+
+#'
+print_stats <- function(df, latex = FALSE) {
+  df$quality <- NULL
+
+  stats <- psych::describe(df) %>% round(2)
+  stats <- stats %>%
+    dplyr::select(-c("mad", "trimmed", "range", "se", "n"))
+
+  if (latex) {
+    stats <- stats %>%
+      kbl("latex", booktabs = T) %>%
+      kable_styling(latex_options = c("striped", "scale_down"))
+    return(stats)
+  }
+
+  stats
 }
