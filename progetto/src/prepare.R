@@ -16,7 +16,7 @@ dataset <- relabeling(dataset)
 
 # Create Partition
 set.seed(444)
-index <- createDataPartition(dataset$quality, p = 0.70, list = FALSE)
+index <- createDataPartition(dataset$quality, p = 0.80, list = FALSE)
 trainset <- dataset[index, ]
 testset <- dataset[-index, ]
 
