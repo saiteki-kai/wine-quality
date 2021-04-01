@@ -14,6 +14,10 @@ source("../utils.R")
     ggtitle(title)
 }
 
+preliminar_path <- file.path("..", "..", "plots", "eda", "preliminar")
+create_dir_if_not_exists(preliminar_path)
+save <- TRUE
+
 # Load dataset
 whitewine <- read.csv("../../data/winequality-white.csv")
 
@@ -25,4 +29,10 @@ p1 <- .type_barplot(config1, "2 levels")
 p2 <- .type_barplot(config2, "3 levels")
 p3 <- .type_barplot(config3, "10 levels")
 
-print(p3 + p2 + p1)
+p <- p3 + p2 / p1
+
+print_or_save(p, file.path(preliminar_path, "class_hist.png"), save = save, wide = TRUE)
+
+print_or_save(p1, file.path(preliminar_path, "class_hist1.png"), save = save)
+print_or_save(p2, file.path(preliminar_path, "class_hist2.png"), save = save)
+print_or_save(p3, file.path(preliminar_path, "class_hist3.png"), save = save)

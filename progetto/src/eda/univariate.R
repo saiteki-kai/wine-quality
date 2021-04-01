@@ -38,20 +38,26 @@ source("../utils.R")
     .plot_distribution(data, "free.sulfur.dioxide", target) +
     .plot_distribution(data, "total.sulfur.dioxide", target) +
     plot_layout(guides = "collect")
-
-  print(p)
 }
+
+univariate_path <- file.path("..", "..", "plots", "eda", "univariate")
+create_dir_if_not_exists(univariate_path)
+save <- TRUE
 
 # Load dataset
 trainset <- read.csv("../../data/winequality-train.csv")
 trainset$quality <- factor(trainset$quality)
 
 # Summary report
-psych::describe(trainset)
+s1 <- print_stats(trainset, latex = TRUE)
+write(s1, file.path(univariate_path, "train_summary.tex"))
 
 # Check Missing Values
 miss_var_summary(trainset)
 
 # Plot Attributes Distribution
-.plot_distributions(trainset)
-.plot_distributions(trainset, target = "quality")
+p1 <- .plot_distributions(trainset)
+p2 <- .plot_distributions(trainset, target = "quality")
+
+print_or_save(p1, file.path(univariate_path, "distribution1.png"), save = TRUE, wide = TRUE)
+print_or_save(p2, file.path(univariate_path, "distribution2.png"), save = TRUE, wide = TRUE)
