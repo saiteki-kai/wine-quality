@@ -67,9 +67,9 @@ for (i in names(dataset)) {
       labs(x = i)
 
     print_or_save(plot,
-                  filename = file.path(outliers_path, paste0(i, "_boxplot.png")),
-                  save = TRUE,
-                  wide = TRUE
+      filename = file.path(outliers_path, paste0(i, "_boxplot.png")),
+      save = TRUE,
+      wide = TRUE
     )
 
     d0 <- .plot_distribution(dataset, i, "Original", x_lims)
@@ -82,9 +82,9 @@ for (i in names(dataset)) {
       labs(x = i)
 
     print_or_save(plot,
-                  filename = file.path(outliers_path, paste0(i, "_distribution.png")),
-                  save = save,
-                  wide = FALSE
+      filename = file.path(outliers_path, paste0(i, "_distribution.png")),
+      save = save,
+      wide = FALSE
     )
 
     q0 <- .plot_qqplot(dataset, i, "Original")
@@ -95,8 +95,8 @@ for (i in names(dataset)) {
     plot <- (q0 + q1 + q2 + q3) + plot_layout(guides = "collect")
 
     print_or_save(plot,
-                  filename = file.path(outliers_path, paste0(i, "_qqplot.png")),
-                  save = save
+      filename = file.path(outliers_path, paste0(i, "_qqplot.png")),
+      save = save
     )
   }
 }
