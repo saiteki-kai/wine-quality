@@ -196,9 +196,9 @@ for (preproc_type in preproc_types) {
   measures$model <- factor(unlist(lapply(i, function(o) o[[1]])))
   colnames(measures) <- c("Value", "Measure", "Model")
 
-  p <- ggplot(measures, aes(fill = Measure, x = Measure, y = Value)) +
+  p <- ggplot(measures, aes(fill = Model, x = Model, y = Value)) +
     geom_bar(position = "dodge", stat = "identity") +
-    facet_wrap(vars(Model), nrow = 1)
+    facet_wrap(vars(Measure), nrow = 1)
 
   print_or_save(p,
     file.path(comparison_path, paste0(preproc_type, "_measures.png")),
