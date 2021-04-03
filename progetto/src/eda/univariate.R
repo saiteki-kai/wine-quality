@@ -59,5 +59,13 @@ miss_var_summary(trainset)
 p1 <- .plot_distributions(trainset)
 p2 <- .plot_distributions(trainset, target = "quality")
 
-print_or_save(p1, file.path(univariate_path, "distribution1.png"), save = TRUE, wide = TRUE)
-print_or_save(p2, file.path(univariate_path, "distribution2.png"), save = TRUE, wide = TRUE)
+print_or_save(p1,
+  file.path(univariate_path, "distribution1.png"),
+  save = save,
+  wide = TRUE
+)
+print_or_save(p2,
+  file.path(univariate_path, "distribution2.png"),
+  save = save,
+  wide = TRUE
+)
