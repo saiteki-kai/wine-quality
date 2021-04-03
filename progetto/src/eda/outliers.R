@@ -68,8 +68,8 @@ for (i in names(dataset)) {
 
     print_or_save(plot,
       filename = file.path(outliers_path, paste0(i, "_boxplot.png")),
-      save = TRUE,
-      wide = TRUE
+      save = save,
+      wide = F
     )
 
     d0 <- .plot_distribution(dataset, i, "Original", x_lims)
@@ -107,5 +107,12 @@ s2 <- print_stats(d_iqr, latex = TRUE)
 write(s1, file.path(outliers_path, "with_outliers.tex"))
 write(s2, file.path(outliers_path, "without_outliers.tex"))
 
-# gg_miss_var(dataset, quality)
-# gg_miss_fct(dataset, quality)
+# Plot removed outliers with the IQR method
+perc <- round(mean(is.na(d_iqr)) * 100, 2)
+p <- gg_miss_var(d_iqr, facet = quality) + labs(y = paste0("# Removed (", perc, "%)"))
+
+print_or_save(p,
+  filename = file.path(outliers_path, "iqr-outliers.png"),
+  save = save,
+  wide = TRUE
+)
