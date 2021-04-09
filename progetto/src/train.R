@@ -12,8 +12,8 @@ source("./config.R")
   if (!require("pacman")) install.packages("pacman")
   pacman::p_load(caret, doParallel)
 
-  folds <- 10
-  repeats <- 3
+  folds <- 5
+  repeats <- 5
   grid_size <- ifelse(is.null(tune_grid), tune_length, prod(dim(tune_grid)))
 
   # Set seed for repeatability

@@ -1,4 +1,4 @@
-# White Wine Quality
+# Red Wine Quality
 
 Machine learning course project about wine quality
 

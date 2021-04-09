@@ -9,7 +9,7 @@ pacman::p_load(caret)
 source("./utils.R")
 
 # Load the dataset
-dataset <- read.csv("../data/winequality-white.csv")
+dataset <- read.csv("../data/winequality-red.csv")
 
 # Setup quality
 dataset <- relabeling(dataset)

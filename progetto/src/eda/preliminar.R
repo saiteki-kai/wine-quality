@@ -19,11 +19,11 @@ create_dir_if_not_exists(preliminar_path)
 save <- TRUE
 
 # Load dataset
-whitewine <- read.csv("../../data/winequality-white.csv")
+redwine <- read.csv("../../data/winequality-red.csv")
 
-config1 <- relabeling(whitewine, 1) # 2 levels
-config2 <- relabeling(whitewine, 2) # 3 levels
-config3 <- relabeling(whitewine, 3) # 10 levels
+config1 <- relabeling(redwine, 1) # 2 levels
+config2 <- relabeling(redwine, 2) # 3 levels
+config3 <- relabeling(redwine, 3) # 10 levels
 
 p1 <- .type_barplot(config1, "2 levels")
 p2 <- .type_barplot(config2, "3 levels")
