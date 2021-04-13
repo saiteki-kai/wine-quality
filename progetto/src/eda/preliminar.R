@@ -1,4 +1,6 @@
-#' Preliminar Analysis
+#' The preliminary analysis consists of analyzing the target attribute.
+#' Different divisions of the quality class have been tested and compared to
+#' choose which configuration to use (2 levels, 3 levels and 10 levels).
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
