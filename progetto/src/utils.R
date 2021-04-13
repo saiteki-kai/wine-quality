@@ -1,3 +1,5 @@
+#' This file contains the utility functions used in the whole project.
+
 # Install packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret, ggplot2, kableExtra, psych, dplyr)
@@ -5,12 +7,14 @@ pacman::p_load(caret, ggplot2, kableExtra, psych, dplyr)
 #' Convert the quality attribute based on the configuration
 #'
 #' @param dataset a dataset
-#' @param config indicates the class configuration to be used
+#' @param config the class configuration to be used
+#' @param type when TRUE keep the type attribute, if present, otherwise
+#' remove it (the default)
 #'
 #' @details
-#' config = 1  -> 2 classes (0: bad-quality, 1: good-quality)
-#' config = 2  -> 3 classes (0: low-quality, 1: medium-quality, 2: high-quality)
-#' otherwise -> 10 classes (0: low-quality, ..., 10: high-quality)
+#' config = 1  -> 2 levels  (0: bad-quality, 1: good-quality)
+#' config = 2  -> 3 levels  (0: low-quality, 1: medium-quality, 2: high-quality)
+#' otherwise   -> 10 levels (0: low-quality, ..., 10: high-quality)
 #'
 #' @return the processed dataset
 relabeling <- function(dataset, config = 1, type = FALSE) {
@@ -39,7 +43,7 @@ relabeling <- function(dataset, config = 1, type = FALSE) {
   dataset
 }
 
-#' Combine the red and the white datasets and add type attribute.
+#' Combine the red and the white datasets and add the type attribute.
 #' Save the result as a csv file
 #'
 #' @return the combined dataset
@@ -122,7 +126,12 @@ treat_outliers <- function(data, method = "winsorizing",
   data
 }
 
-remove_outliers <- function(trainset) {
+#' Remove the outliers given a dataset, using the IQR method
+#'
+#' @param trainset a dataset
+#'
+#' @return the dataset without outliers
+remove_outliers_iqr <- function(trainset) {
   trainset %>%
     lapply(function(x) {
       if (is.numeric(x)) {
@@ -135,6 +144,12 @@ remove_outliers <- function(trainset) {
     na.omit()
 }
 
+#' Save plot (ggplot or normal plot) as png
+#'
+#' @param filename file name to save
+#' @param plot plot to save
+#' @param wide when TRUE, saves the plot using a wide horizontal
+#' proportion, otherwise a square proportion (the default).
 save_plot_png <- function(filename, plot, wide = FALSE) {
   if ("gg" %in% class(plot)) {
     ggsave(filename,
@@ -155,6 +170,13 @@ save_plot_png <- function(filename, plot, wide = FALSE) {
   }
 }
 
+#' Save a plot as png or just print it
+#'
+#' @param filename file name to save
+#' @param plot plot to save
+#' @param save when TRUE saves the plot, otherwise just print it
+#' @param wide when TRUE set a wide horizontal proportion for the plot,
+#' otherwise a square proportion (the default).
 print_or_save <- function(plot, filename, save = FALSE, wide = FALSE) {
   if (save) {
     save_plot_png(filename, plot = plot, wide = wide)
@@ -177,7 +199,13 @@ create_dir_if_not_exists <- function(path) {
   TRUE
 }
 
+#' Print a summary of descriptive statistics (mean, median, min, max, skewness
+#' and kurtosis)
 #'
+#' @param df a dataframe of numerical variables
+#' @param latex when TRUE, generate the summary in latex, otherwise print it
+#'
+#' @return a dataframe containing the statistics
 print_stats <- function(df, latex = FALSE) {
   df$quality <- NULL
 
