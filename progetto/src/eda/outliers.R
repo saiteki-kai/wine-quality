@@ -69,7 +69,7 @@ for (i in names(dataset)) {
     print_or_save(plot,
       filename = file.path(outliers_path, paste0(i, "_boxplot.png")),
       save = save,
-      wide = F
+      wide = TRUE
     )
 
     d0 <- .plot_distribution(dataset, i, "Original", x_lims)
