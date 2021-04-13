@@ -82,46 +82,24 @@ source("../utils.R")
   transformed
 }
 
-.plot_corrmatrix <- function(trainset, title) {
-  corr <- cor(trainset)
+.plot_corrmatrix <- function(trainset, title, outlier) {
+  
+  corr <- round(cor(trainset_num_inv), 3)
+  corr <- corr
   p.mat <- cor_pmat(corr)
-
-  # p <- ggcorrplot(corr,
-  #     p.mat = p.mat,
-  #     sig.level = 0.001,
-  #     insig = "blank",
-  #     lab = TRUE,
-  #     colors = c("lightblue", "white", "darkblue")
-  # )
-
-  # p <- p + ggtitle(title)
-  # print(p)
-
-  # p.mat <- cor.mtest(trainset)$p
-
-  # corrplot.mixed(corr,
-  #   tl.pos = "lt",
-  #   tl.cex = .8,
-  #   number.cex = .8,
-  #   upper = "color",
-  #   p.mat = p.mat,
-  #   sig.level = 0.01
-  # )
-
-  # corrplot.mixed(corr, upper = "ellipse", lower="number", diag ="n", tl.pos = "lt", addCoefasPercent = T)
-
-  corrplot(corr,
-    type = "full",
-    method = "color",
-    tl.col = "gray40",
-    cl.pos = "r",
-    col = colorRampPalette(c("red", "white", "blue"))(50),
-    # p.mat = p.mat,
-    # sig.level = 0.05,
-    # insig = "blank"
+  p <- ggcorrplot(corr,  hc.order = TRUE, lab = TRUE, p.mat = p.mat, insig = "blank")
+  
+  p <- p + ggtitle(title)
+ 
+  corr_path <- file.path("..", "..", "plots", "eda", "Correlation_matrix")
+  create_dir_if_not_exists(corr_path)
+  suffix <- paste0(ifelse(outlier, "O", "NoO"), ".png")
+  
+  print_or_save(p,
+                filename = file.path(corr_path, paste0("Correlation_matrix_.png")),
+                save = save,
+                wide = TRUE
   )
-
-  # recordPlot()
 }
 
 .plot_pairplot <- function(data, target, title) {
@@ -151,5 +129,11 @@ trainset_num$quality <- as.numeric(trainset$quality) - 1
 trainset_noo$quality <- as.numeric(trainset_noo$quality) - 1
 
 # Plot Correlation Matrix
-corr_o <- .plot_corrmatrix(trainset_num, "White data Correlations")
-corr_noo <- .plot_corrmatrix(trainset_noo, "White data Correlations")
+corr_o <- .plot_corrmatrix(trainset_num, "Red data Correlations", outlier=TRUE)
+corr_noo <- .plot_corrmatrix(trainset_noo, "Red data Correlations without outliers",outlier=FALSE)
+
+# Save Plot correlation matrix
+corr <- round(cor(trainset_num), 3)
+corr <- corr
+p.mat <- cor_pmat(corr)
+ggcorrplot(corr,  hc.order = TRUE, lab = TRUE, p.mat = p.mat, insig = "blank")
