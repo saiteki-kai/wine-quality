@@ -139,7 +139,7 @@ trainset <- read.csv("../../data/winequality-train.csv")
 trainset$quality <- factor(trainset$quality)
 
 # Remove Outliers
-trainset_noo <- remove_outliers(trainset)
+trainset_noo <- remove_outliers_iqr(trainset)
 
 # Plot PCA
 pca_o <- .plot_pca(trainset)

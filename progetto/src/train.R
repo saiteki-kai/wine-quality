@@ -118,7 +118,7 @@ trainset <- read.csv("../data/winequality-train.csv") %>%
 
 # Remove Outliers
 if (!keep_outliers) {
-  trainset <- remove_outliers(trainset)
+  trainset <- remove_outliers_iqr(trainset)
 }
 
 # Subsampling
