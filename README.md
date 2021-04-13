@@ -31,4 +31,4 @@ https://docs.google.com/presentation/d/15Vv52jSk2hnaXR3ZWF4y3bjLNW_DlrJSGzQyvJsI
 
 - [x] Separate preliminary analysis from EDA
 - [ ] Rename variables (designation clash, ect..)  
-- [ ] Documentation
+- [ ] Documentation (train.R, test.R, univariate.R, multivariate.R)
