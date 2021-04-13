@@ -1,3 +1,6 @@
+#' Train
+#'
+
 # Install packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(caret, dplyr)
@@ -7,6 +10,17 @@ source("./utils.R")
 source("./config.R")
 
 # Local functions
+
+#' Train the model with the tuning specified on the trainset.
+#' 5-fold cross validation and 5 repetitions are used.
+#' The tuning optimizes the AUC of the precision-recall curve.
+#'
+#' @param trainset a dataset
+#' @param model_name the model name of caret
+#' @param tune_grid a tune grid
+#' @param tune_length number of parameter for the tuning (default 3)
+#'
+#' @return the trained model
 .train_model <- function(trainset, model_name, tune_grid = NULL, tune_length = 3) {
   # Install packages
   if (!require("pacman")) install.packages("pacman")
@@ -22,7 +36,7 @@ source("./config.R")
   for (i in 1:(length(seeds) - 1)) seeds[[i]] <- sample.int(n = 1000, grid_size)
   seeds[[length(seeds)]] <- sample.int(1000, 1)
 
-  # 10-Fold cross validation
+  # 5-Fold cross validation
   train_control <- trainControl(
     method = "repeatedcv",
     repeats = repeats,

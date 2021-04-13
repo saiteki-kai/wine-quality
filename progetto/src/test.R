@@ -10,6 +10,13 @@ source("./utils.R")
 source("./config.R")
 
 # Local functions
+
+#' Get the saved model by specifying the preprocessing method and the model name
+#'
+#' @param model_name the model name of caret
+#' @param preproc_type the pre processing type
+#'
+#' @return the trained model if the file exists, NULL otherwise
 .get_model <- function(model_name, preproc_type) {
   filename <- file.path(
     outputs_path,
@@ -24,11 +31,11 @@ source("./config.R")
 }
 
 #' Write a log file
-#' @param model_name model's name
-#' @param preproc_type type of preprocessing
-#' @param cm a confusion matrix
-#' @param pred_time prediction time
 #'
+#' @param model_name the model name of caret
+#' @param preproc_type type of preprocessing
+#' @param cm the confusion matrix
+#' @param pred_time the prediction time
 .write_log <- function(model_name, preproc_type, cm, pred_time) {
   create_dir_if_not_exists(outputs_path)
 
