@@ -131,9 +131,3 @@ trainset_noo$quality <- as.numeric(trainset_noo$quality) - 1
 # Plot Correlation Matrix
 corr_o <- .plot_corrmatrix(trainset_num, "Red data Correlations", outlier=TRUE)
 corr_noo <- .plot_corrmatrix(trainset_noo, "Red data Correlations without outliers",outlier=FALSE)
-
-# Save Plot correlation matrix
-corr <- round(cor(trainset_num), 3)
-corr <- corr
-p.mat <- cor_pmat(corr)
-ggcorrplot(corr,  hc.order = TRUE, lab = TRUE, p.mat = p.mat, insig = "blank")
