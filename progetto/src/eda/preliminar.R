@@ -32,8 +32,10 @@ p2 <- .type_barplot(config2, "3 levels")
 p3 <- .type_barplot(config3, "10 levels")
 
 p <- p3 + p2 / p1
+pp <- p3 + p1 
 
 print_or_save(p, file.path(preliminar_path, "class_hist.png"), save = save, wide = TRUE)
+print_or_save(pp, file.path(preliminar_path, "class_hist_2.png"), save = save, wide = TRUE)
 
 print_or_save(p1, file.path(preliminar_path, "class_hist1.png"), save = save)
 print_or_save(p2, file.path(preliminar_path, "class_hist2.png"), save = save)

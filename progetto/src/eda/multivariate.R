@@ -84,7 +84,7 @@ source("../utils.R")
 
 .plot_corrmatrix <- function(trainset, title, outlier) {
   
-  corr <- round(cor(trainset_num_inv), 3)
+  corr <- round(cor(trainset), 3)
   corr <- corr
   p.mat <- cor_pmat(corr)
   p <- ggcorrplot(corr,  hc.order = TRUE, lab = TRUE, p.mat = p.mat, insig = "blank")
@@ -96,7 +96,7 @@ source("../utils.R")
   suffix <- paste0(ifelse(outlier, "O", "NoO"), ".png")
   
   print_or_save(p,
-                filename = file.path(corr_path, paste0("Correlation_matrix_.png")),
+                filename = file.path(corr_path, paste0("Correlation_matrix_.png",suffix)),
                 save = save,
                 wide = TRUE
   )
@@ -129,5 +129,5 @@ trainset_num$quality <- as.numeric(trainset$quality) - 1
 trainset_noo$quality <- as.numeric(trainset_noo$quality) - 1
 
 # Plot Correlation Matrix
-corr_o <- .plot_corrmatrix(trainset_num, "Red data Correlations", outlier=TRUE)
-corr_noo <- .plot_corrmatrix(trainset_noo, "Red data Correlations without outliers",outlier=FALSE)
+corr_o <- .plot_corrmatrix(trainset_num, "Red data Correlations", outlier = TRUE)
+corr_noo <- .plot_corrmatrix(trainset_noo, "Red data Correlations without outliers", outlier = FALSE)
