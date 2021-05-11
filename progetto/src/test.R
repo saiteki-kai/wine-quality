@@ -3,7 +3,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, ggplot2, precrec, dplyr)
+pacman::p_load(caret, ggplot2, e1071, precrec, dplyr)
 
 # Source scripts
 source("./utils.R")
@@ -108,7 +108,7 @@ source("./config.R")
   )
   autoplot(sscurves)
   dev.off()
-
+  
   # Format AUC
   aucs <- auc(sscurves) %>% dplyr::select("modnames", "curvetypes", "aucs")
   aucs$curvetypes <- factor(aucs$curvetypes, levels = unique(aucs$curvetypes))
@@ -196,7 +196,8 @@ for (preproc_type in preproc_types) {
     res
   })
 
-  measures <- sort(unlist(measures), decreasing = TRUE)
+  #measures <- sort(unlist(measures), decreasing = TRUE, na.last = TRUE)
+  measures <- unlist(measures)
   measures <- data.frame(measures, stringsAsFactors = TRUE)
   i <- strsplit(row.names(measures), ".", fixed = TRUE)
   measures$measure <- factor(unlist(lapply(i, function(o) o[[2]])))
@@ -205,8 +206,17 @@ for (preproc_type in preproc_types) {
 
   p <- ggplot(measures, aes(fill = Model, x = Model, y = Value)) +
     geom_bar(position = "dodge", stat = "identity") +
-    facet_wrap(vars(Measure), nrow = 1)
+    facet_wrap(vars(Measure), nrow = 1) +
+    theme(
+      strip.text = element_text(size=20),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      # legend.position = "none"
+    )
 
+  create_dir_if_not_exists(comparison_path)
   print_or_save(p,
     file.path(comparison_path, paste0(preproc_type, "_measures.png")),
     save = TRUE,
@@ -219,22 +229,21 @@ for (preproc_type in preproc_types) {
 
     # Model comparison
     summary(cv.values)
-    create_dir_if_not_exists(comparison_path)
     print_or_save(dotplot(cv.values, metric = c("Precision", "Recall"), layout = c(1, 2)),
       file.path(comparison_path, paste0(preproc_type, "_dotplot.png")),
       save = TRUE,
       wide = TRUE
     )
-    print_or_save(bwplot(cv.values, layout = c(1, 4)),
-      file.path(comparison_path, paste0(preproc_type, "_bwplot.png")),
-      save = TRUE,
-      wide = TRUE
-    )
-    print_or_save(splom(cv.values, metric = "Precision"),
-      file.path(comparison_path, paste0(preproc_type, "_splom.png")),
-      save = TRUE,
-      wide = TRUE
-    )
+    # print_or_save(bwplot(cv.values, layout = c(1, 4)),
+    #   file.path(comparison_path, paste0(preproc_type, "_bwplot.png")),
+    #   save = TRUE,
+    #   wide = TRUE
+    # )
+    # print_or_save(splom(cv.values, metric = "Precision"),
+    #   file.path(comparison_path, paste0(preproc_type, "_splom.png")),
+    #   save = TRUE,
+    #   wide = TRUE
+    # )
   }
 }
 

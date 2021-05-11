@@ -3,7 +3,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, dplyr)
+pacman::p_load(caret, MLmetrics, kernlab, dplyr)
 
 # Source scripts
 source("./utils.R")
