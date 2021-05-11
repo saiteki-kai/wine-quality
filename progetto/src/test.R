@@ -108,7 +108,7 @@ source("./config.R")
   )
   autoplot(sscurves)
   dev.off()
-  
+
   # Format AUC
   aucs <- auc(sscurves) %>% dplyr::select("modnames", "curvetypes", "aucs")
   aucs$curvetypes <- factor(aucs$curvetypes, levels = unique(aucs$curvetypes))
@@ -196,7 +196,7 @@ for (preproc_type in preproc_types) {
     res
   })
 
-  #measures <- sort(unlist(measures), decreasing = TRUE, na.last = TRUE)
+  # measures <- sort(unlist(measures), decreasing = TRUE, na.last = TRUE)
   measures <- unlist(measures)
   measures <- data.frame(measures, stringsAsFactors = TRUE)
   i <- strsplit(row.names(measures), ".", fixed = TRUE)
@@ -208,7 +208,7 @@ for (preproc_type in preproc_types) {
     geom_bar(position = "dodge", stat = "identity") +
     facet_wrap(vars(Measure), nrow = 1) +
     theme(
-      strip.text = element_text(size=20),
+      strip.text = element_text(size = 20),
       axis.title.x = element_blank(),
       axis.title.y = element_blank(),
       axis.text.x = element_blank(),

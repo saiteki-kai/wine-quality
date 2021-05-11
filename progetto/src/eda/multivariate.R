@@ -83,22 +83,21 @@ source("../utils.R")
 }
 
 .plot_corrmatrix <- function(trainset, title, outlier) {
-  
   corr <- round(cor(trainset), 3)
   corr <- corr
   p.mat <- cor_pmat(corr)
-  p <- ggcorrplot(corr,  hc.order = TRUE, lab = TRUE, p.mat = p.mat, insig = "blank")
-  
+  p <- ggcorrplot(corr, hc.order = TRUE, lab = TRUE, p.mat = p.mat, insig = "blank")
+
   p <- p + ggtitle(title)
- 
+
   corr_path <- file.path("..", "..", "plots", "eda", "Correlation_matrix")
   create_dir_if_not_exists(corr_path)
   suffix <- paste0(ifelse(outlier, "O", "NoO"), ".png")
-  
+
   print_or_save(p,
-                filename = file.path(corr_path, paste0("Correlation_matrix_.png",suffix)),
-                save = save,
-                wide = TRUE
+    filename = file.path(corr_path, paste0("Correlation_matrix_.png", suffix)),
+    save = save,
+    wide = TRUE
   )
 }
 
