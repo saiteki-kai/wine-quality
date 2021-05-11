@@ -58,6 +58,6 @@ Nel file config.R è possibile specificare:
 Il progetto è stato testato nei seguenti ambienti:
 
 - Windows 10 (20H2), R v4.0.5, Rstudio v1.4.1106
-- Linux Ubuntu (20.04), R v4.0.0
+- Linux Ubuntu (20.04), R v3.6.3
 
 Tutti i pacchetti necessari vengono installati all'esecuzione di ogni file.
