@@ -151,6 +151,11 @@ for (preproc_type in preproc_types) {
   for (model in models) {
     print(paste0("training ", model$name, "..."))
 
+    if (!is.null(model$tune_grid$scale)) {
+      scale <- 1 / (ncol(transformed) - 1)
+      model$tune_grid$scale < scale
+    }
+
     # Train model
     m <- .train_model(trasformed, model$name,
       tune_grid = model$tune_grid,
