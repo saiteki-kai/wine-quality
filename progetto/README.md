@@ -32,8 +32,6 @@ progetto/
 
 ## Esecuzione
 
-Tutti i pacchetti necessari vengono installati all'esecuzione di ogni file.
-
 Per l'analisi bisogna impostare come working directory la cartella ./src/eda/ ed eseguire il file eda.R che esegue tutti i file di analisi.
 ```r
 setwd("$PROJECT_FOLDER/src/eda/")
@@ -54,3 +52,12 @@ Nel file config.R è possibile specificare:
  - se tenere o meno gli outliers con la variabile booleana `keep_outliers`
  - i modelli da trainare tramite la lista `models` e la griglia di tuning 
  - i vari pre processing nella lista `preproc_types`.
+
+## Auto-Consistenza
+
+Il progetto è stato testato nei seguenti ambienti:
+
+- Windows 10 (20H2), R v4.0.5, Rstudio v1.4.1106
+- Linux Ubuntu (20.04), R v4.0.0
+
+Tutti i pacchetti necessari vengono installati all'esecuzione di ogni file.
