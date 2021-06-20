@@ -145,8 +145,8 @@ for (preproc_type in preproc_types) {
 
   # Apply pre-processing
   pre_proc <- .pre_proc(trainset, preproc_type)
-  trasformed <- predict(pre_proc, trainset[, -ncol(trainset)])
-  trasformed$quality <- trainset$quality
+  transformed <- predict(pre_proc, trainset[, -ncol(trainset)])
+  transformed$quality <- trainset$quality
 
   for (model in models) {
     print(paste0("training ", model$name, "..."))
@@ -157,7 +157,7 @@ for (preproc_type in preproc_types) {
     }
 
     # Train model
-    m <- .train_model(trasformed, model$name,
+    m <- .train_model(transformed, model$name,
       tune_grid = model$tune_grid,
       tune_length = model$tune_length
     )
