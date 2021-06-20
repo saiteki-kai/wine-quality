@@ -3,7 +3,7 @@
 
 # Install packages
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(caret, ggplot2, e1071, precrec, dplyr)
+pacman::p_load(caret, ggplot2, kernlab, e1071, precrec, dplyr)
 
 # Source scripts
 source("./utils.R")
