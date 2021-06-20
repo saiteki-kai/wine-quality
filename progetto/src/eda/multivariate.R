@@ -82,7 +82,7 @@ source("../utils.R")
   transformed
 }
 
-.plot_corrmatrix <- function(trainset, title, outlier) {
+.plot_corrmatrix <- function(trainset, title, outlier, save = TRUE) {
   corr <- round(cor(trainset), 3)
   corr <- corr
   p.mat <- cor_pmat(corr)
