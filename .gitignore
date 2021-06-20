@@ -44,3 +44,5 @@ vignettes/*.pdf
 
 # Latex build files
 relazione/build/
+
+papers/
