@@ -1,2 +1,39 @@
 \chapter{Conclusioni}
 \label{ch:conclusioni}
+In questa trattazione si è visto un problema di classificazione per la qualità del vino. Si è visto che con 10 classi il problema era difficile per la mancanza di dati per alcune classi. Si è passato quindi ad un problema binario con vini di buona qualità e vini di cattiva qualità, inoltre si è preferito analizzare solo una tipologia di vino, limitandosi al vino rosso.
+
+\noindent
+Durante la fase di analisi dei dati si è visto come i dati siano sbilanciati ed alcuni attributi presentassero distribuzioni fortemente asimmetriche.
+
+\noindent
+Sono stati identificati gli outliers e si è notato che la loro numerosità costituisce solamente il 2.88\% del training set. E' stato deciso inizialmente di non rimuoverli ed aspettare la fase di esperimenti per prendere una decisione in seguito ai risultati ottenuti.
+
+\noindent
+Analizzando le correlazioni abbiamo notato bassi valori tra i vari attributi e la qualità, il che comporta una difficoltà nel distinguere le due classi.
+Inoltre con la rimozione degli outliers aumentano leggermente i valori di correlazione, anche se rimangono abbastanza medio bassi.
+
+
+\noindent
+E' stata effettuata una PCA e come previsto dai valori bassi di correlazione non ci sono stati grandi miglioramenti. Con il 95\% di varianza spiegata vengono tenuti 9 degli 11 attributi.
+
+\newpage
+
+\noindent
+I modelli che sono stati scelti per questa trattazione sono CART e SVM, per quest'ultimo sono stati analizzati diversi kernel. Questi modelli di solito sono abbastanza robusti agli outliers e sono addestrabili anche con relativamente pochi dati.
+Dato che l'SVM richiede che venga effettuato un pre processing sui dati, è stato eseguito una standardizzazione con z-score.
+
+\noindent
+Addestrare questi modelli ha previsto alcune accortezze a causa dello sbilanciamento dei dati. E' stata usata una 5-fold cross validation stratificata con 5 ripetizioni per ottenere risultati più attendibili. La metrica usata per la scelta del modello migliore è l'AUC della PRC.
+
+\noindent
+Dagli esperimenti è risultato che il kernel migliore per SVM è quello radiale. Questo modello è stato confrontato con CART al variare del pre processing.
+I due modelli migliori identificati sono SVM radiale con Standardizzazione + PCA e CART con Standardizzazione, entrambi mantenendo gli outliers.
+
+\noindent
+I modelli proposti presentano performance molto simili con alti valori di Precision e bassi di Recall. Le uniche differenze sono nei costi di addestramento e gli intervalli di confidenza sull'AUC della PRC, motivo per il quale, tra i due, il migliore risulta essere l'SVM.
+
+\noindent
+I risultati ottenuti non sono ottimi, comunque comprensibili, poichè i dati sono sbilanciati e le feature poco discriminanti.
+Possibili sviluppi futuri, oltre la raccolta di nuovi dati, possono essere gestire lo sbilanciamento con tecniche di undersampling o oversampling, altri modelli più sofisticati possono essere utilizzati come le Random Forest che grazie a tecniche di Bagging degli attributi gestisce lo sbilanciamento dei dati.
+Inoltre si potrebbe estendere il problema a più classi o considerare anche il vino bianco.
+

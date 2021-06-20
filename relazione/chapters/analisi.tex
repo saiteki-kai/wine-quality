@@ -1,47 +1,46 @@
 \chapter{Analisi Esplorativa}
 \label{ch:analisi}
-
-L‘Exploratory Data Analysis, spesso abbreviato in EDA, è una tecnica usata nel campo della Data Science per approfondire la conoscenza del dataset su cui si intende lavorare, operazione cruciale per svolgere su di esso qualsiasi tipo di attività.\\
-Queste tecniche permettono di approfondire e conoscere il dataset attraverso diverse tecniche che tendono a variare per ogni dataset.\\
-Come verrà presentato in questo capitolo i principali strumenti attraverso i quali si studia il dataset sono i grafici e calcoli numerici di particolari valori indicativi di andamenti e correlazioni tra i dati.\\
-I grafici sono di diverse tipologie in base a ciò che si vuole andare a catturare, a carpire dal dataset.\\
-Questo studio sui dati permette di verificare alcune supposizioni, ipotesi fatte a priori, permette di trovare informazioni difficili da poter notare in modo intuitivo o tramite semplici osservazioni.\\
-Queste analisi non sono banali e semplici, possono richiedere molto tempo e studio, ma se compiuta in modo adeguato può portare ad una conoscenza approfondita del dataset trovando tutte le principali correlazioni, tutte le principali relazioni che intercorrono tra i dati.
-
-\section{Tipi di dati}
-In questo capitolo vengono semplicemente elencati i tipi di dati per ogni singolo attributo presente nel dataset.\\
-Convertiamo il tipo di $quality$ da $integer$ a $factor$ per permetterci di lavorare con una classificazione a due classi come precedentemente specificato.\\
-Nello specifico $quality$ può assuemre solo il valore $"0"$ o il valore $"1"$ relative alla bassa qualità ($"0"$) e all'alta qualità ($"1"$).\\
+L‘Exploratory Data Analysis, spesso abbreviato in EDA, è una tecnica usata nel campo della Data Science per approfondire la conoscenza del dataset su cui si intende lavorare, operazione cruciale per svolgere su esso qualsiasi tipo di attività.
 
 \noindent
-\textbf{Elenco variabili}
-\begin{enumerate}
-    \item \textbf{Fixed acidity:} $numeric$
-    \item \textbf{Volatile acidity:} $numeric$
-    \item \textbf{Citric acid:} $numeric$
-    \item \textbf{Residual sugar:} $numeric$
-    \item \textbf{Chlorides:} $numeric$
-    \item \textbf{Free sulfur dioxide:} $numeric$
-    \item \textbf{Total sulfur dioxide:} $numeric$
-    \item \textbf{Density:} $numeric$
-    \item \textbf{pH:} $numeric$
-    \item \textbf{Sulphates:} $numeric$
-    \item \textbf{Alcohol:} $numeric$
-    \item \textbf{Type:} $character$
-    \item \textbf{Quality:} $factor$
-\end{enumerate}
+Questa analisi permette di approfondire e conoscere il dataset attraverso diverse tecniche che tendono a variare per ogni dataset.
 
 \noindent
-Inoltre nel dataset non sono presenti dati mancanti per nessuna delle variabili presenti.
+Come verrà presentato in questo capitolo i principali strumenti attraverso i quali si studia il dataset sono i grafici e i calcoli numerici di particolari valori indicativi di andamenti e correlazioni tra i dati.
+
+\noindent
+I grafici che si utilizzano sono di diverse tipologie in base a ciò che si vuole catturare e percepire dal dataset.
+
+\noindent
+Questo studio sui dati permette di verificare alcune supposizioni, ipotesi fatte a priori e permette di trovare informazioni difficili da notare in modo intuitivo o tramite semplici osservazioni.
+
+\noindent
+Inoltre questa analisi se compiuta in modo adeguato può portare ad una conoscenza approfondita del dataset trovando tutte le principali correlazioni e le principali relazioni che intercorrono tra i dati.
+
+\newpage
+
+\section{Dataset}
+Per prima cosa è stato fatto un controllo dei valori mancanti e sono state calcolate delle statistiche descrittive per ogni variabile sul training set, in modo da avere una prima impressione dei dati. I valori calcolati sono stati riportati nella seguente tabella.
+
+\input{tables/train_summary}
+
+\begin{itemize}
+    \item Non risultano esserci valori mancanti in nessuna variabile.
+    \item Nessuna variabile ha valori negativi.
+    \item Le variabili \textit{free.sulfur.dioxide}, \textit{total.sulfur.dioxide} e \textit{residual.sugar} hanno un valore massimo molto alto rispetto alla media.
+\end{itemize}
+
+\noindent
+\textit{skew} (asimmetria) è una misura quantificabile di quanto sia distorto un campione di dati dalla distribuzione normale, più è alto in valore assoluto il valore più i dati sono lontani dalla distribuzione normale.
+Inoltre il segno della \textit{skew} indica se negativo che la media della distribuzione dei dati è spostata a sinistra rispetto alla normale, se positiva è spostata a destra \cite{skewness}.
+
+\noindent 
+\textit{kurtosis} (curtosi) è la misura di una funzione "tailedness", spesso descritta visivamente dalla nitidezza dei valori di picco, la curtosi è spesso spiegata in termini di picco centrale e valori più alti di esso indicano un picco più alto e più nitido (una forma a campana più stretta) mentre valori inferiori indicano un picco inferiore e meno distinto. Se ho un valore maggiore di zero ho una curva più "appuntita" di una normale, mentre se ho un valore minore di zero ho una curva più "appiattita" di una normale \cite{kurtosis}.
+
+\input{chapters/analisi/distribuzioni}
 
 \input{chapters/analisi/outliers}
 
-\input{chapters/analisi/Distribuzioni_delle_variabil}
+\input{chapters/analisi/correlazione}
 
-\input{chapters/analisi/Distribuzione_delle_classi}
-
-\section{Confronto tra Classi}
-
-\section{Correlazione}
-
-\section{Analisi delle componenti principali}
+\input{chapters/analisi/pca}

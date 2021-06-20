@@ -1,0 +1,34 @@
+\chapter{Pre Processing}
+\label{ch:preprocessing}
+Il pre processing dei dati è una fase importate che consiste nel manipolare i dati attraverso varie trasformazioni e scelte.
+Questa fase include la rimozione dei valori mancanti, un'eventuale scelta delle istanze da usare (campionamento, rimozione degli outliers), rimozione della ridondanza, trasformazioni sui dati come ad esempio normalizzazione, standardizzazione, \textit{feature extraction} e \textit{feature selection}.
+Queste operazioni permettono di avere un input che passato ai modelli produce  risultati migliori.
+
+\vspace{4mm}
+\noindent
+Il dataset originale è stato diviso in due sottoinsiemi, tenendo in ognuno di questi la stessa percentuale di istanze per classe (bad, good). Il training set contiene l'80\% del dataset, mentre il test set contiene il restante 20\%.
+
+\vspace{4mm}
+\noindent
+Sul training set sono state applicate le seguenti strategie di pre processing:
+
+\begin{itemize}
+    \item Standardizzazione
+    \item Standardizzazione + PCA
+    \item Standardizzazione e rimozione outliers
+    \item Standardizzazione + PCA e rimozione outliers
+\end{itemize}
+
+\newpage
+
+\noindent
+Per la standardizzazione vengono calcolate media $\mu$ e deviazione standard $\sigma$ per ogni variabile del training set, mentre per la PCA viene calcolata la matrice di rotazione $\text{W}$.
+Queste misure vengono usate per effettuare il pre processing su entrambi i dataset $\text{X}$ (training e test).
+La rimozione degli outliers viene effettuata attraverso il metodo scelto (IQR), prima di applicare le varie trasformazioni sui dati.
+
+\vspace{4mm}
+\begin{align*}
+    \text{Z} &= \frac{\text{X} - \mu}{\sigma} \quad \text{(Standardizzazione)}
+    \\\\
+    \text{Z} &= \text{X} \text{W} \quad \text{(Trasformazione PCA)}
+\end{align*}

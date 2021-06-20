@@ -1,51 +1,68 @@
 \chapter{Introduzione}
 \label{ch:introduzione}
 
-Il vino è una bevanda alcolica ottenuta dalla fermentazione del frutto della vite, dell'uva o del mosto.\\
-Il vino è un prodotto molto rinomato e conosciuto dalle diverse proprietà alimentari ricercate.\\
-Queste proprietà che definiscono la qualità del vino dipendono da numerosi fattori come la variante di uva usata, il territorio in cui viene coltivata l'uva, la qualità della produzione, il tempo di fermentazione e di invecchiamento del vino.\\
-Questi fattori influiscono fortemente anche sul costo del vino per cui sono presenti numerosi studi e analisi sulle varie tipologie di vini ed uve per poter comprende quali caratteristiche chimiche influiscono e in che modo.\\
-Come intuitivo pensare alcune proprietà sono ricercate in quanto aumentano la qualità e di conseguenza il valore del vino come ad esempio polifenoli e le antocianine ricercate in quanto sostanze che migliorano il gusto e hanno un effetto positivo sulla salute.\\
-Invece altre caratteristiche influiscono in modo negativo sul vino per quanto riguarda il gusto e possono portare ad effetti anche tossici per la salute come ad esempio l'anidride solforosa che per legge deve essere al di sotto di una soglia massima perché altamente tossica per l'organismo \cite{wikipedia:vino}.\\
-L'analisi del vino è di centrale importanza, ma risulta molto complicata per una serie di ragioni (successivamente elencate e spiegate); inoltre si possono effettuare diverse tipologie di analisi in base al tipo di informazione cercata come ad esempio la qualità o la presenza di sostanze nocive.\\
+Il vino è una bevanda alcolica ottenuta dalla fermentazione del frutto della vite, dell'uva o del mosto.
+
+\noindent
+Questo è un prodotto molto rinomato e conosciuto dalle diverse proprietà alimentari molto ricercate.
+
+\noindent
+Queste proprietà che definiscono la qualità del vino dipendono da numerosi fattori come la variante di uva usata, il territorio in cui viene coltivata l'uva, la qualità della produzione, il tempo di fermentazione e di invecchiamento del vino.
+
+\noindent
+Questi fattori influiscono fortemente anche sul costo del vino per questo motivo sono presenti numerosi studi e analisi sulle varie tipologie di vini ed uve per poter comprende quali caratteristiche chimiche influiscono e in che modo.
+
+\noindent
+Com'è intuitivo pensare, alcune proprietà sono ricercate in quanto aumentano la qualità e di conseguenza il valore del vino, come ad esempio i \textit{polifenoli} e le \textit{antocianine} ricercate in quanto sostanze che migliorano il gusto e hanno un effetto positivo sulla salute.
+
+\noindent
+Invece altre caratteristiche influiscono in modo negativo sul vino per quanto riguarda il gusto e possono portare ad effetti anche tossici per la salute, come ad esempio \textit{l'anidride solforosa} che per legge deve essere al di sotto di una soglia massima perché altamente tossica per l'organismo \cite{wikipedia:vino}.
+
+\noindent
+L'analisi del vino è di centrale importanza, ma risulta molto complicata per una serie di ragioni (successivamente elencate e spiegate); inoltre si possono effettuare diverse tipologie di analisi in base al tipo di informazione cercata come ad esempio la qualità o la presenza di sostanze nocive.
+
+\noindent
 Alcune delle ragioni che rendono complessa l'analisi sono:
 
 \begin{itemize}
     \item L'alto costo delle analisi e il tempo richiesto per effettuarle.
-    \item Nella maggior parte delle analisi risulta troppo costo ed elaborato considerare tutti i fattori chimici presenti, tendendo a selezionare solo quelli che risultano di maggior interesse per la tipologia di vino in analisi.
+    \item Nella maggior parte delle analisi risulta troppo costoso ed elaborato considerare tutti i fattori chimici presenti, quindi è preferibile selezionare solo quelli che risultano di maggior interesse per la tipologia di vino in analisi.
     \item Nella maggior parte dei casi l'analisi rende non più utilizzabile il vino e questo diventa proibitivo per vini molto pregiati e costosi.
     \item Anche effettuando analisi approfondite e meticolose le classiche tecniche utilizzate ottengono nella maggior parte dei casi risultati parziali o poco indicativi dati i numerosi fattori chimici e organolettici.
 \end{itemize}
 
-In questo progetto è stata analizzata la qualità dei vini comprendendo le relazioni e i relativi significati delle diverse proprietà disponibili descritte all'interno del dataset fornito \cite{cortez2009modeling}.
+\noindent
+In questo progetto è stata analizzata la qualità dei vini comprendendo le relazioni e i relativi significati delle diverse proprietà disponibili descritte all'interno del dataset scelto \cite{cortez2009modeling}.
 
-\section{Dominio}
-\label{ch:dominio}
+\section{Dataset}
+\label{ch:dataset}
 
-Il dataset utilizzato contiene le proprietà chimiche delle varianti rosso e bianco del vino "Vinho Verde". Questo vino è un prodotto unico della regione del Minho del Portogallo.\\
-A causa di problemi logistici e di privacy, sono disponibili solo variabili fisico-chimiche (input) e sensoriali (output), ad esempio Non ci sono dati su tipi di uva, marca di vino, prezzo di vendita del vino.\\
-Il dataset è composto da 13 attributi (12 input + 1 output) e 1599 istanze per il vino rosso e 4898 istanze per il vino bianco, inoltre le classi di qualità che descrivono le varie tipologie di vino sono ordinate e non bilanciate perché ci sono molti più vini di media qualità rispetto a quelli di alta e bassa qualità.
+Il dataset utilizzato contiene le proprietà chimiche delle varianti rosso e bianco del vino "Vinho Verde". Questo vino è un prodotto unico della regione del Minho del Portogallo.
+
+\noindent
+A causa di problemi logistici e di privacy, sono disponibili solo variabili fisico-chimiche (input) e sensoriali (output), ad esempio non ci sono dati su tipi di uva, marca del vino, prezzo di vendita del vino.
+
+\noindent
+Il dataset è composto da 12 attributi (11 input + 1 output) e 1599 istanze per il vino rosso e 4898 istanze per il vino bianco, inoltre le classi di qualità che descrivono le varie tipologie di vino sono ordinate e non bilanciate perché ci sono molti più vini di media qualità rispetto a quelli di alta e bassa qualità.
 
 \vspace{4mm}
-
 \noindent
 Gli attributi sono i seguenti:
 
 \noindent
 \textbf{Input}
 \begin{enumerate}
-    \item \textbf{Fixed acidity (tartaric acid - $g / dm^3$):} La maggior parte degli acidi coinvolti nel vino fissi o non volatili (non evaporano facilmente)
+    \item \textbf{Fixed acidity (tartaric acid) [$g / dm^3$]:} La maggior parte degli acidi coinvolti nel vino fissi o non volatili (non evaporano facilmente)
     \item \textbf{Volatile acidity (acetic acid - $g / dm^3$):} La quantità di acido acetico nel vino, che a livelli troppo alti può portare a un sapore sgradevole di aceto
-    \item \textbf{Citric acid ($g / dm^3$):} Apporta una sensazione di freschezza, contribuendo all'equilibrio gustativo del vino, inoltre esalta le caratteristiche aromatiche fruttate.
-    \item \textbf{Residual sugar ($g / dm^3$):} La quantità di zucchero rimanente dopo l'arresto della fermentazione, è raro trovare vini con meno di 1$g / dm^3$ e i vini con più di 45$g / dm^3$ sono considerati dolci.
-    \item \textbf{Chlorides (sodium chloride - $g / dm^3$):} La quantità di sali nel vino.
-    \item \textbf{Free sulfur dioxide ($mg / dm^3$):} Una parte di anidride solforosa,detta libera, si trova sotto forma di gas o allo stato di combinazioni inorganiche (H2SO3, HSO3- e SO32-); solo questa parte è in grado di svolgere l'azione antisettica.
-    \item \textbf{Total sulfur dioxide ($mg / dm^3$):} La legge fissa dei limiti per l'anidride solforosa totale, la concentrazione di SO2 totale in un vino al momento della sua immissione sul mercato deve essere inferiore a 210 $mg / dm^3$ per i vini bianchi e a 160 $mg / dm^3$ per i vini rossi.
-    \item \textbf{Density ($g / cm^3$):} La densità di una sostanza è il rapporto tra la massa e il volume di tale sostanza.
-    \item \textbf{pH:} Il pH del vino bianco ha valori ottimali compresi tra 3.00 e 3.30 pH, mentre il pH del vino rosso è solitamente compreso fra 3.40 e 3.50 pH. il pH ottimale prima del processo di fermentazione è compreso tra 2.9 e 4.0 pH.
-    \item \textbf{Sulphates (potassium sulphate - $g / dm^3$):} Sono molecole composte da ossigeno e zolfo il cui compito è quello di prevenire l'ossidazione degli alimenti, svolgono quindi una funzione antiossidante e antimicrobica; inoltre possono essere presenti naturalmente oppure aggiunti.
-    \item \textbf{Alcohol (\% by volume):} Percentuale di alcool presente all'interno nel vino.
-    \item \textbf{Type:} Indica se il vino è rosso o bianco
+    \item \textbf{Citric acid [$g / dm^3$]:} Apporta una sensazione di freschezza, contribuendo all'equilibrio gustativo del vino, inoltre esalta le caratteristiche aromatiche fruttate.
+    \item \textbf{Residual sugar [$g / dm^3$]:} La quantità di zucchero rimanente dopo l'arresto della fermentazione, è raro trovare vini con meno di 1$g / dm^3$ e i vini con più di 45$g / dm^3$ sono considerati dolci.
+    \item \textbf{Chlorides (sodium chloride)  [$g / dm^3$]:} La quantità di sali nel vino.
+    \item \textbf{Free sulfur dioxide [$mg / dm^3$]:} Una parte di anidride solforosa,detta libera, si trova sotto forma di gas o allo stato di combinazioni inorganiche (H2SO3, HSO3- e SO32-); solo questa parte è in grado di svolgere l'azione antisettica.
+    \item \textbf{Total sulfur dioxide [$mg / dm^3$]:} La legge fissa dei limiti per l'anidride solforosa totale, la concentrazione di SO2 totale in un vino al momento della sua immissione sul mercato deve essere inferiore a 210 $mg / dm^3$ per i vini bianchi e a 160 $mg / dm^3$ per i vini rossi.
+    \item \textbf{Density [$g / cm^3$]:} Il rapporto tra la massa e il volume.
+    \item \textbf{pH:} Indica l'acidità del vino. Il vino bianco ha valori ottimali compresi tra 3.00 e 3.30 pH, mentre il pH del vino rosso è solitamente compreso fra 3.40 e 3.50 pH. il pH ottimale prima del processo di fermentazione è compreso tra 2.9 e 4.0 pH.
+    \item \textbf{Sulphates (potassium sulphate) [$g / dm^3$]:} Sono molecole composte da ossigeno e zolfo il cui compito è quello di prevenire l'ossidazione degli alimenti, svolgono quindi una funzione antiossidante e antimicrobica; inoltre possono essere presenti naturalmente oppure aggiunti.
+    \item \textbf{Alcohol (\% by volume):} Percentuale di alcohol presente all'interno nel vino.
 \end{enumerate}
 
 \noindent
